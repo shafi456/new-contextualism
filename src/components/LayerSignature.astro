@@ -1,0 +1,120 @@
+---
+/**
+ * Ten marks, one per dimension, showing which a project foregrounds — as
+ * reported in its sources, or as an editorial reading where they are silent.
+ */
+import type { Dimension } from '../lib/content';
+import { pad } from '../lib/format';
+import { url } from '../lib/url';
+
+interface Props {
+  dimensions: Dimension[];
+  active: string[];
+  basis: 'reported' | 'editorial';
+  detailed?: boolean;
+}
+
+const { dimensions, active, basis, detailed = false } = Astro.props;
+const on = (id: string) => active.includes(id);
+const names = dimensions.filter((d) => on(d.id)).map((d) => d.data.name);
+const caption = basis === 'reported' ? 'Emphasis reported in the sources' : 'Editorial reading of emphasis';
+---
+
+<div class:list={['layers', { 'layers--detailed': detailed }]}>
+  <ol class="layers__marks" role="list" aria-label={`${caption}: ${names.join(', ') || 'none recorded'}`}>
+    {
+      dimensions.map((d) => (
+        <li class:list={['layers__mark', { 'is-on': on(d.id) }]} title={`${pad(d.data.number)} ${d.data.name}`} aria-hidden="true">
+          {detailed && <span class="layers__num">{pad(d.data.number)}</span>}
+        </li>
+      ))
+    }
+  </ol>
+  {
+    detailed ? (
+      <div class="layers__legend">
+        <p class="label">{caption}</p>
+        <ul class="layers__names" role="list">
+          {dimensions
+            .filter((d) => on(d.id))
+            .map((d) => (
+              <li>
+                <a href={url(`/framework/${d.id}/`)}>{d.data.name}</a>
+              </li>
+            ))}
+        </ul>
+      </div>
+    ) : (
+      <span class="layers__caption label">{names.join(' · ')}</span>
+    )
+  }
+</div>
+
+<style>
+  .layers {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .layers__marks {
+    display: flex;
+    gap: 3px;
+    margin: 0;
+    flex: none;
+  }
+
+  .layers__mark {
+    width: 5px;
+    height: 16px;
+    border: 1px solid var(--grey);
+  }
+
+  .layers__mark.is-on {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .layers__caption {
+    font-size: 0.625rem;
+  }
+
+  .layers--detailed {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .layers--detailed .layers__marks {
+    gap: 6px;
+  }
+
+  .layers--detailed .layers__mark {
+    position: relative;
+    width: 18px;
+    height: 46px;
+  }
+
+  .layers__num {
+    position: absolute;
+    left: 50%;
+    bottom: -1.35rem;
+    transform: translateX(-50%);
+    font-size: 0.5625rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .layers__legend {
+    margin-top: 1.1rem;
+  }
+
+  .layers__names {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.9rem;
+    margin: 0.4rem 0 0;
+    font-size: var(--fs-small);
+  }
+</style>

@@ -1,0 +1,475 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Plate from '../../components/Plate.astro';
+import Provenance from '../../components/Provenance.astro';
+import LayerSignature from '../../components/LayerSignature.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import Bibliography from '../../components/Bibliography.astro';
+import { citations, listed, registry } from '../../lib/content';
+import { projectMedia } from '../../lib/media';
+import { STATUS_DESCRIPTIONS, STATUS_LABELS } from '../../lib/provenance';
+import { joinList, pad } from '../../lib/format';
+import { url } from '../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const reg = await registry();
+  return reg.projects.map((p) => ({ params: { id: p.id } }));
+}) satisfies GetStaticPaths;
+
+const reg = await registry();
+const project = reg.projects.find((p) => p.id === Astro.params.id)!;
+const d = project.data;
+const cite = citations(reg, `projects/${project.id}`);
+const media = projectMedia(project);
+
+const sections = [
+  { id: 'context', n: 1, title: 'Context and background', html: cite.md(d.context) },
+  { id: 'questions', n: 2, title: 'Research questions', list: d.questions },
+  {
+    id: 'conditions',
+    n: 3,
+    title: 'Conditions',
+    conditions: [
+      { title: 'Historical', html: cite.md(d.historical) },
+      { title: 'Social', html: cite.md(d.social) },
+      { title: 'Cultural', html: cite.md(d.cultural) },
+      { title: 'Ecological', html: cite.md(d.ecological) },
+    ],
+  },
+  { id: 'process', n: 4, title: 'Analytical process', html: cite.md(d.process) },
+  { id: 'response', n: 5, title: 'Design response', html: cite.md(d.response) },
+  { id: 'outcomes', n: 6, title: 'Outcomes and critical reflections', html: cite.md(d.outcomes) },
+];
+d.sources.forEach((k) => cite.add(k));
+
+const related = listed(reg.projects)
+  .filter((p) => p.id !== project.id)
+  .map((p) => ({ p, shared: p.data.layers.filter((l) => d.layers.includes(l)).length }))
+  .filter((x) => x.shared > 0)
+  .sort((a, b) => b.shared - a.shared || a.p.data.order - b.p.data.order)
+  .slice(0, 3)
+  .map((x) => x.p);
+const all = listed(reg.projects);
+const idx = all.findIndex((p) => p.id === project.id);
+const prev = idx > 0 ? all[idx - 1] : undefined;
+const next = idx > -1 && idx < all.length - 1 ? all[idx + 1] : undefined;
+const pendingNote = 'Not yet documented. This section will be completed with material supplied or approved by the project’s authors.';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: d.title,
+  description: d.summary,
+  creator: d.team.map((t) => ({ '@type': 'Person', name: t.name })),
+  locationCreated: d.location,
+  dateCreated: d.year ? String(d.year) : undefined,
+  creativeWorkStatus: STATUS_LABELS[d.status],
+};
+---
+
+<Base title={d.title} description={d.summary} type="article" jsonLd={jsonLd}>
+  <article class="project">
+    <header class="wrap project__header">
+      <nav class="crumbs label" aria-label="Breadcrumb">
+        <a href={url('/projects/')}>Projects</a> <span aria-hidden="true">/</span>
+        <a href={url(`/projects/#${d.status}`)}>{STATUS_LABELS[d.status]}</a>
+      </nav>
+      {d.archived && <p class="pending archived">This record is archived. It is kept at this address for reference.</p>}
+      <p class="label project__status">
+        <span class={`status status--${d.status}`}>{STATUS_LABELS[d.status]}</span>
+        <span class="project__kind">{d.kind}</span>
+      </p>
+      <h1 class="project__title">{d.title}</h1>
+      <p class="project__where">
+        {d.location}
+        <span aria-hidden="true"> · </span>
+        <span class="num">{d.year ?? `Documented ${d.documented}`}</span>
+      </p>
+      <p class="lede project__summary">{d.summary}</p>
+    </header>
+
+    <div class="wrap project__figure">
+      <Plate
+        src={media.src}
+        alt={media.alt}
+        width={media.width}
+        height={media.height}
+        ratio="16 / 9"
+        tag={media.tag}
+        caption={media.caption}
+        credit={media.credit}
+        eager
+        reveal={false}
+        sizes="100vw"
+      />
+    </div>
+
+    <div class="wrap grid project__body">
+      <aside class="project__facts" aria-label="Project facts">
+        <dl class="facts">
+          <dt class="label">Status</dt>
+          <dd>
+            {STATUS_LABELS[d.status]}. <span class="muted">{STATUS_DESCRIPTIONS[d.status]}</span>
+          </dd>
+          <dt class="label">Type</dt>
+          <dd>{d.kind}</dd>
+          {
+            d.year && (
+              <>
+                <dt class="label">Year</dt>
+                <dd>{d.year}</dd>
+              </>
+            )
+          }
+          <dt class="label">Documented</dt>
+          <dd>First published account, {d.documented}</dd>
+          <dt class="label">Location</dt>
+          <dd>{d.location}</dd>
+          {
+            d.team.length > 0 && (
+              <>
+                <dt class="label">{d.team.length > 1 ? 'Team' : 'Author'}</dt>
+                <dd>
+                  <ul role="list" class="team">
+                    {d.team.map((t) => (
+                      <li>{t.role ? `${t.name}, ${t.role.toLowerCase()}` : t.name}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )
+          }
+          <dt class="label">Sources</dt>
+          <dd>
+            {d.sources.map((k, i) => (
+              <>{i > 0 && '; '}<a href={`#ref-${k}`}>{cite.label(k)}</a></>
+            ))}
+          </dd>
+        </dl>
+        {
+          d.layers.length > 0 && (
+            <div class="project__layers">
+              <LayerSignature dimensions={reg.dimensions} active={d.layers} basis={d.layersBasis} detailed />
+              {d.layersNote && <p class="small muted project__layers-note">{d.layersNote}</p>}
+            </div>
+          )
+        }
+      </aside>
+
+      <div class="project__main">
+        <Provenance kind={d.provenance} approval={d.approval} note="Compiled from the cited sources" />
+        {
+          sections.map((s) => (
+            <section class="psec" id={s.id} aria-labelledby={`${s.id}-title`}>
+              <h2 class="psec__title" id={`${s.id}-title`}>
+                <span class="psec__num">{pad(s.n)}</span>
+                {s.title}
+              </h2>
+              {'html' in s && s.html ? <div class="prose psec__body" set:html={s.html} /> : null}
+              {'list' in s && s.list && s.list.length ? (
+                <div class="psec__body">
+                  <ul class="psec__questions" role="list">
+                    {s.list.map((q) => (
+                      <li>{q}</li>
+                    ))}
+                  </ul>
+                  <p class="small muted">Questions as posed in the cited source.</p>
+                </div>
+              ) : null}
+              {'conditions' in s && s.conditions ? (
+                <div class="conditions">
+                  {s.conditions.map((c) => (
+                    <div class="condition">
+                      <h3 class="label condition__title">{c.title}</h3>
+                      {c.html ? <div class="prose condition__body" set:html={c.html} /> : <p class="condition__pending">Not yet documented.</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {(('html' in s && !s.html) || ('list' in s && !(s.list && s.list.length))) && (
+                <p class="pending">
+                  <span class="label">Awaiting documentation</span>
+                  {pendingNote}
+                </p>
+              )}
+            </section>
+          ))
+        }
+        <section class="psec" id="contributors" aria-labelledby="contributors-title">
+          <h2 class="psec__title" id="contributors-title">
+            <span class="psec__num">07</span>
+            Contributors and references
+          </h2>
+          <div class="psec__body">
+            {
+              d.team.length ? (
+                <p>{`${joinList(d.team.map((t) => t.name))}, as credited in the published sources.`}</p>
+              ) : (
+                <p class="muted">Contributors have not been named in the published sources.</p>
+              )
+            }
+          </div>
+          <Bibliography reg={reg} keys={cite.cited()} heading="" grouped={false} />
+        </section>
+      </div>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="section related" aria-labelledby="related-title">
+          <div class="wrap">
+            <hr class="rule rule--ink" />
+            <h2 class="related__title label" id="related-title">
+              Related projects
+            </h2>
+            <div class="grid related__grid">
+              {related.map((p) => (
+                <div class="related__item">
+                  <ProjectCard project={p} dimensions={reg.dimensions} sizes="(min-width: 900px) 30vw, 100vw" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <nav class="wrap pager" aria-label="Other projects">
+      {
+        prev ? (
+          <a href={url(`/projects/${prev.id}/`)} rel="prev">
+            <span class="label">Previous</span>
+            <span class="pager__name">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a href={url(`/projects/${next.id}/`)} rel="next" class="pager__next">
+            <span class="label">Next</span>
+            <span class="pager__name">{next.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .crumbs {
+    display: flex;
+    gap: 0.6rem;
+    padding-top: 1.5rem;
+  }
+
+  .crumbs a {
+    text-decoration-color: var(--rule);
+  }
+
+  .project__header {
+    padding-top: 0;
+    padding-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+
+  .archived {
+    margin-top: 1.5rem;
+  }
+
+  .project__status {
+    margin-top: clamp(2.5rem, 2rem + 4vw, 6rem);
+    line-height: 1.7;
+  }
+
+  .project__status .status {
+    white-space: nowrap;
+  }
+
+  .project__status .status::after {
+    content: '·';
+    margin: 0 0.75em;
+    color: var(--grey);
+  }
+
+  .project__title {
+    margin-top: 1.25rem;
+    font-size: clamp(2.5rem, 1.5rem + 4vw, 5.75rem);
+    line-height: 0.98;
+    max-width: 20ch;
+  }
+
+  .project__where {
+    margin-top: 1.5rem;
+    color: var(--ink-2);
+  }
+
+  .project__summary {
+    margin-top: 1.5rem;
+    max-width: 40rem;
+  }
+
+  .project__body {
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+    align-items: start;
+  }
+
+  .project__facts {
+    grid-column: 1 / span 4;
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .team {
+    margin: 0;
+  }
+
+  .project__layers {
+    margin-top: 2rem;
+  }
+
+  .project__layers-note {
+    margin-top: 1.25rem;
+  }
+
+  .project__main {
+    grid-column: 6 / span 7;
+  }
+
+  .psec {
+    padding-top: 1.25rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--ink);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .psec__title {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    font-size: var(--fs-h3);
+  }
+
+  .psec__num {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .psec__body {
+    margin-top: 1.25rem;
+    font-size: 1.0625rem;
+  }
+
+  .psec .pending {
+    margin-top: 1.25rem;
+  }
+
+  .psec__questions {
+    margin: 0 0 0.75rem;
+  }
+
+  .psec__questions li {
+    padding: 0.6rem 0;
+    border-top: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.25;
+  }
+
+  .conditions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem var(--col-gap);
+    margin-top: 1.5rem;
+  }
+
+  .condition {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .condition__body {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .condition__pending {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+
+  .related {
+    padding-bottom: 0;
+  }
+
+  .related__title {
+    margin: 0.9rem 0 2.5rem;
+  }
+
+  .related__grid {
+    row-gap: 3rem;
+  }
+
+  .related__item {
+    grid-column: span 4;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--col-gap);
+    margin-top: var(--section);
+  }
+
+  .pager a {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+    text-decoration: none;
+  }
+
+  .pager__next {
+    text-align: right;
+  }
+
+  .pager__name {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+    line-height: 1.1;
+  }
+
+  .pager a:hover .pager__name {
+    color: var(--brick);
+  }
+
+  @media (max-width: 1080px) {
+    .project__facts,
+    .project__main {
+      grid-column: 1 / -1;
+      position: static;
+    }
+
+    .project__main {
+      margin-top: 1rem;
+    }
+
+    .related__item {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .conditions {
+      grid-template-columns: 1fr;
+    }
+
+    .related__item {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

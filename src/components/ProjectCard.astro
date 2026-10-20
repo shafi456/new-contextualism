@@ -1,0 +1,118 @@
+---
+import Plate from './Plate.astro';
+import LayerSignature from './LayerSignature.astro';
+import type { Dimension, Project } from '../lib/content';
+import { projectMedia } from '../lib/media';
+import { STATUS_LABELS } from '../lib/provenance';
+import { url } from '../lib/url';
+
+interface Props {
+  project: Project;
+  dimensions: Dimension[];
+  ratio?: string;
+  headingLevel?: 2 | 3;
+  class?: string;
+  sizes?: string;
+}
+
+const { project, dimensions, ratio = '4 / 3', headingLevel = 3, class: className, sizes } = Astro.props;
+const d = project.data;
+const media = projectMedia(project);
+const href = url(`/projects/${project.id}/`);
+const when = d.year ? String(d.year) : `Documented ${d.documented}`;
+const H = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<article class:list={['project-card', className]} data-status={d.status}>
+  <a class="project-card__media" href={href} tabindex="-1" aria-hidden="true">
+    <Plate
+      src={media.src}
+      alt=""
+      width={media.width}
+      height={media.height}
+      ratio={ratio}
+      tag={media.tag}
+      sizes={sizes}
+    />
+  </a>
+  <div class="project-card__body">
+    <p class="label project-card__status">
+      <span class={`status status--${d.status}`}>{STATUS_LABELS[d.status]}</span><span class="project-card__kind"
+        >{d.kind}</span
+      >
+    </p>
+    <H class="project-card__title"><a href={href}>{d.title}</a></H>
+    <p class="project-card__where">{d.location} · <span class="num">{when}</span></p>
+    <p class="project-card__summary">{d.summary}</p>
+    {d.layers.length > 0 && <LayerSignature dimensions={dimensions} active={d.layers} basis={d.layersBasis} />}
+  </div>
+</article>
+
+<style>
+  .project-card__media {
+    display: block;
+  }
+
+  .project-card__media :global(.plate__frame) {
+    transition: outline-color 0.3s var(--ease);
+  }
+
+  .project-card__media :global(img) {
+    transition: transform 1.2s var(--ease);
+  }
+
+  .project-card:hover .project-card__media :global(img) {
+    transform: scale(1.025);
+  }
+
+  .project-card__body {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .project-card__status {
+    line-height: 1.7;
+  }
+
+  .project-card__status .status {
+    white-space: nowrap;
+  }
+
+  .project-card__status .status::after {
+    content: '·';
+    margin: 0 0.75em;
+    color: var(--grey);
+  }
+
+  .project-card__title {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2.125rem);
+    line-height: 1.08;
+    max-width: 24ch;
+  }
+
+  .project-card__title a {
+    text-decoration: none;
+    background-image: linear-gradient(var(--brick), var(--brick));
+    background-size: 0 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.5s var(--ease);
+  }
+
+  .project-card__title a:hover,
+  .project-card:hover .project-card__title a {
+    background-size: 100% 1px;
+  }
+
+  .project-card__where {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .project-card__summary {
+    max-width: 34rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+</style>

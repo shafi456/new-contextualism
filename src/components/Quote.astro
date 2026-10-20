@@ -1,0 +1,70 @@
+---
+/**
+ * A verified quotation. Only text checked word for word against the cited
+ * publication belongs here; the citation is always shown.
+ */
+interface Props {
+  text: string;
+  /** Who wrote it, e.g. "Mohammad Habib Reza". */
+  author: string;
+  /** Author–date label, e.g. "Reza 2025". */
+  label: string;
+  href: string;
+  source?: string;
+  class?: string;
+}
+const { text, author, label, href, source, class: className } = Astro.props;
+---
+
+<figure class:list={['quote', className]}>
+  <blockquote>
+    <p>‘{text}’</p>
+  </blockquote>
+  <figcaption>
+    <span class="quote__author">{author}</span>
+    {source && <span class="quote__source">{source}</span>}
+    <a class="quote__cite" href={href}>{label}</a>
+  </figcaption>
+</figure>
+
+<style>
+  .quote blockquote {
+    margin: 0;
+  }
+
+  .quote p {
+    font-family: var(--serif);
+    font-size: var(--fs-lede);
+    line-height: 1.22;
+    text-wrap: balance;
+  }
+
+  .quote figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.6rem;
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .quote__author {
+    color: var(--ink);
+  }
+
+  .quote__source {
+    font-style: italic;
+  }
+
+  .quote__cite::before {
+    content: '(';
+  }
+
+  .quote__cite::after {
+    content: ')';
+  }
+
+  .quote__cite {
+    text-decoration-color: var(--rule);
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+/** Read, Plan, Process: the sequence described by Reza and Nitu (2025). */
+import type { Dimension } from '../lib/content';
+import { pad } from '../lib/format';
+
+interface Props {
+  dimensions: Dimension[];
+  citation: [string, string];
+}
+const { dimensions, citation } = Astro.props;
+---
+
+<figure class="diagram process" data-reveal>
+  <ol class="process__steps" role="list">
+    <li class="process__step process__step--read">
+      <span class="label">Phase 1</span>
+      <span class="process__name">Read</span>
+      <span class="process__note">Reading the site through the ten dimensions, the phase given particular weight.</span>
+      <ol class="process__lens" role="list" aria-label="The ten dimensions">
+        {
+          dimensions.map((d) => (
+            <li title={d.data.name}>
+              <span class="process__bar" />
+              <span class="process__num">{pad(d.data.number)}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </li>
+    <li class="process__step">
+      <span class="label">Phase 2</span>
+      <span class="process__name">Plan</span>
+      <span class="process__note">Weighing the layers for this place and project.</span>
+    </li>
+    <li class="process__step">
+      <span class="label">Phase 3</span>
+      <span class="process__name">Process</span>
+      <span class="process__note">Developing the design response.</span>
+    </li>
+  </ol>
+  <figcaption class="diagram__caption">
+    <span class="label label--ink">Diagram</span>
+    <span>The three phases with which every project is said to begin. Drawn by the editors after <a href={citation[1]}
+        >{citation[0]}</a
+      >; the descriptions of the second and third phases are editorial.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .process__steps {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .process__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem 1.5rem 0;
+  }
+
+  .process__step + .process__step {
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--rule);
+  }
+
+  .process__step + .process__step::before {
+    content: '→';
+    position: absolute;
+    left: -0.55rem;
+    top: 2.6rem;
+    background: var(--paper);
+    color: var(--ink-2);
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+
+  .process__name {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+    line-height: 1;
+  }
+
+  .process__step--read .process__name {
+    font-style: italic;
+  }
+
+  .process__note {
+    max-width: 22rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .process__lens {
+    display: flex;
+    gap: 6px;
+    margin: 0.75rem 0 0;
+  }
+
+  .process__lens li {
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+  }
+
+  .process__bar {
+    width: 14px;
+    height: 40px;
+    background: var(--ink);
+  }
+
+  .process__lens li:nth-child(odd) .process__bar {
+    background: var(--sage);
+  }
+
+  .process__num {
+    font-size: 0.5625rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 720px) {
+    .process__steps {
+      grid-template-columns: 1fr;
+    }
+
+    .process__step + .process__step {
+      padding-left: 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .process__step + .process__step::before {
+      content: none;
+    }
+  }
+</style>

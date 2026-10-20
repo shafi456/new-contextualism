@@ -1,0 +1,162 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { listed, registry } from '../lib/content';
+import { STATUS_LABELS, TYPE_LABELS } from '../lib/provenance';
+import { url } from '../lib/url';
+
+const reg = await registry();
+// A complete index of the platform, shown when scripts are unavailable.
+const groups = [
+  {
+    title: 'Sections',
+    items: [
+      ['The Movement', '/movement/'],
+      ['Philosophy', '/philosophy/'],
+      ['Framework', '/framework/'],
+      ['Projects', '/projects/'],
+      ['Research', '/research/'],
+      ['About', '/about/'],
+      ['Dialogue and events', '/dialogue/'],
+      ['Contact', '/contact/'],
+    ],
+  },
+  { title: 'Dimensions', items: reg.dimensions.map((d) => [d.data.name, `/framework/${d.id}/`]) },
+  {
+    title: 'Projects',
+    items: listed(reg.projects).map((p) => [`${p.data.title} (${STATUS_LABELS[p.data.status].toLowerCase()})`, `/projects/${p.id}/`]),
+  },
+  {
+    title: 'Records',
+    items: listed(reg.publications)
+      .filter((p) => ['new-contextualism', 'founder'].includes(p.data.collection))
+      .map((p) => [`${p.data.title} (${TYPE_LABELS[p.data.type].toLowerCase()}, ${reg.labels.get(p.id)})`, `/research/${p.id}/`]),
+  },
+];
+---
+
+<Base title="Search" description="Search the New Contextualism platform." noindex>
+  <PageHeader label="Search" title="Search" compact />
+  <div class="wrap search-page">
+    <form role="search" action={url('/search/')} method="get" data-search-page hidden>
+      <label class="visually-hidden" for="search-page-input">Search terms</label>
+      <input
+        id="search-page-input"
+        class="search-input"
+        name="q"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Philosophy, dimensions, projects, research…"
+      />
+    </form>
+    <p class="label search-dialog__status" role="status" aria-live="polite" data-search-page-status></p>
+    <ol class="search-results" role="list" data-search-page-results></ol>
+
+    <section class="search-index" aria-labelledby="index-title" data-search-index>
+      <h2 class="label" id="index-title">Index of the platform</h2>
+      <noscript><p class="small muted">Search needs JavaScript. Everything on the platform is listed below.</p></noscript>
+      <div class="search-index__groups">
+        {
+          groups.map((g) => (
+            <div>
+              <h3 class="search-index__title">{g.title}</h3>
+              <ul role="list">
+                {g.items.map(([t, u]) => (
+                  <li>
+                    <a href={url(u)}>{t}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .search-page {
+    max-width: 64rem;
+  }
+
+  .search-page .search-input {
+    margin-top: 0;
+  }
+
+  .search-index {
+    margin-top: 4rem;
+  }
+
+  .search-index__groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem var(--col-gap);
+    margin-top: 1.25rem;
+  }
+
+  .search-index__title {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .search-index ul {
+    margin: 0;
+  }
+
+  .search-index li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+  }
+
+  .search-index a {
+    text-decoration-color: var(--rule);
+  }
+
+  @media (max-width: 720px) {
+    .search-index__groups {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { loadIndex, renderHits, search, statusText } from '../scripts/search';
+
+  const form = document.querySelector<HTMLFormElement>('[data-search-page]');
+  const input = form?.querySelector<HTMLInputElement>('input');
+  const list = document.querySelector<HTMLElement>('[data-search-page-results]');
+  const status = document.querySelector<HTMLElement>('[data-search-page-status]');
+  const index = document.querySelector<HTMLElement>('[data-search-index]');
+
+  if (form && input && list) {
+    form.hidden = false;
+    const run = async (updateUrl: boolean) => {
+      const q = input.value;
+      try {
+        const hits = search(await loadIndex(), q, 60);
+        renderHits(list, hits, q);
+        if (status) status.textContent = statusText(hits.length, q);
+        if (index) index.hidden = Boolean(q.trim());
+      } catch {
+        if (status) status.textContent = 'Search is unavailable at the moment.';
+      }
+      if (updateUrl) history.replaceState(null, '', q.trim() ? `?q=${encodeURIComponent(q.trim())}` : location.pathname);
+    };
+    input.value = new URLSearchParams(location.search).get('q') ?? '';
+    run(false);
+    input.focus();
+    let t = 0;
+    input.addEventListener('input', () => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => run(true), 90);
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      run(true);
+    });
+  }
+</script>

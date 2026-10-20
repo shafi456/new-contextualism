@@ -1,0 +1,98 @@
+---
+/** A dated sequence; every entry cites its sources. */
+import { formatPartialDate } from '../lib/format';
+import { url } from '../lib/url';
+
+interface Item {
+  date: string;
+  dateLabel?: string;
+  title: string;
+  text: string;
+  sources: string[];
+  href?: string;
+}
+
+interface Props {
+  items: Item[];
+  /** Returns [label, href] for a citation key, registering it on the page. */
+  cite: (key: string) => [string, string];
+}
+
+const { items, cite } = Astro.props;
+---
+
+<ol class="chronology" role="list">
+  {
+    items.map((item) => (
+      <li class="chronology__item" data-reveal>
+        <p class="chronology__date">{item.dateLabel ?? formatPartialDate(item.date)}</p>
+        <div class="chronology__body">
+          <h3 class="chronology__title">{item.href ? <a href={url(item.href)}>{item.title}</a> : item.title}</h3>
+          <p class="chronology__text">{item.text}</p>
+          <p class="chronology__sources">
+            {item.sources.map((k, i) => {
+              const [label, href] = cite(k);
+              return (
+                <>{i > 0 && '; '}<a href={href}>{label}</a></>
+              );
+            })}
+          </p>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .chronology {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .chronology__item {
+    display: grid;
+    grid-template-columns: minmax(8rem, 3fr) 9fr;
+    gap: 0.5rem var(--col-gap);
+    padding: 1.25rem 0 1.4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chronology__date {
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+    padding-top: 0.3rem;
+  }
+
+  .chronology__title {
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .chronology__title a {
+    text-decoration-color: var(--rule);
+  }
+
+  .chronology__text {
+    margin-top: 0.4rem;
+    max-width: 40rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .chronology__sources {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .chronology__sources a {
+    text-decoration-color: var(--rule);
+  }
+
+  @media (max-width: 640px) {
+    .chronology__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

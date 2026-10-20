@@ -1,0 +1,579 @@
+/* ==========================================================================
+   New Contextualism — design system
+   Tokens, base typography, the 12-column grid and shared editorial parts.
+   Component-specific styles live with their components.
+   ========================================================================== */
+
+:root {
+  /* Palette (from the brief). Neutral surfaces carry ~90% of the interface. */
+  --paper: #f1efe9; /* warm paper white */
+  --ink: #24241f; /* deep charcoal */
+  --grey: #88877f; /* soft grey: rules, drawings, large text only (3.1:1) */
+  --rule: #d4d1c8; /* fine divider grey */
+  --brick: #a54b37; /* muted brick red: used sparingly (5.0:1) */
+  --sage: #b7b9a6; /* desaturated sage: diagrams only */
+  /* Derived: the soft grey darkened to pass WCAG AA for small text (5.2:1). */
+  --ink-2: #65645d;
+  --paper-2: #e9e6de; /* recessed surface, e.g. code and quiet panels */
+
+  /* Type */
+  --serif: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --fs-label: 0.75rem;
+  --fs-small: 0.875rem;
+  --fs-body: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+  --fs-lede: clamp(1.375rem, 1.12rem + 0.9vw, 1.875rem);
+  --fs-h4: clamp(1.25rem, 1.12rem + 0.5vw, 1.5rem);
+  --fs-h3: clamp(1.625rem, 1.3rem + 1.1vw, 2.25rem);
+  --fs-h2: clamp(2.375rem, 1.5rem + 3.4vw, 4.75rem);
+  --fs-h1: clamp(3rem, 1.4rem + 6.4vw, 8.75rem);
+  /* Sized so that "CONTEXTUALISM" spans the measure at every width. */
+  --fs-mast: min(15.2vw, 15rem);
+
+  /* Space */
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+  --col-gap: clamp(0.75rem, 1.6vw, 1.5rem);
+  --max: 96rem;
+  --section: clamp(5rem, 3rem + 8vw, 11rem);
+  --measure: 38rem;
+
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --header-h: 4.25rem;
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------------ Reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.62;
+  font-feature-settings: 'cv11', 'ss03';
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--sage);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brick);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* ------------------------------------------------------------- Typography */
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: 0.92;
+  letter-spacing: -0.015em;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.08;
+}
+
+h4 {
+  font-size: var(--fs-h4);
+  line-height: 1.2;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+strong,
+b {
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: var(--grey);
+  transition: text-decoration-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+a:hover {
+  text-decoration-color: var(--brick);
+}
+
+.serif {
+  font-family: var(--serif);
+  font-weight: 400;
+}
+
+.lede {
+  font-family: var(--serif);
+  font-size: var(--fs-lede);
+  line-height: 1.24;
+  letter-spacing: -0.003em;
+}
+
+.small {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--ink-2);
+}
+
+/* Compact uppercase metadata: the system's quiet voice. */
+.label {
+  font-family: var(--sans);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.label--ink {
+  color: var(--ink);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------------- Layout */
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.section + .section {
+  padding-top: 0;
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+}
+
+.rule--ink {
+  border-top-color: var(--ink);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: 0.5rem;
+  z-index: 100;
+  padding: 0.6rem 0.9rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--fs-small);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 0.2s var(--ease);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* --------------------------------------------------- Shared editorial parts */
+
+/* Section identifier, e.g. "01 / The Idea" */
+.section-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+
+.section-label .index {
+  color: var(--ink);
+}
+
+.section-label .sep {
+  color: var(--grey);
+}
+
+/* Understated text link with an arrow, e.g. "Explore the Philosophy ↗" */
+.arrow-link {
+  display: inline-flex;
+  justify-self: start;
+  align-self: start;
+  align-items: baseline;
+  gap: 0.45em;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 0.15em;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.arrow-link .arrow {
+  display: inline-block;
+  transition: transform 0.3s var(--ease);
+}
+
+.arrow-link:hover {
+  border-bottom-color: var(--brick);
+}
+
+.arrow-link:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+.arrow-link--quiet {
+  border-bottom-color: var(--rule);
+}
+
+/* A button that reads as a text link */
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--grey);
+  text-underline-offset: 0.22em;
+}
+
+.link-button:hover {
+  text-decoration-color: var(--brick);
+}
+
+/* Long-form reading text */
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > * + * {
+  margin-top: 1.05em;
+}
+
+.prose h2 {
+  font-size: var(--fs-h3);
+  margin-top: 2.2em;
+  line-height: 1.1;
+}
+
+.prose h3 {
+  font-size: var(--fs-h4);
+  margin-top: 1.8em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose li::marker {
+  color: var(--grey);
+}
+
+.prose blockquote {
+  font-family: var(--serif);
+  font-size: var(--fs-lede);
+  line-height: 1.25;
+  padding-left: 1.2rem;
+  border-left: 1px solid var(--ink);
+}
+
+.citation {
+  white-space: nowrap;
+}
+
+.citation .cite {
+  text-decoration-color: var(--rule);
+}
+
+.citation .cite:hover {
+  text-decoration-color: var(--brick);
+}
+
+a.ext::after {
+  content: '\2009↗';
+  font-size: 0.85em;
+  color: var(--ink-2);
+}
+
+/* Diagrams and their captions */
+.diagram {
+  margin: 0;
+}
+
+.diagram__caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  margin-top: 1rem;
+  max-width: 44rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.diagram__caption .label {
+  padding-top: 0.12em;
+  font-size: 0.6875rem;
+}
+
+/* Definition-style key/value lists used for metadata */
+.facts {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  border-top: 1px solid var(--rule);
+}
+
+.facts dt,
+.facts dd {
+  padding-block: 0.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.facts dt {
+  padding-right: 1rem;
+}
+
+.facts dd {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+/* A quiet, honest placeholder for material that has not been supplied. */
+.pending {
+  border: 1px dashed var(--grey);
+  padding: 1rem 1.15rem;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.pending .label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* Pill-free tag list */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+/* Project status glyphs: completed, ongoing and conceptual work are always
+   distinguished, by shape as well as by name. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+}
+
+.status::before {
+  content: '';
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1px solid var(--ink);
+}
+
+.status--completed::before {
+  background: var(--ink);
+}
+
+.status--ongoing::before {
+  background: linear-gradient(90deg, var(--ink) 50%, transparent 50%);
+}
+
+.status--conceptual::before {
+  border-style: dashed;
+}
+
+/* ---------------------------------------------------------------- Motion */
+
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 1s var(--ease),
+      transform 1s var(--ease);
+  }
+
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js [data-reveal='plate'] {
+    transform: none;
+    clip-path: inset(0 0 100% 0);
+    transition:
+      opacity 0.6s var(--ease),
+      clip-path 1.6s var(--ease);
+  }
+
+  .js [data-reveal='plate'].is-in {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ----------------------------------------------------------------- Print */
+
+@media print {
+  :root {
+    --section: 2rem;
+  }
+
+  .site-header,
+  .site-footer nav,
+  .prepub,
+  .skip-link,
+  [data-print='hide'] {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  a.ext::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+  }
+}

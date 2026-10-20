@@ -1,0 +1,81 @@
+---
+/** Opening of an inner page: identifier, large title, introduction. */
+interface Props {
+  label: string;
+  index?: string;
+  title: string;
+  intro?: string;
+  compact?: boolean;
+}
+const { label, index, title, intro, compact = false } = Astro.props;
+---
+
+<header class:list={['page-header wrap', { 'page-header--compact': compact }]}>
+  <p class="label section-label page-header__label">
+    {
+      index && (
+        <>
+          <span class="index">{index}</span>
+          <span class="sep" aria-hidden="true">
+            /
+          </span>
+        </>
+      )
+    }
+    <span>{label}</span>
+  </p>
+  <div class="grid page-header__grid">
+    <h1 class="page-header__title">{title}</h1>
+    {intro && <p class="lede page-header__intro">{intro}</p>}
+    <div class="page-header__slot">
+      <slot />
+    </div>
+  </div>
+</header>
+
+<style>
+  .page-header {
+    padding-top: clamp(3rem, 2rem + 6vw, 8rem);
+    padding-bottom: clamp(3rem, 2rem + 5vw, 7rem);
+  }
+
+  .page-header__label {
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  .page-header__grid {
+    row-gap: clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
+    align-items: end;
+  }
+
+  .page-header__title {
+    grid-column: 1 / -1;
+    max-width: 14ch;
+  }
+
+  .page-header--compact .page-header__title {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    max-width: 22ch;
+  }
+
+  .page-header__intro {
+    grid-column: 6 / span 7;
+    max-width: 36rem;
+  }
+
+  .page-header__slot {
+    grid-column: 6 / span 7;
+  }
+
+  .page-header__slot:empty {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .page-header__intro,
+    .page-header__slot {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

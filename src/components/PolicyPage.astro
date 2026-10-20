@@ -1,0 +1,77 @@
+---
+/** Template for policy and governance pages stored in src/content/pages. */
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHeader from './PageHeader.astro';
+import Provenance from './Provenance.astro';
+import { renderMarkdown } from '../lib/markdown';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  id: string;
+}
+
+const page = await getEntry('pages', Astro.props.id);
+if (!page) throw new Error(`Missing page content: src/content/pages/${Astro.props.id}.md`);
+const html = renderMarkdown(page.body, {
+  label: (key) => {
+    throw new Error(`pages/${Astro.props.id}: citations are not supported here ("${key}")`);
+  },
+});
+---
+
+<Base title={page.data.title} description={page.data.intro}>
+  <PageHeader label={page.data.label} title={page.data.title} intro={page.data.intro} compact />
+  <div class="wrap grid policy">
+    <aside class="policy__meta">
+      <p class="label">Last updated</p>
+      <p>{formatDate(page.data.updated)}</p>
+      <Provenance kind={page.data.provenance} approval={page.data.approval} />
+    </aside>
+    <div class="prose policy__body" set:html={html} />
+  </div>
+</Base>
+
+<style>
+  .policy {
+    align-items: start;
+  }
+
+  .policy__meta {
+    grid-column: 1 / span 3;
+    display: grid;
+    gap: 0.5rem;
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    font-size: 0.9375rem;
+  }
+
+  .policy__meta :global(.provenance) {
+    margin-top: 0.75rem;
+  }
+
+  .policy__body {
+    grid-column: 5 / span 7;
+    font-size: 1.0625rem;
+  }
+
+  .policy__body :global(h2) {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .policy__body :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  @media (max-width: 900px) {
+    .policy__meta,
+    .policy__body {
+      grid-column: 1 / -1;
+      position: static;
+    }
+
+    .policy__body {
+      margin-top: 2.5rem;
+    }
+  }
+</style>

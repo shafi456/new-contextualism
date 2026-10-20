@@ -1,0 +1,142 @@
+---
+import { FOOTER_LINKS, NAV, settings } from '../lib/site';
+import { url } from '../lib/url';
+
+const links = [...settings.institutionalLinks, ...settings.socialLinks];
+const year = new Date().getUTCFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <hr class="rule rule--ink" />
+    <div class="grid site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__name">New Contextualism</p>
+        <p class="site-footer__line">{settings.footerLine}</p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        <p class="label">Sections</p>
+        <ul role="list">
+          {
+            NAV.map((item) => (
+              <li>
+                <a href={item.href}>{item.label.replace('The ', '')}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="site-footer__nav" aria-label="Additional">
+        <p class="label">Platform</p>
+        <ul role="list">
+          {
+            FOOTER_LINKS.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      {
+        links.length > 0 && (
+          <nav class="site-footer__nav" aria-label="Elsewhere">
+            <p class="label">Elsewhere</p>
+            <ul role="list">
+              {links.map((l) => (
+                <li>
+                  <a href={l.url} class="ext">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+
+    <div class="site-footer__meta small">
+      <p>
+        {settings.prepublication ? `Pre-publication edition, ${year}.` : `© ${year}.`} Quoted texts and records remain the copyright
+        of their authors and publishers.
+      </p>
+      <p><a href={url('/editorial-standards/')}>How this platform verifies its content</a></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--section);
+    padding-bottom: 2.5rem;
+  }
+
+  .site-footer__grid {
+    row-gap: 2.5rem;
+    padding-top: 2.25rem;
+  }
+
+  .site-footer__brand {
+    grid-column: 1 / span 6;
+  }
+
+  .site-footer__name {
+    font-family: var(--serif);
+    font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.75rem);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+  }
+
+  .site-footer__line {
+    margin-top: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .site-footer__nav {
+    grid-column: span 2;
+  }
+
+  .site-footer__nav ul {
+    margin: 0.85rem 0 0;
+  }
+
+  .site-footer__nav li + li {
+    margin-top: 0.3rem;
+  }
+
+  .site-footer__nav a {
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .site-footer__nav a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--brick);
+  }
+
+  .site-footer__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-top: 4.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 900px) {
+    .site-footer__brand {
+      grid-column: 1 / -1;
+    }
+
+    .site-footer__nav {
+      grid-column: span 6;
+    }
+  }
+</style>

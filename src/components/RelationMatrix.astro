@@ -1,0 +1,175 @@
+---
+/**
+ * The relations between dimensions as a matrix: an accessible table in which
+ * each marked cell is one proposed relation.
+ */
+import type { Dimension, Registry } from '../lib/content';
+import { relations } from '../lib/site';
+import { pad } from '../lib/format';
+
+interface Props {
+  reg: Registry;
+}
+const { reg } = Astro.props;
+const dims: Dimension[] = reg.dimensions;
+const find = (a: string, b: string) => relations.find((r) => (r.a === a && r.b === b) || (r.a === b && r.b === a));
+---
+
+<figure class="matrix" data-matrix>
+  <div class="matrix__scroll">
+    <table>
+      <caption class="visually-hidden">
+        Relations proposed between the ten dimensions. A marked cell indicates a direct relation; its description is given in the
+        cell.
+      </caption>
+      <thead>
+        <tr>
+          <td></td>
+          {
+            dims.map((d) => (
+              <th scope="col" title={d.data.name}>
+                <span class="matrix__col">{pad(d.data.number)}</span>
+                <span class="visually-hidden">{d.data.name}</span>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          dims.map((row, i) => (
+            <tr>
+              <th scope="row">
+                <span class="matrix__num">{pad(row.data.number)}</span> {row.data.shortName ?? row.data.name}
+              </th>
+              {dims.map((col, j) => {
+                if (j === i) return <td class="matrix__self" aria-hidden="true" />;
+                if (j > i) return <td class="matrix__upper" aria-hidden="true" />;
+                const rel = find(row.id, col.id);
+                return rel ? (
+                  <td class="matrix__cell is-related" tabindex="0" data-note={`${row.data.name} — ${col.data.name}: ${rel.note}`}>
+                    <span class="matrix__dot" aria-hidden="true" />
+                    <span class="visually-hidden">
+                      {row.data.name} and {col.data.name}: {rel.note}
+                    </span>
+                  </td>
+                ) : (
+                  <td class="matrix__cell">
+                    <span class="visually-hidden">No direct relation proposed</span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <figcaption class="matrix__readout" aria-hidden="true" data-matrix-readout>
+    Select a marked cell to read the relation it records.
+  </figcaption>
+</figure>
+
+<style>
+  .matrix__scroll {
+    overflow-x: auto;
+  }
+
+  .matrix table {
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .matrix th,
+  .matrix td {
+    padding: 0;
+    text-align: center;
+    font-weight: 400;
+  }
+
+  .matrix thead th {
+    height: 2.25rem;
+    vertical-align: bottom;
+    padding-bottom: 0.4rem;
+  }
+
+  .matrix__col,
+  .matrix__num {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .matrix tbody th {
+    padding-right: 1.25rem;
+    text-align: left;
+    white-space: nowrap;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+  }
+
+  .matrix__num {
+    font-family: var(--sans);
+    margin-right: 0.4rem;
+  }
+
+  .matrix td {
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 1px solid var(--rule);
+  }
+
+  .matrix__upper,
+  .matrix thead td {
+    border-color: transparent !important;
+  }
+
+  .matrix__self {
+    background: repeating-linear-gradient(135deg, var(--rule) 0 1px, transparent 1px 6px);
+  }
+
+  .matrix__cell.is-related {
+    cursor: help;
+  }
+
+  .matrix__dot {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: var(--ink);
+    transition: transform 0.25s var(--ease), background-color 0.25s var(--ease);
+  }
+
+  .matrix__cell.is-related:hover .matrix__dot,
+  .matrix__cell.is-related:focus-visible .matrix__dot,
+  .matrix__cell.is-hot .matrix__dot {
+    background: var(--brick);
+    transform: scale(1.35);
+  }
+
+  .matrix__readout {
+    min-height: 3rem;
+    margin-top: 1rem;
+    max-width: 40rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-matrix]').forEach((root) => {
+    const readout = root.querySelector<HTMLElement>('[data-matrix-readout]');
+    if (!readout) return;
+    const initial = readout.textContent ?? '';
+    root.querySelectorAll<HTMLElement>('[data-note]').forEach((cell) => {
+      const show = () => (readout.textContent = cell.dataset.note ?? '');
+      cell.addEventListener('pointerenter', show);
+      cell.addEventListener('focus', show);
+      cell.addEventListener('click', show);
+    });
+    root.addEventListener('pointerleave', () => (readout.textContent = initial));
+  });
+</script>

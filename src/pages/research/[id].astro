@@ -1,0 +1,527 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Provenance from '../../components/Provenance.astro';
+import RecordList from '../../components/RecordList.astro';
+import { citations, listed, registry } from '../../lib/content';
+import { apa, bibtex, chicago, pubYear } from '../../lib/cite';
+import { displayName, formatDate, joinList } from '../../lib/format';
+import { COLLECTION_LABELS, TYPE_LABELS } from '../../lib/provenance';
+import { url } from '../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const reg = await registry();
+  return reg.publications.map((p) => ({ params: { id: p.id } }));
+}) satisfies GetStaticPaths;
+
+const reg = await registry();
+const rec = reg.publication.get(Astro.params.id!)!;
+const d = rec.data;
+const label = reg.labels.get(rec.id)!;
+const cite = citations(reg, `research/${rec.id}`);
+const abstract = cite.md(rec.body);
+const names = (list: string[]) => joinList(list.map(displayName));
+const year = pubYear(rec);
+const event = d.event ? reg.event.get(d.event) : undefined;
+const citedBy = d.citedBy.map((k) => reg.publication.get(k)!).filter(Boolean);
+const cites = reg.publications.filter((p) => p.data.citedBy.includes(rec.id));
+const projects = listed(reg.projects).filter((p) => p.data.sources.includes(rec.id));
+const dimensionsUsing = reg.dimensions.filter((dim) => dim.data.keywordsSource === rec.id);
+const related = listed(reg.publications)
+  .filter((p) => p.id !== rec.id && ['new-contextualism', 'founder'].includes(p.data.collection))
+  .map((p) => ({
+    p,
+    score:
+      p.data.topics.filter((t) => d.topics.includes(t)).length * 2 +
+      p.data.dimensions.filter((x) => d.dimensions.includes(x)).length * 0.2 +
+      (p.data.event && p.data.event === d.event ? 3 : 0),
+  }))
+  .filter((x) => x.score > 0.5)
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 4)
+  .map((x) => x.p);
+
+const typeLabel = TYPE_LABELS[d.type];
+const schemaType =
+  d.type === 'article' ? 'ScholarlyArticle' : d.type === 'book' || d.type === 'edited-book' ? 'Book' : d.type === 'chapter' ? 'Chapter' : d.type === 'essay' ? 'Article' : 'CreativeWork';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': schemaType,
+  name: d.title,
+  headline: d.title,
+  author: d.authors.map((a) => ({ '@type': a.includes(',') ? 'Person' : 'Organization', name: displayName(a) })),
+  editor: d.editors.length ? d.editors.map((a) => ({ '@type': 'Person', name: displayName(a) })) : undefined,
+  datePublished: d.date ? d.date.toISOString().slice(0, 10) : year ? String(year) : undefined,
+  publisher: d.publisher ?? d.venue,
+  url: d.doi ? `https://doi.org/${d.doi}` : d.url,
+  sameAs: d.alsoPublished.map((a) => a.url),
+};
+---
+
+<Base title={d.title} description={d.summary ?? `${typeLabel}${year ? `, ${year}` : ''}: ${d.title}`} type="article" jsonLd={jsonLd}>
+  <article class="wrap record-page">
+    <nav class="crumbs label" aria-label="Breadcrumb">
+      <a href={url('/research/')}>Research</a> <span aria-hidden="true">/</span>
+      <span>{COLLECTION_LABELS[d.collection]}</span>
+    </nav>
+
+    {d.archived && <p class="pending archived">This record is archived. It is kept at this address for reference.</p>}
+
+    <header class="record-page__header">
+      <p class="label">{typeLabel}{year ? ` · ${year}` : ''}</p>
+      <h1 class="record-page__title">{d.title}</h1>
+      {
+        (d.authors.length > 0 || d.editors.length > 0) && (
+          <p class="record-page__by">
+            {d.authors.length ? names(d.authors) : `${names(d.editors)}, ${d.editors.length > 1 ? 'editors' : 'editor'}`}
+          </p>
+        )
+      }
+      <p class="record-page__where">
+        {d.venue && <i>{d.venue}</i>}
+        {d.date && <span>{formatDate(d.date)}</span>}
+      </p>
+    </header>
+
+    <div class="grid record-page__body">
+      <div class="record-page__main">
+        {
+          abstract ? (
+            <section aria-labelledby="abstract-title">
+              <h2 class="label" id="abstract-title">
+                Abstract
+              </h2>
+              <div class="prose record-page__abstract" set:html={abstract} />
+              <Provenance kind="editorial-summary" note="Summary written by the editors" />
+            </section>
+          ) : (
+            d.summary && (
+              <section aria-labelledby="abstract-title">
+                <h2 class="label" id="abstract-title">
+                  Note
+                </h2>
+                <p class="record-page__summary">{d.summary}</p>
+              </section>
+            )
+          )
+        }
+
+        <section class="cite-box" aria-labelledby="cite-title" data-cite>
+          <h2 class="label" id="cite-title">Cite this record</h2>
+          <div class="cite-box__tabs" role="tablist" aria-label="Citation style">
+            <button type="button" role="tab" aria-selected="true" aria-controls="cite-chicago" id="tab-chicago" data-cite-tab>Chicago</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="cite-apa" id="tab-apa" tabindex="-1" data-cite-tab>APA</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="cite-bibtex" id="tab-bibtex" tabindex="-1" data-cite-tab
+              >BibTeX</button
+            >
+          </div>
+          <div role="tabpanel" id="cite-chicago" aria-labelledby="tab-chicago" class="cite-box__panel">
+            <p class="cite-box__text" data-copy-source set:html={chicago(rec, label)} />
+          </div>
+          <div role="tabpanel" id="cite-apa" aria-labelledby="tab-apa" class="cite-box__panel" hidden>
+            <p class="cite-box__text" data-copy-source>{apa(rec).replace(/\*/g, '')}</p>
+          </div>
+          <div role="tabpanel" id="cite-bibtex" aria-labelledby="tab-bibtex" class="cite-box__panel" hidden>
+            <pre class="cite-box__code" data-copy-source>{bibtex(rec)}</pre>
+          </div>
+          <p class="cite-box__foot">
+            <button type="button" class="link-button" data-copy>Copy citation</button>
+            <span class="small muted" role="status" aria-live="polite" data-copy-status></span>
+            <span class="small muted">In-text: ({label})</span>
+          </p>
+        </section>
+      </div>
+
+      <aside class="record-page__facts" aria-label="Record details">
+        <dl class="facts">
+          <dt class="label">Type</dt>
+          <dd>{typeLabel}</dd>
+          <dt class="label">Collection</dt>
+          <dd>{COLLECTION_LABELS[d.collection]}</dd>
+          {
+            d.container && (
+              <>
+                <dt class="label">In</dt>
+                <dd>
+                  <i>{d.container}</i>
+                  {d.pages && `, pp. ${d.pages}`}
+                </dd>
+              </>
+            )
+          }
+          {
+            (d.volume || d.issue || (d.pages && !d.container)) && (
+              <>
+                <dt class="label">Volume</dt>
+                <dd>
+                  {[d.volume && `vol. ${d.volume}`, d.issue && `no. ${d.issue}`, !d.container && d.pages && `pp. ${d.pages}`]
+                    .filter(Boolean)
+                    .join(', ')}
+                </dd>
+              </>
+            )
+          }
+          {
+            d.publisher && (
+              <>
+                <dt class="label">Publisher</dt>
+                <dd>{[d.place, d.publisher].filter(Boolean).join(': ')}</dd>
+              </>
+            )
+          }
+          {
+            d.place && !d.publisher && (
+              <>
+                <dt class="label">Place</dt>
+                <dd>{d.place}</dd>
+              </>
+            )
+          }
+          {
+            (d.doi || d.url) && (
+              <>
+                <dt class="label">Source</dt>
+                <dd>
+                  <a class="ext" href={d.doi ? `https://doi.org/${d.doi}` : d.url}>
+                    {d.doi ? `doi:${d.doi}` : new URL(d.url!).hostname.replace(/^www\./, '')}
+                  </a>
+                </dd>
+              </>
+            )
+          }
+          {
+            d.alsoPublished.length > 0 && (
+              <>
+                <dt class="label">Also published</dt>
+                <dd>
+                  <ul role="list" class="plain">
+                    {d.alsoPublished.map((a) => (
+                      <li>
+                        <a class="ext" href={a.url}>
+                          {a.venue}
+                        </a>
+                        {a.date && <span class="muted">, {formatDate(a.date)}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )
+          }
+          {
+            d.accessed && (
+              <>
+                <dt class="label">Consulted</dt>
+                <dd>{formatDate(d.accessed)}</dd>
+              </>
+            )
+          }
+          {
+            event && (
+              <>
+                <dt class="label">Event</dt>
+                <dd>
+                  <a href={url(`/dialogue/#${event.id}`)}>{event.data.title}</a>
+                </dd>
+              </>
+            )
+          }
+          {
+            d.dimensions.length > 0 && (
+              <>
+                <dt class="label">Dimensions</dt>
+                <dd>
+                  <ul role="list" class="tags">
+                    {d.dimensions.map((id) => (
+                      <li>
+                        <a href={url(`/framework/${id}/`)}>{reg.dimension.get(id)?.data.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )
+          }
+          {
+            d.topics.length > 0 && (
+              <>
+                <dt class="label">Topics</dt>
+                <dd>
+                  <ul role="list" class="tags">
+                    {d.topics.map((t) => (
+                      <li>
+                        <a href={url(`/research/?topic=${encodeURIComponent(t.toLowerCase())}`)}>{t}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )
+          }
+          {
+            citedBy.length > 0 && (
+              <>
+                <dt class="label">Cited in</dt>
+                <dd>
+                  {citedBy.map((p, i) => (
+                    <>{i > 0 && '; '}<a href={url(`/research/${p.id}/`)}>{reg.labels.get(p.id)}</a></>
+                  ))}
+                </dd>
+              </>
+            )
+          }
+          {
+            cites.length > 0 && (
+              <>
+                <dt class="label">Cites</dt>
+                <dd>
+                  {cites.map((p, i) => (
+                    <>{i > 0 && '; '}<a href={url(`/research/${p.id}/`)}>{reg.labels.get(p.id)}</a></>
+                  ))}
+                </dd>
+              </>
+            )
+          }
+          {
+            projects.length > 0 && (
+              <>
+                <dt class="label">Documents</dt>
+                <dd>
+                  <ul role="list" class="plain">
+                    {projects.map((p) => (
+                      <li>
+                        <a href={url(`/projects/${p.id}/`)}>{p.data.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )
+          }
+          {
+            dimensionsUsing.length > 0 && (
+              <>
+                <dt class="label">Defines</dt>
+                <dd>
+                  The terms for {dimensionsUsing.length === reg.dimensions.length ? 'all ten dimensions' : `${dimensionsUsing.length} dimensions`}{' '}
+                  (<a href={url('/framework/')}>Framework</a>)
+                </dd>
+              </>
+            )
+          }
+          <dt class="label">Record</dt>
+          <dd class="small">
+            Persistent address: <code>/research/{rec.id}/</code>
+          </dd>
+        </dl>
+      </aside>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="record-page__related" aria-labelledby="related-title">
+          <h2 class="label" id="related-title">
+            Related records
+          </h2>
+          <RecordList reg={reg} records={related} compact />
+        </section>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .crumbs {
+    display: flex;
+    gap: 0.6rem;
+    padding-top: 1.5rem;
+  }
+
+  .crumbs a {
+    text-decoration-color: var(--rule);
+  }
+
+  .archived {
+    margin-top: 1.5rem;
+  }
+
+  .record-page__header {
+    padding: clamp(2.5rem, 2rem + 4vw, 6rem) 0 clamp(2rem, 1.5rem + 3vw, 4rem);
+    max-width: 62rem;
+  }
+
+  .record-page__title {
+    margin-top: 1.25rem;
+    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 4.75rem);
+    line-height: 1.02;
+  }
+
+  .record-page__by {
+    margin-top: 1.5rem;
+    font-family: var(--serif);
+    font-size: 1.5rem;
+  }
+
+  .record-page__where {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+  }
+
+  .record-page__body {
+    align-items: start;
+    border-top: 1px solid var(--ink);
+    padding-top: 2rem;
+  }
+
+  .record-page__main {
+    grid-column: 1 / span 7;
+    display: grid;
+    gap: 3rem;
+  }
+
+  .record-page__abstract {
+    margin: 0.9rem 0 1.25rem;
+    font-size: 1.0625rem;
+  }
+
+  .record-page__abstract :global(p:first-child) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.15rem + 0.55vw, 1.6rem);
+    line-height: 1.3;
+  }
+
+  .record-page__summary {
+    margin-top: 0.9rem;
+    font-family: var(--serif);
+    font-size: var(--fs-lede);
+    line-height: 1.26;
+  }
+
+  .record-page__facts {
+    grid-column: 9 / span 4;
+  }
+
+  .plain {
+    margin: 0;
+  }
+
+  .plain li + li {
+    margin-top: 0.25rem;
+  }
+
+  .tags a {
+    text-decoration-color: var(--rule);
+  }
+
+  code {
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
+
+  .cite-box {
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cite-box__tabs {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .cite-box__tabs button {
+    background: none;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    padding: 0.2rem 0;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+
+  .cite-box__tabs button[aria-selected='true'] {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  .cite-box__panel {
+    padding: 1rem 1.15rem;
+    background: var(--paper-2);
+  }
+
+  .cite-box__text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .cite-box__code {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .cite-box__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    margin-top: 0.85rem;
+  }
+
+  .record-page__related {
+    margin-top: var(--section);
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (max-width: 1080px) {
+    .record-page__main,
+    .record-page__facts {
+      grid-column: 1 / -1;
+    }
+
+    .record-page__facts {
+      margin-top: 3rem;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-cite]').forEach((box) => {
+    const tabs = [...box.querySelectorAll<HTMLButtonElement>('[data-cite-tab]')];
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) tab.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        select(tabs[(i + d + tabs.length) % tabs.length], true);
+      });
+    });
+    const status = box.querySelector<HTMLElement>('[data-copy-status]');
+    box.querySelector('[data-copy]')?.addEventListener('click', async () => {
+      const panel = box.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden]) [data-copy-source]');
+      try {
+        await navigator.clipboard.writeText(panel?.innerText.trim() ?? '');
+        if (status) status.textContent = 'Copied.';
+      } catch {
+        if (status) status.textContent = 'Select the text to copy it.';
+      }
+    });
+  });
+</script>

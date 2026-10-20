@@ -1,0 +1,88 @@
+---
+/** The ten dimensions with the terms the founder uses for each. */
+import type { Dimension } from '../lib/content';
+import { pad } from '../lib/format';
+import { url } from '../lib/url';
+
+interface Props {
+  dimensions: Dimension[];
+  citation: [string, string];
+}
+const { dimensions, citation } = Astro.props;
+---
+
+<figure class="diagram dim-table" data-reveal>
+  <table>
+    <caption class="visually-hidden">The ten contextual dimensions and the terms used to characterise them</caption>
+    <thead>
+      <tr>
+        <th scope="col" class="label">No.</th>
+        <th scope="col" class="label">Dimension</th>
+        <th scope="col" class="label">In the founder’s terms</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        dimensions.map((d) => (
+          <tr>
+            <td class="dim-table__num">{pad(d.data.number)}</td>
+            <th scope="row" class="dim-table__name">
+              <a href={url(`/framework/${d.id}/`)}>{d.data.name}</a>
+            </th>
+            <td class="dim-table__keys">{d.data.keywords.join(', ')}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <figcaption class="diagram__caption">
+    <span class="label label--ink">Table</span>
+    <span>Terms as published in <a href={citation[1]}>{citation[0]}</a>. The name ‘Scientific and Technological’ follows this
+      platform’s usage; the essay uses ‘Scientific’.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .dim-table table {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 1px solid var(--ink);
+  }
+
+  .dim-table th,
+  .dim-table td {
+    padding: 0.7rem 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: baseline;
+    font-weight: 400;
+  }
+
+  .dim-table thead th {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .dim-table__num {
+    width: 3.5rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dim-table__name {
+    width: 40%;
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.15;
+  }
+
+  .dim-table__name a {
+    text-decoration-color: var(--rule);
+  }
+
+  .dim-table__keys {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+</style>

@@ -1,0 +1,675 @@
+---
+/**
+ * The interactive contextual diagram: the ten dimensions as nodes on a ring,
+ * joined by the relations proposed between them.
+ *
+ * Accessibility: the labels are an ARIA tablist (arrow keys, Home, End) and
+ * each dimension has a tabpanel with the same information as the drawing.
+ * Without JavaScript every panel is shown in sequence.
+ *
+ * mode="static" draws the ring centred on one dimension, with labels as links
+ * (used on each dimension's page).
+ */
+import type { Dimension, Registry } from '../lib/content';
+import { projectsForDimension, recordsForDimension, relationsFor } from '../lib/content';
+import { relations } from '../lib/site';
+import { pad } from '../lib/format';
+import { url } from '../lib/url';
+
+interface Props {
+  reg: Registry;
+  selected?: string;
+  mode?: 'interactive' | 'static';
+  idPrefix?: string;
+}
+
+const { reg, mode = 'interactive', idPrefix = 'ctx' } = Astro.props;
+const dims: Dimension[] = reg.dimensions;
+const selected = Astro.props.selected ?? dims[0].id;
+const N = dims.length;
+const C = 500;
+const R = 312;
+const LABEL_R = 368;
+
+const geo = Object.fromEntries(
+  dims.map((d, i) => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / N;
+    const cos = Math.cos(a);
+    const sin = Math.sin(a);
+    const h = cos > 0.3 ? 'right' : cos < -0.3 ? 'left' : 'centre';
+    const v = sin < -0.85 ? 'top' : sin > 0.85 ? 'bottom' : 'middle';
+    return [
+      d.id,
+      {
+        i,
+        x: C + R * cos,
+        y: C + R * sin,
+        lx: (C + LABEL_R * cos) / 10,
+        ly: (C + LABEL_R * sin) / 10,
+        h,
+        v,
+      },
+    ];
+  }),
+);
+
+const f = (n: number) => n.toFixed(1);
+const edges = relations.map((r) => {
+  const a = geo[r.a];
+  const b = geo[r.b];
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const cx = C + (mx - C) * 0.36;
+  const cy = C + (my - C) * 0.36;
+  return { ...r, d: `M${f(a.x)} ${f(a.y)}Q${f(cx)} ${f(cy)} ${f(b.x)} ${f(b.y)}` };
+});
+
+let ticks = '';
+for (let k = 0; k < 120; k++) {
+  const a = -Math.PI / 2 + (k * Math.PI) / 60;
+  const major = k % 12 === 0;
+  const r1 = R + 16;
+  const r2 = R + (major ? 34 : k % 6 === 0 ? 26 : 22);
+  ticks += `M${f(C + r1 * Math.cos(a))} ${f(C + r1 * Math.sin(a))}L${f(C + r2 * Math.cos(a))} ${f(C + r2 * Math.sin(a))}`;
+}
+
+const relatedOf = (id: string) => relationsFor(id).map((r) => r.other);
+const hull = (id: string) =>
+  id
+    ? [id, ...relatedOf(id)]
+        .map((k) => geo[k])
+        .sort((p, q) => p.i - q.i)
+        .map((p) => `${f(p.x)},${f(p.y)}`)
+        .join(' ')
+    : '';
+
+// An empty selection draws the whole network without emphasis.
+const sel = selected;
+const selRelated = sel ? relatedOf(sel) : [];
+const nodeState = (id: string) =>
+  !sel ? '' : id === sel ? 'is-selected' : selRelated.includes(id) ? 'is-related' : 'is-dim';
+const edgeState = (a: string, b: string) => (!sel ? '' : a === sel || b === sel ? 'is-on' : 'is-off');
+const names = Object.fromEntries(dims.map((d) => [d.id, d.data.name]));
+const data = {
+  related: Object.fromEntries(dims.map((d) => [d.id, relatedOf(d.id)])),
+  hull: Object.fromEntries(dims.map((d) => [d.id, hull(d.id)])),
+};
+const interactive = mode === 'interactive';
+---
+
+<div
+  class:list={['ctx', `ctx--${mode}`, { 'ctx--neutral': !sel }]}
+  data-ctx={interactive ? '' : undefined}
+  data-selected={sel}
+>
+  <div class="ctx__figure">
+    <div class="ctx__stage">
+      <svg class="ctx__svg" viewBox="0 0 1000 1000" aria-hidden="true" focusable="false">
+        <circle class="ctx__ring" cx={C} cy={C} r={R}></circle>
+        <path class="ctx__ticks" d={ticks}></path>
+        <polygon class="ctx__hull" points={hull(sel)} data-ctx-hull></polygon>
+        <g class="ctx__edges">
+          {edges.map((e) => <path class:list={['ctx__edge', edgeState(e.a, e.b)]} d={e.d} data-a={e.a} data-b={e.b} data-edge={e.id} />)}
+        </g>
+        <path class="ctx__cross" d={`M${C - 12} ${C}H${C + 12}M${C} ${C - 12}V${C + 12}`}></path>
+        <g class="ctx__nodes">
+          {
+            dims.map((d) => (
+              <circle class:list={['ctx__node', nodeState(d.id)]} cx={f(geo[d.id].x)} cy={f(geo[d.id].y)} r="7" data-node={d.id} />
+            ))
+          }
+        </g>
+      </svg>
+
+      {
+        interactive ? (
+          <div class="ctx__labels" role="tablist" aria-label="The ten dimensions">
+            {dims.map((d) => (
+              <button
+                type="button"
+                role="tab"
+                class:list={['ctx__label', `h-${geo[d.id].h}`, `v-${geo[d.id].v}`, nodeState(d.id)]}
+                style={`left:${f(geo[d.id].lx)}%;top:${f(geo[d.id].ly)}%`}
+                id={`${idPrefix}-tab-${d.id}`}
+                aria-controls={`${idPrefix}-panel-${d.id}`}
+                aria-selected={d.id === sel ? 'true' : 'false'}
+                tabindex={d.id === sel ? 0 : -1}
+                data-tab={d.id}
+              >
+                <span class="ctx__num">{pad(d.data.number)}</span>
+                <span class="ctx__name">{d.data.shortName ?? d.data.name}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <ul class="ctx__labels" role="list">
+            {dims.map((d) => (
+              <li
+                class:list={['ctx__label', `h-${geo[d.id].h}`, `v-${geo[d.id].v}`, nodeState(d.id)]}
+                style={`left:${f(geo[d.id].lx)}%;top:${f(geo[d.id].ly)}%`}
+              >
+                {d.id === sel ? (
+                  <span aria-current="true">
+                    <span class="ctx__num">{pad(d.data.number)}</span>
+                    <span class="ctx__name">{d.data.shortName ?? d.data.name}</span>
+                  </span>
+                ) : (
+                  <a href={url(`/framework/${d.id}/`)}>
+                    <span class="ctx__num">{pad(d.data.number)}</span>
+                    <span class="ctx__name">{d.data.shortName ?? d.data.name}</span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    interactive && (
+      <div class="ctx__panels">
+        {dims.map((d) => {
+          const rel = relationsFor(d.id);
+          const records = recordsForDimension(reg, d.id).length;
+          const projects = projectsForDimension(reg, d.id).length;
+          return (
+            <section
+              class="ctx__panel"
+              role="tabpanel"
+              id={`${idPrefix}-panel-${d.id}`}
+              aria-labelledby={`${idPrefix}-tab-${d.id}`}
+              tabindex="0"
+              hidden={d.id !== sel}
+              data-panel={d.id}
+            >
+              <p class="label">
+                <span class="index">{pad(d.data.number)}</span> / {pad(N)} · Dimension
+              </p>
+              <h3 class="ctx__title">{d.data.name}</h3>
+              <p class="ctx__summary">{d.data.summary}</p>
+              <p class="ctx__keys">
+                <span class="label">In the founder’s terms</span>
+                <span>
+                  {d.data.keywords.join(', ')}{' '}
+                  <a class="ctx__cite" href={url(`/research/${d.data.keywordsSource}/`)}>
+                    ({reg.labels.get(d.data.keywordsSource)})
+                  </a>
+                </span>
+              </p>
+              <div class="ctx__questions">
+                <p class="label">Questions it asks · editorial</p>
+                <ul role="list">
+                  {d.data.questions.slice(0, 2).map((q) => (
+                    <li>{q}</li>
+                  ))}
+                </ul>
+              </div>
+              <div class="ctx__relations">
+                <p class="label">Relations · editorial interpretation</p>
+                <ul role="list">
+                  {rel.map((r) => (
+                    <li>
+                      <button type="button" class="ctx__rel" data-goto={r.other} data-edge-ref={r.id}>
+                        <span class="ctx__rel-name">{names[r.other]}</span>
+                        <span class="ctx__rel-note">{r.note}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p class="ctx__more">
+                <a class="arrow-link" href={url(`/framework/${d.id}/`)}>
+                  Read the dimension <span class="arrow">→</span>
+                </a>
+                <span class="ctx__counts">
+                  {records} archive record{records === 1 ? '' : 's'} · {projects} project{projects === 1 ? '' : 's'}
+                </span>
+              </p>
+            </section>
+          );
+        })}
+      </div>
+    )
+  }
+  {interactive && <script type="application/json" data-ctx-data set:html={JSON.stringify(data)} />}
+</div>
+<noscript>
+  <style>
+    .ctx__panel[hidden] {
+      display: block !important;
+    }
+    .ctx__panel + .ctx__panel {
+      margin-top: 3rem;
+    }
+  </style>
+</noscript>
+
+<style>
+  .ctx {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 4vw, 5rem);
+    align-items: start;
+  }
+
+  .ctx--static {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ctx__figure {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .ctx--static .ctx__figure {
+    position: static;
+  }
+
+  .ctx__stage {
+    position: relative;
+    width: 100%;
+    max-width: 44rem;
+    margin-inline: auto;
+    aspect-ratio: 1;
+  }
+
+  .ctx__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .ctx__ring {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 1.2;
+  }
+
+  .ctx__ticks {
+    fill: none;
+    stroke: var(--grey);
+    stroke-width: 1;
+  }
+
+  .ctx__cross {
+    stroke: var(--grey);
+    stroke-width: 1.2;
+  }
+
+  .ctx__hull {
+    fill: var(--sage);
+    fill-opacity: 0.32;
+    stroke: none;
+    transition: opacity 0.4s var(--ease);
+  }
+
+  .ctx__edge {
+    fill: none;
+    stroke: var(--grey);
+    stroke-width: 1.2;
+    opacity: 0.55;
+    transition:
+      opacity 0.45s var(--ease),
+      stroke 0.3s var(--ease),
+      stroke-width 0.3s var(--ease);
+  }
+
+  .ctx__edge.is-on {
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    opacity: 1;
+  }
+
+  .ctx__edge.is-off {
+    opacity: 0.16;
+  }
+
+  .ctx--neutral .ctx__edge {
+    stroke: var(--ink);
+    opacity: 0.42;
+  }
+
+  .ctx__edge.is-hot {
+    stroke: var(--brick);
+    stroke-width: 2.6;
+    opacity: 1;
+  }
+
+  .ctx__node {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    transition:
+      fill 0.3s var(--ease),
+      r 0.3s var(--ease),
+      stroke 0.3s var(--ease);
+  }
+
+  .ctx__node.is-related {
+    fill: var(--ink);
+  }
+
+  .ctx__node.is-selected {
+    fill: var(--brick);
+    stroke: var(--brick);
+    r: 10px;
+  }
+
+  .ctx__node.is-dim {
+    stroke: var(--grey);
+  }
+
+  .ctx__labels {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ctx__label {
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.2rem 0.3rem;
+    background: none;
+    border: 0;
+    color: var(--ink);
+    text-align: left;
+    white-space: nowrap;
+    transition: color 0.3s var(--ease), opacity 0.3s var(--ease);
+  }
+
+  .ctx__label a,
+  .ctx__label > span {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    text-decoration: none;
+  }
+
+  .ctx__label.h-right {
+    transform: translate(0, -50%);
+  }
+
+  .ctx__label.h-left {
+    transform: translate(-100%, -50%);
+    flex-direction: row-reverse;
+  }
+
+  .ctx__label.h-left a,
+  .ctx__label.h-left > span {
+    flex-direction: row-reverse;
+  }
+
+  .ctx__label.h-centre.v-top {
+    transform: translate(-50%, -100%);
+  }
+
+  .ctx__label.h-centre.v-bottom {
+    transform: translate(-50%, 0);
+  }
+
+  .ctx__label.h-centre.v-middle {
+    transform: translate(-50%, -50%);
+  }
+
+  .ctx__num {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ctx__name {
+    font-family: var(--serif);
+    font-size: clamp(1.05rem, 0.8rem + 0.7vw, 1.45rem);
+    line-height: 1;
+  }
+
+  .ctx__label.is-dim {
+    color: var(--ink-2);
+  }
+
+  .ctx__label.is-selected .ctx__name {
+    color: var(--brick);
+    font-style: italic;
+  }
+
+  button.ctx__label:hover .ctx__name,
+  .ctx__label a:hover .ctx__name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--brick);
+  }
+
+  /* Panels */
+  .ctx__panel {
+    padding-top: 0.25rem;
+  }
+
+  .ctx__panel:focus-visible {
+    outline-offset: 8px;
+  }
+
+  .ctx__title {
+    margin-top: 0.75rem;
+    font-size: var(--fs-h2);
+    line-height: 0.98;
+  }
+
+  .ctx__summary {
+    margin-top: 1rem;
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.25;
+    max-width: 30rem;
+  }
+
+  .ctx__keys {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .ctx__cite {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    text-decoration-color: var(--rule);
+  }
+
+  .ctx__questions,
+  .ctx__relations {
+    margin-top: 1.75rem;
+  }
+
+  .ctx__questions ul {
+    margin: 0.5rem 0 0;
+  }
+
+  .ctx__questions li {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .ctx__relations ul {
+    margin: 0.5rem 0 0;
+  }
+
+  .ctx__rel {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.6rem 0;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--rule);
+    text-align: left;
+  }
+
+  .ctx__rel-name {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  .ctx__rel-note {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .ctx__rel:hover .ctx__rel-name,
+  .ctx__rel:focus-visible .ctx__rel-name {
+    color: var(--brick);
+  }
+
+  .ctx__more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .ctx__counts {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 1080px) {
+    .ctx {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ctx__figure {
+      position: static;
+    }
+
+    .ctx__stage {
+      max-width: 36rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ctx__stage {
+      width: 78%;
+    }
+
+    .ctx__name {
+      font-size: 1rem;
+    }
+
+    .ctx--interactive .ctx__name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .ctx__num {
+      font-size: 0.75rem;
+    }
+
+    .ctx__label.is-selected .ctx__num {
+      color: var(--brick);
+    }
+
+    .ctx__rel {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>
+
+<script>
+  interface CtxData {
+    related: Record<string, string[]>;
+    hull: Record<string, string>;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-ctx]').forEach((root) => {
+    const json = root.querySelector('[data-ctx-data]')?.textContent;
+    if (!json) return;
+    const data = JSON.parse(json) as CtxData;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const nodes = [...root.querySelectorAll<SVGCircleElement>('[data-node]')];
+    const edges = [...root.querySelectorAll<SVGPathElement>('[data-edge]')];
+    const hull = root.querySelector<SVGPolygonElement>('[data-ctx-hull]');
+    const ids = tabs.map((t) => t.dataset.tab ?? '');
+
+    const select = (id: string, opts: { focus?: boolean; updateHash?: boolean } = {}) => {
+      if (!ids.includes(id)) return;
+      const related = data.related[id] ?? [];
+      root.dataset.selected = id;
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const tid = t.dataset.tab ?? '';
+        t.classList.toggle('is-selected', on);
+        t.classList.toggle('is-related', related.includes(tid));
+        t.classList.toggle('is-dim', !on && !related.includes(tid));
+        if (on && opts.focus) t.focus();
+      });
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+      nodes.forEach((n) => {
+        const nid = n.dataset.node ?? '';
+        n.classList.toggle('is-selected', nid === id);
+        n.classList.toggle('is-related', related.includes(nid));
+        n.classList.toggle('is-dim', nid !== id && !related.includes(nid));
+      });
+      edges.forEach((e) => {
+        const on = e.dataset.a === id || e.dataset.b === id;
+        e.classList.toggle('is-on', on);
+        e.classList.toggle('is-off', !on);
+        e.classList.remove('is-hot');
+      });
+      if (hull) hull.setAttribute('points', data.hull[id] ?? '');
+      if (opts.updateHash) history.replaceState(null, '', `#${id}`);
+    };
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t.dataset.tab ?? '', { updateHash: true }));
+      t.addEventListener('keydown', (e) => {
+        let next = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabs.length - 1;
+        if (next < 0) return;
+        e.preventDefault();
+        select(ids[next], { focus: true, updateHash: true });
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) => {
+      const edge = () => edges.find((e) => e.dataset.edge === b.dataset.edgeRef);
+      const hot = (on: boolean) => edge()?.classList.toggle('is-hot', on);
+      b.addEventListener('pointerenter', () => hot(true));
+      b.addEventListener('pointerleave', () => hot(false));
+      b.addEventListener('focus', () => hot(true));
+      b.addEventListener('blur', () => hot(false));
+      b.addEventListener('click', () => select(b.dataset.goto ?? '', { focus: true, updateHash: true }));
+    });
+
+    const fromHash = decodeURIComponent(location.hash.slice(1));
+    if (ids.includes(fromHash)) select(fromHash);
+    window.addEventListener('hashchange', () => {
+      const h = decodeURIComponent(location.hash.slice(1));
+      if (ids.includes(h)) select(h);
+    });
+  });
+</script>

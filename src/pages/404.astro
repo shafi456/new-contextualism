@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { NAV } from '../lib/site';
+import { url } from '../lib/url';
+---
+
+<Base title="Page not found" noindex>
+  <PageHeader
+    label="Error 404"
+    title="This page could not be found."
+    intro="It may have moved, or the address may be mistyped. Records in the archive keep their addresses permanently; if you followed a link to one, please tell the editors."
+    compact
+  >
+    <ul class="lost" role="list">
+      {
+        NAV.map((item) => (
+          <li>
+            <a class="arrow-link arrow-link--quiet" href={item.href}>
+              {item.label} <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a class="arrow-link arrow-link--quiet" href={url('/search/')} data-search-open>Search <span class="arrow" aria-hidden="true">→</span></a>
+      </li>
+    </ul>
+  </PageHeader>
+</Base>
+
+<style>
+  .lost {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    margin: 0;
+  }
+</style>

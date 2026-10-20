@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Editorial interface · New Contextualism</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!--
+      Decap CMS, the editorial interface for this platform. Its configuration
+      is in config.yml in this folder; see README.md for local editing and for
+      setting up editor sign-in in production.
+    -->
+    <script src="https://unpkg.com/decap-cms@3.17.1/dist/decap-cms.js"></script>
+    <script>
+      // Resolved against this page, so it also works when the site lives in a sub-folder.
+      window.CMS && window.CMS.registerPreviewStyle(new URL('preview.css', location.href).href);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+---
+/**
+ * A scholarly list of archive records. Each row carries data attributes used
+ * by the archive filters; without JavaScript the full list is shown.
+ */
+import type { Registry, Publication } from '../lib/content';
+import { displayName, formatDate } from '../lib/format';
+import { pubYear } from '../lib/cite';
+import { TYPE_LABELS, COLLECTION_LABELS } from '../lib/provenance';
+import { url } from '../lib/url';
+
+interface Props {
+  reg: Registry;
+  records: Publication[];
+  compact?: boolean;
+  filterable?: boolean;
+}
+
+const { reg, records, compact = false, filterable = false } = Astro.props;
+
+const byline = (p: Publication) => {
+  const people = p.data.authors.length ? p.data.authors : p.data.editors;
+  const names = people.map(displayName);
+  const who = names.length > 3 ? `${names.slice(0, 3).join(', ')} et al.` : names.join(', ');
+  return p.data.editors.length && !p.data.authors.length ? `${who} (eds)` : who;
+};
+const where = (p: Publication) => p.data.venue ?? p.data.container ?? p.data.publisher ?? '';
+const when = (p: Publication) => (p.data.date ? formatDate(p.data.date) : String(pubYear(p) ?? 'n.d.'));
+const attr = (list: string[]) => list.map((s) => s.toLowerCase()).join('|');
+---
+
+<ol class:list={['records', { 'records--compact': compact }]} role="list" data-records>
+  {
+    records.map((p) => (
+      <li
+        class="record"
+        data-record
+        data-type={p.data.type}
+        data-year={pubYear(p) ?? ''}
+        data-authors={attr([...p.data.authors, ...p.data.editors].map(displayName))}
+        data-dimensions={attr(p.data.dimensions)}
+        data-topics={attr(p.data.topics)}
+        data-collection={p.data.collection}
+        data-text={`${p.data.title} ${byline(p)} ${where(p)} ${p.data.summary ?? ''} ${p.data.topics.join(' ')}`.toLowerCase()}
+      >
+        <span class="record__year num">{pubYear(p) ?? 'n.d.'}</span>
+        <div class="record__main">
+          <a class="record__title" href={url(`/research/${p.id}/`)}>
+            {p.data.title}
+          </a>
+          <p class="record__by">
+            {byline(p)}
+            {where(p) && (
+              <>
+                <span class="record__sep" aria-hidden="true">
+                  —
+                </span>
+                <i>{where(p)}</i>
+              </>
+            )}
+          </p>
+          {!compact && p.data.summary && <p class="record__summary">{p.data.summary}</p>}
+        </div>
+        <div class="record__meta">
+          <span class="label record__type">{TYPE_LABELS[p.data.type]}</span>
+          {filterable && <span class="record__collection">{COLLECTION_LABELS[p.data.collection]}</span>}
+          {!compact && <span class="record__date">{when(p)}</span>}
+          <span class="record__cite">{reg.labels.get(p.id)}</span>
+        </div>
+        {(p.data.doi || p.data.url) && (
+          <a class="record__source" href={p.data.doi ? `https://doi.org/${p.data.doi}` : p.data.url} aria-label={`Source of “${p.data.title}”`}>
+            Source ↗
+          </a>
+        )}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .records {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .record {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 13rem 5rem;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    padding: 1.15rem 0 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .record[hidden] {
+    display: none;
+  }
+
+  .record__year {
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1;
+  }
+
+  .record__title {
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    line-height: 1.15;
+    text-decoration: none;
+    text-wrap: balance;
+  }
+
+  .record__title:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--brick);
+  }
+
+  .record__by {
+    margin-top: 0.35rem;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .record__sep {
+    margin: 0 0.4em;
+    color: var(--grey);
+  }
+
+  .record__summary {
+    margin-top: 0.5rem;
+    max-width: 44rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .record__meta {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .record__type {
+    color: var(--ink);
+  }
+
+  .record__cite {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .record__source {
+    justify-self: end;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    text-decoration-color: var(--rule);
+  }
+
+  .records--compact .record {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 9rem 5rem;
+    padding: 0.95rem 0 1rem;
+  }
+
+  @media (max-width: 900px) {
+    .record,
+    .records--compact .record {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+    }
+
+    .record__meta {
+      grid-column: 2;
+      grid-auto-flow: column;
+      justify-content: start;
+      gap: 1rem;
+    }
+
+    .record__source {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+</style>

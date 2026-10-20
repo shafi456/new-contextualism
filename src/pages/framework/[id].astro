@@ -1,0 +1,389 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Provenance from '../../components/Provenance.astro';
+import Plate from '../../components/Plate.astro';
+import ContextDiagram from '../../components/ContextDiagram.astro';
+import RecordList from '../../components/RecordList.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import Bibliography from '../../components/Bibliography.astro';
+import { citations, projectsForDimension, recordsForDimension, registry, relationsFor } from '../../lib/content';
+import { dimensionMedia } from '../../lib/media';
+import { pad } from '../../lib/format';
+import { url } from '../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const reg = await registry();
+  return reg.dimensions.map((d) => ({ params: { id: d.id } }));
+}) satisfies GetStaticPaths;
+
+const reg = await registry();
+const { id } = Astro.params;
+const dim = reg.dimension.get(id!)!;
+const d = dim.data;
+const index = reg.dimensions.indexOf(dim);
+const prev = reg.dimensions[(index - 1 + reg.dimensions.length) % reg.dimensions.length];
+const next = reg.dimensions[(index + 1) % reg.dimensions.length];
+
+const cite = citations(reg, `framework/${id}`);
+const definition = cite.md(dim.body);
+cite.add(d.keywordsSource);
+const rels = relationsFor(dim.id).map((r) => {
+  if (r.source) cite.add(r.source);
+  return { ...r, dim: reg.dimension.get(r.other)! };
+});
+const records = recordsForDimension(reg, dim.id);
+const projects = projectsForDimension(reg, dim.id);
+const media = dimensionMedia(dim);
+const name = d.name;
+---
+
+<Base title={`${name} · Framework`} description={`${d.summary} The ${name.toLowerCase()} dimension of New Contextualism.`}>
+  <nav class="wrap crumbs label" aria-label="Breadcrumb">
+    <a href={url('/framework/')}>Framework</a> <span aria-hidden="true">/</span> <span aria-current="page">{name}</span>
+  </nav>
+  <PageHeader label={`Dimension ${pad(d.number)} of ${pad(reg.dimensions.length)}`} title={name} intro={d.summary} compact />
+
+  <section class="dimension" aria-labelledby="definition-title">
+    <div class="wrap grid">
+      <div class="dimension__main">
+        <h2 class="dimension__h" id="definition-title">Definition</h2>
+        <Provenance kind={d.provenance} approval={d.approval} />
+        <div class="prose dimension__prose" set:html={definition} />
+      </div>
+      <aside class="dimension__aside" aria-label="Terms and questions">
+        <div class="terms">
+          <p class="label">In the founder’s terms</p>
+          <p class="terms__words">{d.keywords.join(', ')}</p>
+          <p class="small muted">
+            As published in <a href={`#ref-${d.keywordsSource}`}>{cite.label(d.keywordsSource)}</a>
+          </p>
+        </div>
+        <div class="questions">
+          <p class="label">Key research questions</p>
+          <ol role="list">
+            {d.questions.map((q, i) => (
+              <li>
+                <span class="questions__num">{pad(i + 1)}</span>
+                <span>{q}</span>
+              </li>
+            ))}
+          </ol>
+          <Provenance kind="editorial-summary" approval={d.approval} note="Questions proposed by the editors" />
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="diagram-title">
+    <div class="wrap">
+      <SectionHead label="Analytical diagram" />
+      <h2 class="visually-hidden" id="diagram-title">Analytical diagram</h2>
+      <Plate
+        src={media.src}
+        alt={media.alt}
+        width={media.width}
+        height={media.height}
+        ratio="4 / 3"
+        tag={media.tag}
+        caption={media.caption}
+        class="dimension__plate"
+      />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="connections-title">
+    <div class="wrap">
+      <SectionHead label="Connections" />
+      <div class="grid connections">
+        <div class="connections__diagram">
+          <ContextDiagram reg={reg} mode="static" selected={dim.id} />
+        </div>
+        <div class="connections__list">
+          <h2 class="dimension__h2" id="connections-title">{name} in relation</h2>
+          <Provenance kind="interpretation" note="Relations proposed by the editors" />
+          <ul role="list">
+            {
+              rels.map((r) => (
+                <li>
+                  <a class="connections__name" href={url(`/framework/${r.other}/`)}>
+                    <span class="label">{pad(r.dim.data.number)}</span> {r.dim.data.name}
+                  </a>
+                  <p class="connections__note">
+                    {r.note}
+                    {r.source && (
+                      <>
+                        {' '}
+                        <span class="muted small">
+                          Example drawn from <a href={`#ref-${r.source}`}>{cite.label(r.source)}</a>.
+                        </span>
+                      </>
+                    )}
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="records-title">
+    <div class="wrap">
+      <SectionHead label="Relevant publications" />
+      <h2 class="visually-hidden" id="records-title">Relevant publications</h2>
+      {
+        records.length ? (
+          <RecordList reg={reg} records={records} compact />
+        ) : (
+          <p class="pending">
+            <span class="label">No records yet</span>
+            No archive records have yet been tagged with this dimension.
+          </p>
+        )
+      }
+      <p class="dimension__more">
+        <a class="arrow-link arrow-link--quiet" href={url(`/research/?dimension=${dim.id}`)}>
+          Filter the archive by this dimension <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="projects-title">
+    <div class="wrap">
+      <SectionHead label="Related projects" />
+      <h2 class="visually-hidden" id="projects-title">Related projects</h2>
+      {
+        projects.length ? (
+          <div class="grid dimension__projects">
+            {projects.map((p) => (
+              <div class="dimension__project">
+                <ProjectCard project={p} dimensions={reg.dimensions} sizes="(min-width: 900px) 30vw, 100vw" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p class="pending">
+            <span class="label">No projects yet</span>
+            No documented project foregrounds this dimension.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <nav class="wrap pager" aria-label="Other dimensions">
+    <a href={url(`/framework/${prev.id}/`)} rel="prev">
+      <span class="label">Previous · {pad(prev.data.number)}</span>
+      <span class="pager__name">{prev.data.name}</span>
+    </a>
+    <a href={url(`/framework/${next.id}/`)} rel="next" class="pager__next">
+      <span class="label">Next · {pad(next.data.number)}</span>
+      <span class="pager__name">{next.data.name}</span>
+    </a>
+  </nav>
+
+  <div class="section">
+    <div class="wrap">
+      <Bibliography reg={reg} keys={cite.cited()} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .crumbs {
+    display: flex;
+    gap: 0.6rem;
+    padding-top: 1.5rem;
+  }
+
+  .crumbs a {
+    text-decoration-color: var(--rule);
+  }
+
+  .dimension__main {
+    grid-column: 1 / span 7;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .dimension__h {
+    font-family: var(--sans);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .dimension__prose {
+    margin-top: 0.75rem;
+    font-size: 1.0625rem;
+  }
+
+  .dimension__prose :global(p:first-child) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.15rem + 0.55vw, 1.6rem);
+    line-height: 1.3;
+  }
+
+  .dimension__aside {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 2.5rem;
+    align-content: start;
+  }
+
+  .terms {
+    padding: 1.25rem 0 1.4rem;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .terms__words {
+    margin: 0.6rem 0 0.5rem;
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .questions ol {
+    margin: 0.75rem 0 1.25rem;
+  }
+
+  .questions li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .questions__num {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    padding-top: 0.2em;
+  }
+
+  :global(.dimension__plate) {
+    max-width: 64rem;
+  }
+
+  .connections {
+    align-items: start;
+  }
+
+  .connections__diagram {
+    grid-column: 1 / span 6;
+  }
+
+  .connections__list {
+    grid-column: 8 / span 5;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .dimension__h2 {
+    font-size: var(--fs-h3);
+  }
+
+  .connections__list ul {
+    margin: 0;
+  }
+
+  .connections__list li {
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .connections__name {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
+
+  .connections__name:hover {
+    color: var(--brick);
+  }
+
+  .connections__note {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .dimension__more {
+    margin-top: 1.5rem;
+  }
+
+  .dimension__projects {
+    row-gap: 3.5rem;
+  }
+
+  .dimension__project {
+    grid-column: span 4;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--col-gap);
+    margin-top: var(--section);
+  }
+
+  .pager a {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+    text-decoration: none;
+  }
+
+  .pager__next {
+    text-align: right;
+  }
+
+  .pager__name {
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.75rem);
+    line-height: 1;
+  }
+
+  .pager a:hover .pager__name {
+    color: var(--brick);
+  }
+
+  @media (max-width: 1080px) {
+    .dimension__main,
+    .dimension__aside,
+    .connections__diagram,
+    .connections__list {
+      grid-column: 1 / -1;
+    }
+
+    .dimension__aside {
+      margin-top: 3rem;
+    }
+
+    .connections__list {
+      margin-top: 2.5rem;
+    }
+
+    .dimension__project {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .dimension__project {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

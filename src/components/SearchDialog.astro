@@ -1,0 +1,168 @@
+---
+import { url } from '../lib/url';
+/** Site search, opened from the header. Runs entirely in the browser. */
+---
+
+<dialog class="search-dialog" id="search-dialog" aria-labelledby="search-dialog-title" data-search-dialog>
+  <div class="wrap search-dialog__inner">
+    <div class="search-dialog__bar">
+      <h2 class="label" id="search-dialog-title">Search the platform</h2>
+      <button type="button" class="search-dialog__close" data-search-close>Close</button>
+    </div>
+    <form role="search" action={url('/search/')} method="get" data-search-form>
+      <label class="visually-hidden" for="search-dialog-input">Search terms</label>
+      <input
+        id="search-dialog-input"
+        class="search-input"
+        name="q"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Philosophy, dimensions, projects, research…"
+        data-search-input
+      />
+    </form>
+    <p class="label search-dialog__status" role="status" aria-live="polite" data-search-status></p>
+    <ol class="search-results" role="list" data-search-results></ol>
+  </div>
+</dialog>
+
+<style is:global>
+  .search-dialog {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: color-mix(in srgb, var(--paper) 97%, transparent);
+    color: var(--ink);
+  }
+
+  .search-dialog::backdrop {
+    background: var(--paper);
+  }
+
+  .search-dialog[open] {
+    animation: search-in 0.3s var(--ease);
+  }
+
+  @keyframes search-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .search-dialog__inner {
+    max-width: 64rem;
+    padding-bottom: 4rem;
+  }
+
+  .search-dialog__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .search-dialog__close {
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    padding: 0.2rem 0 0.1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .search-input {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 0.35rem 0 0.6rem;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    background: transparent;
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3.25rem);
+    line-height: 1.15;
+    border-radius: 0;
+    appearance: none;
+  }
+
+  .search-input::placeholder {
+    color: var(--grey);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-bottom-color: var(--brick);
+  }
+
+  .search-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .search-dialog__status {
+    margin-top: 1rem;
+    min-height: 1.2em;
+  }
+
+  .search-results {
+    margin: 0.75rem 0 0;
+  }
+
+  .search-results li {
+    border-top: 1px solid var(--rule);
+  }
+
+  .search-results a {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.25rem 1.5rem;
+    padding: 1rem 0;
+    text-decoration: none;
+  }
+
+  .search-results a:hover .search-result__title,
+  .search-results a:focus-visible .search-result__title {
+    text-decoration: underline;
+    text-decoration-color: var(--brick);
+    text-underline-offset: 0.2em;
+  }
+
+  .search-result__kind {
+    padding-top: 0.35rem;
+  }
+
+  .search-result__title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .search-result__excerpt {
+    grid-column: 2;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .search-results mark {
+    background: color-mix(in srgb, var(--sage) 70%, transparent);
+    color: inherit;
+    padding: 0 0.08em;
+  }
+
+  @media (max-width: 640px) {
+    .search-results a {
+      grid-template-columns: 1fr;
+    }
+
+    .search-result__excerpt {
+      grid-column: 1;
+    }
+  }
+</style>

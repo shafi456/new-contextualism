@@ -1,0 +1,97 @@
+---
+/**
+ * The provenance label that accompanies claim-bearing text: published source,
+ * editorial summary, proposed statement, founder-approved, or interpretation.
+ */
+import { PROVENANCE_META, type Provenance } from '../lib/provenance';
+import { url } from '../lib/url';
+
+interface Props {
+  kind: Provenance;
+  approval?: 'pending' | 'approved';
+  note?: string;
+  class?: string;
+}
+
+const { kind, approval, note, class: className } = Astro.props;
+const meta = PROVENANCE_META[kind];
+const pending = approval === 'pending' && kind !== 'published-source';
+---
+
+<p class:list={['provenance', `provenance--${kind}`, className]}>
+  <span class="provenance__item"><span class="provenance__mark" aria-hidden="true"></span><a
+      class="provenance__label"
+      href={url('/editorial-standards/#provenance-labels')}
+      title={meta.description}>{meta.label}</a
+    ></span>
+  {pending && <span class="provenance__item provenance__extra">Awaiting the founder’s approval</span>}
+  {note && <span class="provenance__item provenance__extra">{note}</span>}
+</p>
+
+<style>
+  .provenance {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    line-height: 1.8;
+    color: var(--ink-2);
+  }
+
+  /* Items flow as text; a separator stays with the item it follows. */
+  .provenance__item {
+    white-space: nowrap;
+  }
+
+  .provenance__item:not(:last-child)::after {
+    content: '·';
+    margin: 0 0.7em;
+    color: var(--grey);
+  }
+
+  .provenance__label {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .provenance__label:hover {
+    border-bottom-color: var(--brick);
+  }
+
+  .provenance__mark {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.5rem;
+    vertical-align: 0.02em;
+    border: 1px solid var(--ink);
+  }
+
+  /* One mark per kind, so labels stay distinct without relying on colour. */
+  .provenance--published-source .provenance__mark {
+    background: var(--ink);
+  }
+
+  .provenance--editorial-summary .provenance__mark {
+    background: linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  }
+
+  .provenance--proposed .provenance__mark {
+    border-color: var(--brick);
+    border-radius: 50%;
+  }
+
+  .provenance--proposed .provenance__label {
+    color: var(--brick);
+  }
+
+  .provenance--founder-approved .provenance__mark {
+    background: var(--ink);
+    border-radius: 50%;
+  }
+
+  .provenance--interpretation .provenance__mark {
+    transform: rotate(45deg) scale(0.85);
+  }
+</style>

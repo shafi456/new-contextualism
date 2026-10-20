@@ -1,0 +1,563 @@
+# Decap CMS: the editorial interface for New Contextualism.
+#
+# Local editing (no account needed):
+#   1. npm run dev        (the site, at http://localhost:4321)
+#   2. npm run cms        (the local content server, in a second terminal)
+#   3. open http://localhost:4321/admin/
+# Changes are written straight to the Markdown and JSON files in src/content.
+#
+# Production: the content lives in the GitHub repository below. Editors sign in
+# with GitHub once an OAuth provider is set up (see README.md, "Editorial interface").
+#
+# Keep the fields here in step with the schemas in src/content.config.ts and
+# src/lib/site.ts. The build checks every reference and fails if one is broken.
+
+backend:
+  name: github
+  repo: shafi456/new-contextualism
+  branch: main
+  commit_messages:
+    create: 'Create {{collection}} “{{slug}}”'
+    update: 'Update {{collection}} “{{slug}}”'
+    delete: 'Delete {{collection}} “{{slug}}”'
+    uploadMedia: 'Upload “{{path}}”'
+    deleteMedia: 'Delete “{{path}}”'
+
+# Uses the local content server (npm run cms) when the interface runs on localhost.
+local_backend: true
+
+# To require review before publication, uncomment the next line. Each change
+# then becomes a draft (a pull request on GitHub) that an approver publishes.
+# publish_mode: editorial_workflow
+
+# Uploaded images are optimised at build time. Every image needs alt text and a credit.
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
+
+locale: en
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: '-'
+
+# Reusable field definitions
+_provenance: &provenance
+  label: Provenance
+  name: provenance
+  widget: select
+  hint: Where the text comes from. See /editorial-standards/.
+  options:
+    - { label: 'Published source (verified, cited)', value: published-source }
+    - { label: 'Editorial summary (written from cited sources)', value: editorial-summary }
+    - { label: 'Proposed statement (draft for discussion)', value: proposed }
+    - { label: 'Approved by the founder', value: founder-approved }
+    - { label: 'Interpretation or critical commentary', value: interpretation }
+
+_approval: &approval
+  label: Founder’s approval
+  name: approval
+  widget: select
+  default: pending
+  options:
+    - { label: 'Awaiting approval', value: pending }
+    - { label: 'Approved', value: approved }
+
+_draft: &draft
+  label: Draft (hidden from the published site)
+  name: draft
+  widget: boolean
+  default: false
+  required: false
+
+_archived: &archived
+  label: Archived (kept at its address, removed from listings)
+  name: archived
+  widget: boolean
+  default: false
+  required: false
+
+_dimensions: &dimensions
+  label: Dimensions
+  name: dimensions
+  widget: relation
+  collection: dimensions
+  value_field: '{{slug}}'
+  search_fields: [name]
+  display_fields: [name]
+  multiple: true
+  required: false
+
+_source: &source
+  label: Source
+  name: source
+  widget: relation
+  collection: publications
+  value_field: '{{slug}}'
+  search_fields: [title, venue]
+  display_fields: [title]
+
+_sources: &sources
+  label: Sources
+  name: sources
+  widget: relation
+  collection: publications
+  value_field: '{{slug}}'
+  search_fields: [title, venue]
+  display_fields: [title]
+  multiple: true
+
+_figure: &figure
+  - { label: Image, name: src, widget: image }
+  - { label: Alternative text, name: alt, widget: text, hint: Describe what the image shows for readers who cannot see it. }
+  - { label: Credit, name: credit, widget: string, hint: 'Author or rights holder, e.g. “Drawing: A. Rahman”.' }
+  - { label: Caption, name: caption, widget: text, required: false }
+
+collections:
+  - name: settings
+    label: Site
+    editor: { preview: false }
+    files:
+      - name: settings
+        label: Site settings
+        file: src/content/site/settings.json
+        format: json
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Tagline, name: tagline, widget: string }
+          - { label: Tagline approved by the founder, name: taglineApproved, widget: boolean }
+          - { label: Description, name: description, widget: text }
+          - { label: Footer line, name: footerLine, widget: string }
+          - label: Pre-publication edition
+            name: prepublication
+            widget: boolean
+            hint: Shows the pre-publication notice and keeps the site out of search engines. Turn off only after approval.
+          - { label: Pre-publication note, name: prepublicationNote, widget: string }
+          - label: Contact email
+            name: contactEmail
+            widget: string
+            required: false
+            hint: Leave empty until the address is confirmed. The Contact page adapts automatically.
+          - label: Institutional links (verified only)
+            name: institutionalLinks
+            widget: list
+            required: false
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: url, widget: string }
+          - label: Social media accounts (verified only)
+            name: socialLinks
+            widget: list
+            required: false
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: url, widget: string }
+          - label: Mission
+            name: mission
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: text }
+              - label: Status
+                name: provenance
+                widget: select
+                options:
+                  - { label: Proposed, value: proposed }
+                  - { label: Approved by the founder, value: founder-approved }
+          - label: Vision
+            name: vision
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: text }
+              - label: Status
+                name: provenance
+                widget: select
+                options:
+                  - { label: Proposed, value: proposed }
+                  - { label: Approved by the founder, value: founder-approved }
+
+      - name: chronology
+        label: Chronology
+        file: src/content/site/chronology.json
+        format: json
+        fields:
+          - label: Entries
+            name: items
+            widget: list
+            summary: '{{fields.date}} · {{fields.title}}'
+            fields:
+              - label: Date
+                name: date
+                widget: string
+                pattern: ['^\d{4}(-\d{2}(-\d{2})?)?$', 'Use YYYY, YYYY-MM or YYYY-MM-DD']
+              - { label: Date as displayed (optional), name: dateLabel, widget: string, required: false, hint: 'e.g. 2004–2007' }
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: text, widget: text }
+              - *sources
+              - { label: Link (optional), name: href, widget: string, required: false }
+
+      - name: relations
+        label: Framework relations
+        file: src/content/framework/relations.json
+        format: json
+        fields:
+          - { label: Note, name: note, widget: text }
+          - label: Relations
+            name: relations
+            widget: list
+            summary: '{{fields.a}} — {{fields.b}}'
+            fields:
+              - { <<: *dimensions, label: Dimension A, name: a, multiple: false, required: true }
+              - { <<: *dimensions, label: Dimension B, name: b, multiple: false, required: true }
+              - { label: Relation, name: note, widget: text }
+              - { <<: *source, label: Example drawn from (optional), required: false }
+
+  - name: dimensions
+    label: Dimensions
+    label_singular: Dimension
+    folder: src/content/dimensions
+    create: false
+    delete: false
+    extension: md
+    format: frontmatter
+    identifier_field: name
+    sortable_fields: [number, name]
+    summary: '{{number}} · {{name}}'
+    fields:
+      - { label: Number, name: number, widget: number, value_type: int, min: 1, max: 10 }
+      - { label: Name, name: name, widget: string }
+      - { label: Short name (diagram labels), name: shortName, widget: string, required: false }
+      - { label: Summary (one line), name: summary, widget: string }
+      - { label: The founder’s terms, name: keywords, widget: list, hint: As published, word for word. }
+      - { <<: *source, label: Source of the terms, name: keywordsSource }
+      - { label: Key research questions, name: questions, widget: list, required: false }
+      - *provenance
+      - *approval
+      - { label: Definition, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name], e.g. [@reza-2025-deltaic-bangladesh].' }
+
+  - name: philosophy
+    label: Philosophy
+    label_singular: Section
+    folder: src/content/philosophy
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{fields.order}}-{{slug}}'
+    sortable_fields: [order, title]
+    summary: '{{order}} · {{title}}'
+    fields:
+      - { label: Order, name: order, widget: number, value_type: int }
+      - { label: Title, name: title, widget: string }
+      - { label: Short title (contents), name: navTitle, widget: string, required: false }
+      - *provenance
+      - *approval
+      - label: Figure
+        name: figure
+        widget: select
+        default: none
+        options: [none, chronology, scales, dimensions, relations, process, bibliography]
+      - label: Pull quotation (optional)
+        name: quote
+        widget: object
+        required: false
+        hint: Only text checked word for word against the cited source.
+        fields:
+          - { label: Text, name: text, widget: text }
+          - { label: Author, name: author, widget: string }
+          - *source
+      - { label: Text, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name].' }
+
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/content/projects
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{slug}}'
+    sortable_fields: [order, title, documented]
+    summary: '{{title}} ({{status}})'
+    view_filters:
+      - { label: Completed, field: status, pattern: completed }
+      - { label: Ongoing research, field: status, pattern: ongoing }
+      - { label: Conceptual proposals, field: status, pattern: conceptual }
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Completed project (built or realised), value: completed }
+          - { label: Ongoing research, value: ongoing }
+          - { label: Conceptual proposal (unbuilt), value: conceptual }
+      - { label: Type, name: kind, widget: string, hint: 'e.g. Undergraduate thesis, Competition entry' }
+      - { label: Year, name: year, widget: number, value_type: int, required: false }
+      - { label: Year first documented, name: documented, widget: number, value_type: int }
+      - { label: Location, name: location, widget: string }
+      - label: Team
+        name: team
+        widget: list
+        required: false
+        summary: '{{fields.name}}'
+        fields:
+          - { label: Name, name: name, widget: string }
+          - { label: Role, name: role, widget: string, required: false }
+      - { label: Summary (cards), name: summary, widget: text }
+      - { <<: *dimensions, label: Dimensions emphasised, name: layers }
+      - label: Basis of the emphasis
+        name: layersBasis
+        widget: select
+        default: reported
+        options:
+          - { label: Reported in the sources, value: reported }
+          - { label: Editorial reading, value: editorial }
+      - { label: Note on emphasis, name: layersNote, widget: text, required: false }
+      - { label: Context and background, name: context, widget: markdown, required: false }
+      - { label: Research questions, name: questions, widget: list, required: false }
+      - { label: Historical conditions, name: historical, widget: markdown, required: false }
+      - { label: Social conditions, name: social, widget: markdown, required: false }
+      - { label: Cultural conditions, name: cultural, widget: markdown, required: false }
+      - { label: Ecological conditions, name: ecological, widget: markdown, required: false }
+      - { label: Analytical process, name: process, widget: markdown, required: false }
+      - { label: Design response, name: response, widget: markdown, required: false }
+      - { label: Outcomes and critical reflections, name: outcomes, widget: markdown, required: false }
+      - *sources
+      - label: Abstract plate (used until permitted images are added)
+        name: plate
+        widget: select
+        default: fabric
+        options: [river, canal, fabric, megablock, waterfront, hilltop, village, strata, studio]
+      - { label: Cover image (with permission), name: cover, widget: object, required: false, fields: *figure }
+      - { label: Further images (with permission), name: gallery, widget: list, required: false, fields: *figure }
+      - { label: Featured on the home page, name: featured, widget: boolean, default: false, required: false }
+      - { label: Order, name: order, widget: number, value_type: int, default: 100 }
+      - *provenance
+      - *approval
+      - *draft
+      - *archived
+
+  - name: publications
+    label: Archive and references
+    label_singular: Record
+    folder: src/content/publications
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{slug}}'
+    identifier_field: title
+    sortable_fields: [title, year]
+    summary: '{{title}} ({{year}})'
+    view_groups:
+      - { label: Collection, field: collection }
+      - { label: Type, field: type }
+    fields:
+      - { label: Title, name: title, widget: string, hint: As published. }
+      - { label: Authors, name: authors, widget: list, required: false, hint: '“Family, Given” for people (e.g. “Reza, Mohammad Habib”); organisations as written.' }
+      - { label: Editors, name: editors, widget: list, required: false }
+      - label: Date of publication
+        name: date
+        widget: datetime
+        required: false
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        picker_utc: true
+      - { label: Year, name: year, widget: number, value_type: int, required: false }
+      - label: Type
+        name: type
+        widget: select
+        options:
+          - { label: Book, value: book }
+          - { label: Edited book, value: edited-book }
+          - { label: Book chapter, value: chapter }
+          - { label: Journal article, value: article }
+          - { label: Essay, value: essay }
+          - { label: Conference paper, value: conference-paper }
+          - { label: Lecture, value: lecture }
+          - { label: Report, value: report }
+          - { label: Interview, value: interview }
+          - { label: Event listing, value: event-listing }
+          - { label: Web page, value: web-page }
+          - { label: Thesis, value: thesis }
+      - label: Collection
+        name: collection
+        widget: select
+        options:
+          - { label: New Contextualism (archive), value: new-contextualism }
+          - { label: Founder’s earlier scholarship (archive), value: founder }
+          - { label: Wider reference (reading lists), value: reference }
+          - { label: Documentary source (profiles, listings), value: source }
+      - { label: Venue (journal, newspaper, website or event), name: venue, widget: string, required: false }
+      - { label: Section, name: section, widget: string, required: false }
+      - { label: Book title (chapters), name: container, widget: string, required: false }
+      - { label: Publisher, name: publisher, widget: string, required: false }
+      - { label: Place, name: place, widget: string, required: false }
+      - { label: Volume, name: volume, widget: string, required: false }
+      - { label: Issue, name: issue, widget: string, required: false }
+      - { label: Pages, name: pages, widget: string, required: false }
+      - { label: DOI, name: doi, widget: string, required: false }
+      - { label: URL, name: url, widget: string, required: false }
+      - label: Date consulted (web pages)
+        name: accessed
+        widget: datetime
+        required: false
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        picker_utc: true
+      - label: Also published
+        name: alsoPublished
+        widget: list
+        required: false
+        fields:
+          - { label: Venue, name: venue, widget: string }
+          - { label: Date, name: date, widget: datetime, required: false, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+          - { label: URL, name: url, widget: string }
+      - *dimensions
+      - { label: Topics, name: topics, widget: list, required: false }
+      - { label: One-line summary, name: summary, widget: text, required: false }
+      - label: Event
+        name: event
+        widget: relation
+        collection: events
+        value_field: '{{slug}}'
+        search_fields: [title]
+        display_fields: [title]
+        required: false
+      - { <<: *sources, label: Cited in, name: citedBy, required: false }
+      - *provenance
+      - *draft
+      - *archived
+      - { label: Abstract (editorial), name: body, widget: markdown, required: false }
+
+  - name: events
+    label: Events
+    label_singular: Event
+    folder: src/content/events
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{fields.start}}-{{slug}}'
+    sortable_fields: [start, title]
+    summary: '{{start}} · {{title}}'
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Type
+        name: type
+        widget: select
+        options:
+          - { label: Workshop, value: workshop }
+          - { label: Symposium, value: symposium }
+          - { label: Lecture, value: lecture }
+          - { label: Seminar, value: seminar }
+          - { label: Conference, value: conference }
+          - { label: Call for papers, value: call-for-papers }
+          - { label: Exhibition, value: exhibition }
+      - { label: Start, name: start, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+      - { label: End, name: end, widget: datetime, required: false, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+      - { label: Time, name: time, widget: string, required: false }
+      - label: Format
+        name: format
+        widget: select
+        default: in-person
+        options: [in-person, online, hybrid]
+      - { label: Location, name: location, widget: string, required: false }
+      - { label: Organiser, name: organiser, widget: string, required: false }
+      - label: Programme
+        name: programme
+        widget: list
+        required: false
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Speaker, name: speaker, widget: string, required: false }
+          - { <<: *source, label: Archive record, name: record, required: false }
+      - label: Participants
+        name: participants
+        widget: list
+        required: false
+        fields:
+          - { label: Name, name: name, widget: string }
+          - { label: Role, name: role, widget: string, required: false }
+      - { label: Summary, name: summary, widget: text }
+      - *sources
+      - { label: Registration link (forthcoming events), name: registration, widget: string, required: false }
+      - { label: Deadline (calls for papers), name: deadline, widget: datetime, required: false, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+      - *provenance
+      - *draft
+      - *archived
+      - { label: Description, name: body, widget: markdown, required: false }
+
+  - name: people
+    label: People
+    label_singular: Person
+    folder: src/content/people
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{slug}}'
+    identifier_field: name
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Honorific, name: honorific, widget: string, required: false }
+      - { label: Role on this platform, name: role, widget: string }
+      - { label: Portrait (approved), name: portrait, widget: object, required: false, fields: *figure }
+      - label: Appointments
+        name: appointments
+        widget: list
+        required: false
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Organisation, name: organisation, widget: string }
+          - { label: Period, name: period, widget: string, required: false }
+          - *source
+      - label: Education
+        name: education
+        widget: list
+        required: false
+        fields:
+          - { label: Degree, name: degree, widget: string }
+          - { label: Institution, name: institution, widget: string }
+          - { label: Year, name: year, widget: number, value_type: int, required: false }
+          - *source
+      - label: Affiliations
+        name: affiliations
+        widget: list
+        required: false
+        fields:
+          - { label: Title, name: title, widget: string }
+          - *source
+      - label: Lectures and presentations
+        name: presentations
+        widget: list
+        required: false
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Venue, name: venue, widget: string }
+          - { label: Date, name: date, widget: string }
+          - *source
+      - label: Profiles elsewhere
+        name: links
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: URL, name: url, widget: string }
+      - *provenance
+      - *approval
+      - { label: Biography, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name].' }
+
+  - name: pages
+    label: Pages
+    label_singular: Page
+    folder: src/content/pages
+    create: false
+    delete: false
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Label, name: label, widget: string }
+      - { label: Introduction, name: intro, widget: text, required: false }
+      - { label: Last updated, name: updated, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+      - *provenance
+      - *approval
+      - { label: Text, name: body, widget: markdown }

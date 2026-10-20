@@ -1,0 +1,155 @@
+{
+  "note": "Editorial interpretation. The published texts describe the ten dimensions as overlapping but do not specify pairwise relations. Each relation below is proposed by the editors and, where possible, illustrated by an example from the published record (source). Review against the founder's approved publications before publishing.",
+  "relations": [
+    {
+      "a": "social",
+      "b": "economic",
+      "note": "Livelihoods and affordability decide who can remain in a place, and so whom it is for.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "social",
+      "b": "political",
+      "note": "Governance determines whose needs are recognised and who keeps access to shared space.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "social",
+      "b": "historical",
+      "note": "Collective memory binds communities to places; losing a place can mean losing part of a shared origin.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "social",
+      "b": "cultural",
+      "note": "Shared practices, rituals and everyday routines are how communities sustain their culture in space."
+    },
+    {
+      "a": "social",
+      "b": "urban",
+      "note": "Streets, courtyards and public spaces can gather people, or keep them apart.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "economic",
+      "b": "political",
+      "note": "Patronage and regulation steer where investment flows and what gets built."
+    },
+    {
+      "a": "economic",
+      "b": "cultural",
+      "note": "Heritage, craft and ritual can sustain local economies, as pilgrimage and community-based tourism show.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "economic",
+      "b": "urban",
+      "note": "Land markets and infrastructure investment drive density, sprawl and the loss of shared space."
+    },
+    {
+      "a": "political",
+      "b": "historical",
+      "note": "Policy and patronage decide which histories are preserved, and which are allowed to disappear."
+    },
+    {
+      "a": "political",
+      "b": "ecological",
+      "note": "The fate of rivers, canals and wetlands is decided as much by governance as by nature.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "political",
+      "b": "urban",
+      "note": "Planning rules and infrastructure decisions give the city its form."
+    },
+    {
+      "a": "historical",
+      "b": "scientific-technological",
+      "note": "Prediction depends on history: data and models are only as good as our understanding of past patterns.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "historical",
+      "b": "geographical",
+      "note": "Settlement patterns shaped by water and terrain persist across centuries, as the delta's earthen embankments show.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "historical",
+      "b": "cultural",
+      "note": "Memory and ritual accumulate as layers of meaning; routes between temple and settlement can become the skeleton of new design.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "historical",
+      "b": "urban",
+      "note": "Urban fabrics are palimpsests: an old market can hold dense habitation, informal commerce and heritage structures at once.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "historical",
+      "b": "architectural",
+      "note": "Precedent carries knowledge forward; hybrid forms record encounters between building traditions.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "ecological",
+      "b": "scientific-technological",
+      "note": "Ecosystems are a source of technical knowledge: mangroves dissipate wave energy, termite mounds cool passively.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "ecological",
+      "b": "geographical",
+      "note": "Climate, topography and water systems set the conditions of settlement, above all in a delta."
+    },
+    {
+      "a": "ecological",
+      "b": "urban",
+      "note": "Urbanisation transforms ecological systems: paved wetlands flood, heat islands intensify, canals are lost to encroachment.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "ecological",
+      "b": "architectural",
+      "note": "Climate shapes form: semi-open transitional spaces, louvres and jalis temper heat and humidity.",
+      "source": "reza-2023-new-contextualism-path"
+    },
+    {
+      "a": "scientific-technological",
+      "b": "urban",
+      "note": "Data analytics and scenario planning help anticipate how cities and their needs will change.",
+      "source": "reza-2023-new-contextualism-path"
+    },
+    {
+      "a": "scientific-technological",
+      "b": "architectural",
+      "note": "Material properties set the limits and possibilities of form, from terracotta to contemporary engineering.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "geographical",
+      "b": "cultural",
+      "note": "Regional encounters produce hybrid cultures; Bengal absorbed Vedic, Buddhist, Jain, Islamic and European influences.",
+      "source": "reza-2025-deltaic-bangladesh"
+    },
+    {
+      "a": "geographical",
+      "b": "urban",
+      "note": "Location and connectivity shape networks of movement; a neglected canal can become a transit route.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "cultural",
+      "b": "architectural",
+      "note": "Beliefs and rituals inform spatial organisation; in one thesis, non-dualism shaped interwoven courts.",
+      "source": "reza-nitu-2025-people-place-justice"
+    },
+    {
+      "a": "urban",
+      "b": "architectural",
+      "note": "Every building becomes part of an existing fabric; typology mediates between the building and the city.",
+      "source": "reza-nitu-2025-people-place-justice"
+    }
+  ]
+}

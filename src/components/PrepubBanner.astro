@@ -1,0 +1,42 @@
+---
+import { settings } from '../lib/site';
+import { url } from '../lib/url';
+---
+
+<aside class="prepub" aria-label="Edition">
+  <div class="wrap prepub__inner">
+    <p class="label prepub__label">Pre-publication edition</p>
+    <p class="prepub__note">
+      {settings.prepublicationNote}
+      <a href={url('/editorial-standards/')}>Editorial standards</a>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .prepub {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  .prepub__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+    padding-block: 0.55rem;
+  }
+
+  .prepub__label {
+    color: var(--ink);
+  }
+
+  .prepub__note a {
+    color: var(--ink);
+    white-space: nowrap;
+    margin-left: 0.4em;
+  }
+</style>

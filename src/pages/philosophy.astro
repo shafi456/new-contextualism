@@ -1,0 +1,285 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Provenance from '../components/Provenance.astro';
+import Quote from '../components/Quote.astro';
+import Bibliography from '../components/Bibliography.astro';
+import Chronology from '../components/Chronology.astro';
+import ScalesDiagram from '../components/ScalesDiagram.astro';
+import ProcessDiagram from '../components/ProcessDiagram.astro';
+import DimensionTable from '../components/DimensionTable.astro';
+import ContextDiagram from '../components/ContextDiagram.astro';
+import { citations, registry } from '../lib/content';
+import { chronology } from '../lib/site';
+import { pad } from '../lib/format';
+import { url } from '../lib/url';
+
+const reg = await registry();
+const cite = citations(reg, 'philosophy');
+const anchor = (id: string) => id.replace(/^\d+-/, '');
+
+// Render every section first so the bibliography knows what was cited.
+const sections = reg.philosophy.map((s) => ({
+  entry: s,
+  id: anchor(s.id),
+  html: cite.md(s.body),
+}));
+const ref = (key: string): [string, string] => {
+  cite.add(key);
+  return [cite.label(key), `#ref-${key}`];
+};
+const quoteCite = Object.fromEntries(
+  reg.philosophy.filter((s) => s.data.quote).map((s) => [s.id, ref(s.data.quote!.source)]),
+);
+const figureCites = {
+  scales: ref('reza-2023-new-contextualism-path'),
+  dimensions: ref('reza-2025-deltaic-bangladesh'),
+  process: ref('reza-nitu-2025-people-place-justice'),
+};
+const chronologyCite = (key: string) => ref(key);
+chronology.forEach((c) => c.sources.forEach((k) => cite.add(k)));
+const furtherReading = reg.publications.filter((p) => p.data.collection === 'reference').map((p) => p.id);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'The philosophy of New Contextualism',
+  about: 'New Contextualism in architecture and urban design',
+  inLanguage: 'en-GB',
+  citation: cite.cited().map((k) => reg.publication.get(k)?.data.title),
+};
+---
+
+<Base
+  title="Philosophy"
+  description="New Contextualism in depth: its origins, its critique of physical contextualism, the ten dimensions, context as a system, applications, critical discussion and a bibliography."
+  type="article"
+  jsonLd={jsonLd}
+>
+  <PageHeader
+    label="Philosophy"
+    title="Philosophy"
+    intro="An account of New Contextualism in eight parts, drawn from the founder’s published writing. Every claim is linked to its source, and summary is kept distinct from interpretation."
+  >
+    <p class="small muted philosophy__note">
+      New Contextualism is a philosophy in development, not a settled doctrine with a single definition. This page traces how it has
+      been articulated in published texts, and where those texts differ.
+    </p>
+  </PageHeader>
+
+  <div class="wrap">
+    <div class="grid philosophy">
+      <nav class="toc" aria-label="On this page">
+        <p class="label">Contents</p>
+        <ol role="list">
+          {
+            sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`} data-toc={s.id}>
+                  <span class="toc__num">{pad(s.entry.data.order)}</span>
+                  <span>{s.entry.data.navTitle ?? s.entry.data.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <div class="philosophy__body">
+        {
+          sections.map(({ entry, id, html }) => (
+            <section class="chapter" id={id} aria-labelledby={`${id}-title`} data-chapter>
+              <p class="label chapter__num">{pad(entry.data.order)}</p>
+              <h2 class="chapter__title" id={`${id}-title`}>
+                {entry.data.title}
+              </h2>
+              <Provenance kind={entry.data.provenance} approval={entry.data.approval} class="chapter__provenance" />
+              {html && <div class="prose chapter__prose" set:html={html} />}
+
+              {entry.data.quote && (
+                <Quote
+                  class="chapter__quote"
+                  text={entry.data.quote.text}
+                  author={entry.data.quote.author}
+                  label={quoteCite[entry.id][0]}
+                  href={quoteCite[entry.id][1]}
+                />
+              )}
+
+              {entry.data.figure === 'chronology' && (
+                <div class="chapter__figure">
+                  <h3 class="label chapter__figure-title">Chronology</h3>
+                  <Chronology items={chronology} cite={chronologyCite} />
+                </div>
+              )}
+              {entry.data.figure === 'scales' && (
+                <div class="chapter__figure">
+                  <ScalesDiagram citation={figureCites.scales} />
+                </div>
+              )}
+              {entry.data.figure === 'dimensions' && (
+                <div class="chapter__figure">
+                  <DimensionTable dimensions={reg.dimensions} citation={figureCites.dimensions} />
+                </div>
+              )}
+              {entry.data.figure === 'relations' && (
+                <div class="chapter__figure chapter__figure--wide">
+                  <ContextDiagram reg={reg} mode="static" selected="" />
+                  <p class="diagram__caption">
+                    <span class="label label--ink">Diagram</span>
+                    The ten dimensions and the relations proposed between them. Editorial interpretation; explore it in the
+                    <a href={url('/framework/')}>Framework</a> section.
+                  </p>
+                </div>
+              )}
+              {entry.data.figure === 'process' && (
+                <div class="chapter__figure">
+                  <ProcessDiagram dimensions={reg.dimensions} citation={figureCites.process} />
+                </div>
+              )}
+              {entry.data.figure === 'bibliography' && (
+                <div class="chapter__figure">
+                  <Bibliography reg={reg} keys={cite.cited()} extra={furtherReading} heading="" />
+                </div>
+              )}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .philosophy__note {
+    max-width: 34rem;
+  }
+
+  .philosophy {
+    align-items: start;
+  }
+
+  .toc {
+    grid-column: 1 / span 3;
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    padding-top: 0.25rem;
+  }
+
+  .toc ol {
+    margin: 0.75rem 0 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .toc a {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--ink-2);
+    transition: color 0.25s var(--ease);
+  }
+
+  .toc a:hover,
+  .toc a[aria-current='true'] {
+    color: var(--ink);
+  }
+
+  .toc a[aria-current='true'] .toc__num {
+    color: var(--brick);
+  }
+
+  .toc__num {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+    padding-top: 0.12em;
+  }
+
+  .philosophy__body {
+    grid-column: 5 / span 8;
+  }
+
+  .chapter {
+    padding-bottom: clamp(4rem, 3rem + 4vw, 7rem);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .chapter + .chapter {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .chapter__title {
+    margin-top: 1.25rem;
+    font-size: var(--fs-h2);
+    max-width: 16ch;
+  }
+
+  :global(.chapter__provenance) {
+    margin-top: 1.5rem;
+  }
+
+  .chapter__prose {
+    margin-top: 2rem;
+    font-size: 1.0625rem;
+    max-width: 40rem;
+  }
+
+  .chapter__prose :global(p:first-child) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.15rem + 0.55vw, 1.6rem);
+    line-height: 1.3;
+  }
+
+  :global(.chapter__quote) {
+    margin-top: 3rem;
+    padding: 1.5rem 0 1.5rem 1.5rem;
+    border-left: 1px solid var(--brick);
+    max-width: 36rem;
+  }
+
+  .chapter__figure {
+    margin-top: 3.5rem;
+  }
+
+  .chapter__figure--wide :global(.ctx__stage) {
+    max-width: 40rem;
+    margin-inline: 0;
+  }
+
+  .chapter__figure-title {
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 1080px) {
+    .toc {
+      display: none;
+    }
+
+    .philosophy__body {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+
+<script>
+  // Mark the contents entry for the chapter being read.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('[data-toc]').forEach((a) => links.set(a.dataset.toc ?? '', a));
+  const chapters = document.querySelectorAll<HTMLElement>('[data-chapter]');
+  if (links.size && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          links.get(entry.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-30% 0px -60% 0px' },
+    );
+    chapters.forEach((c) => io.observe(c));
+  }
+</script>

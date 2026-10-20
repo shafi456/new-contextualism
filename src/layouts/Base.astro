@@ -1,0 +1,68 @@
+---
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '@fontsource-variable/inter/opsz.css';
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PrepubBanner from '../components/PrepubBanner.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+import { settings } from '../lib/site';
+import { url } from '../lib/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description = settings.description, type = 'website', jsonLd, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} · ${settings.title}` : `${settings.title} — ${settings.tagline}`;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+// A pre-publication edition is kept out of search engines until approved.
+const robots = noindex || settings.prepublication ? 'noindex, nofollow' : undefined;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:site_name" content={settings.title} />
+    <meta property="og:title" content={title ?? settings.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#f1efe9" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {settings.prepublication && <PrepubBanner />}
+    <SiteHeader />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+    <SearchDialog />
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

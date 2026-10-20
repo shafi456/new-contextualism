@@ -1,0 +1,127 @@
+---
+/**
+ * Bibliography of the records cited on a page, in Chicago author–date style.
+ * Each entry is the target of in-text citations (#ref-{id}) and links to the
+ * record's persistent page.
+ */
+import type { Registry } from '../lib/content';
+import { chicago } from '../lib/cite';
+import { url } from '../lib/url';
+
+interface Props {
+  reg: Registry;
+  keys: string[];
+  /** Further records to list even if not cited (e.g. a reading list). */
+  extra?: string[];
+  heading?: string;
+  headingLevel?: 2 | 3;
+  grouped?: boolean;
+}
+
+const { reg, keys, extra = [], heading = 'Sources', headingLevel = 2, grouped = true } = Astro.props;
+const ids = [...new Set([...keys, ...extra])].filter((k) => reg.publication.has(k));
+const entries = ids
+  .map((id) => ({ id, pub: reg.publication.get(id)!, label: reg.labels.get(id)! }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+const GROUPS = [
+  { key: 'new-contextualism', title: 'New Contextualism' },
+  { key: 'founder', title: 'The founder’s earlier scholarship' },
+  { key: 'cited', title: 'Works cited in the texts of New Contextualism' },
+  { key: 'reference', title: 'Further reading (editorial selection)' },
+  { key: 'source', title: 'Documentary sources' },
+];
+const groupOf = (e: (typeof entries)[number]) =>
+  e.pub.data.collection === 'reference' && e.pub.data.citedBy.length ? 'cited' : e.pub.data.collection;
+const groups = grouped
+  ? GROUPS.map((g) => ({ ...g, items: entries.filter((e) => groupOf(e) === g.key) })).filter((g) => g.items.length)
+  : [{ key: 'all', title: '', items: entries }];
+const H = `h${headingLevel}` as 'h2' | 'h3';
+const Sub = `h${headingLevel + 1}` as 'h3' | 'h4';
+---
+
+{
+  entries.length > 0 && (
+    <section class="bib" aria-label={heading}>
+      {heading && <H class="bib__heading">{heading}</H>}
+      {groups.map((g) => (
+        <div class="bib__group">
+          {g.title && <Sub class="label bib__group-title">{g.title}</Sub>}
+          <ol class="bib__list" role="list">
+            {g.items.map((e) => (
+              <li class="bib__item" id={`ref-${e.id}`}>
+                <span class="bib__label">{e.label}</span>
+                <span class="bib__entry">
+                  <Fragment set:html={chicago(e.pub, e.label)} />
+                  <a class="bib__record" href={url(`/research/${e.id}/`)}>
+                    Record
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+<style>
+  .bib__heading {
+    font-size: var(--fs-h3);
+    margin-bottom: 1.5rem;
+  }
+
+  .bib__group + .bib__group {
+    margin-top: 2.25rem;
+  }
+
+  .bib__group-title {
+    font-family: var(--sans);
+    font-size: var(--fs-label);
+    margin-bottom: 0.25rem;
+  }
+
+  .bib__list {
+    margin: 0;
+  }
+
+  .bib__item {
+    display: grid;
+    grid-template-columns: minmax(8rem, 12rem) 1fr;
+    gap: 0.25rem 1.5rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    scroll-margin-top: calc(var(--header-h) + 2rem);
+  }
+
+  .bib__item:target {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--sage) 35%, transparent), transparent 80%);
+  }
+
+  .bib__label {
+    font-weight: 500;
+  }
+
+  .bib__entry :global(a) {
+    overflow-wrap: anywhere;
+  }
+
+  .bib__record {
+    margin-left: 0.6rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration-color: var(--rule);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .bib__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

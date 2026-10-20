@@ -1,0 +1,131 @@
+---
+/**
+ * A plate: a drawing or photograph with its caption and credit. Abstract
+ * plates carry a visible tag so they are never mistaken for documentation.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: string | ImageMetadata;
+  alt: string;
+  width?: number;
+  height?: number;
+  ratio?: string;
+  caption?: string;
+  credit?: string;
+  number?: string;
+  tag?: string;
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+  reveal?: boolean;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  ratio,
+  caption,
+  credit,
+  number,
+  tag,
+  eager = false,
+  sizes = '(min-width: 1200px) 60vw, 100vw',
+  class: className,
+  reveal = true,
+} = Astro.props;
+const isAsset = typeof src !== 'string';
+---
+
+<figure class:list={['plate', className]} data-reveal={reveal ? 'plate' : undefined}>
+  <div class="plate__frame" style={ratio ? `aspect-ratio: ${ratio}` : undefined}>
+    {
+      isAsset ? (
+        <Image
+          src={src as ImageMetadata}
+          alt={alt}
+          widths={[480, 800, 1200, 1800]}
+          sizes={sizes}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+        />
+      ) : (
+        <img
+          src={src as string}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchpriority={eager ? 'high' : undefined}
+        />
+      )
+    }
+    {tag && <span class="plate__tag">{tag}</span>}
+  </div>
+  {
+    (caption || credit || number) && (
+      <figcaption class="plate__caption">
+        {number && <span class="plate__number">{number}</span>}
+        {caption && <span>{caption}</span>}
+        {credit && <span class="plate__credit">{credit}</span>}
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .plate__frame {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+    outline: 1px solid var(--rule);
+    outline-offset: -1px;
+  }
+
+  .plate__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .plate__tag {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    padding: 0.25rem 0.45rem 0.2rem;
+    background: var(--paper);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    border: 1px solid var(--rule);
+  }
+
+  .plate__caption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .plate__number {
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    color: var(--ink);
+    padding-top: 0.12em;
+  }
+
+  .plate__credit {
+    font-style: italic;
+  }
+</style>

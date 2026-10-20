@@ -1,0 +1,36 @@
+---
+/** Section identifier with a full-width rule, e.g. "01 / The Idea". */
+interface Props {
+  index?: string;
+  label: string;
+  id?: string;
+}
+const { index, label, id } = Astro.props;
+---
+
+<div class="section-head" id={id}>
+  <hr class="rule rule--ink" />
+  <p class="label section-label">
+    {
+      index && (
+        <>
+          <span class="index">{index}</span>
+          <span class="sep" aria-hidden="true">
+            /
+          </span>
+        </>
+      )
+    }
+    <span>{label}</span>
+  </p>
+</div>
+
+<style>
+  .section-head {
+    margin-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
+  .section-head .section-label {
+    margin-top: 0.85rem;
+  }
+</style>

@@ -1,0 +1,112 @@
+---
+/** The scales of context described in the founder's 2023 essay. */
+interface Props {
+  citation: [string, string];
+}
+const { citation } = Astro.props;
+const scales = [
+  { label: 'Universal values', note: 'Values shared across places and cultures' },
+  { label: 'Regional ideas', note: 'Aligned with critical regionalism' },
+  { label: 'Neighbourhood', note: 'The immediate surroundings' },
+  { label: 'Site', note: 'Within its boundaries' },
+];
+---
+
+<figure class="diagram scales" data-reveal>
+  <svg viewBox="0 0 720 440" role="img" aria-labelledby="scales-title scales-desc">
+    <title id="scales-title">Scales of context</title>
+    <desc id="scales-desc">
+      Four nested fields: universal values contain regional ideas, which contain the neighbourhood, which contains the site.
+      Each scale is read through its past and its developmental trends.
+    </desc>
+    {
+      scales.map((s, i) => {
+        const inset = i * 52;
+        const w = 420 - inset * 2;
+        const h = 400 - inset * 2;
+        const x = 20 + inset;
+        const y = 20 + inset;
+        return (
+          <g>
+            <rect
+              x={x}
+              y={y}
+              width={w}
+              height={h}
+              class:list={['scales__field', `scales__field--${i}`]}
+            />
+            <line x1={x + w} y1={y + 18} x2={470} y2={y + 18} class="scales__leader" />
+            <circle cx={x + w} cy={y + 18} r="3" class="scales__dot" />
+            <text x={482} y={y + 23} class="scales__label">
+              {s.label}
+            </text>
+            <text x={482} y={y + 42} class="scales__note">
+              {s.note}
+            </text>
+          </g>
+        );
+      })
+    }
+    <path d="M230 220h-10m10 0h10m-10 0v-10m0 10v10" class="scales__cross"></path>
+  </svg>
+  <figcaption class="diagram__caption">
+    <span class="label label--ink">Diagram</span>
+    <span>Scales of context, each read through its past and its developmental trends. Drawn by the editors after <a
+        href={citation[1]}>{citation[0]}</a>.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .scales svg {
+    width: 100%;
+    max-width: 46rem;
+    height: auto;
+  }
+
+  .scales__field {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.2;
+  }
+
+  .scales__field--0 {
+    stroke: var(--grey);
+    stroke-dasharray: 6 6;
+  }
+
+  .scales__field--1 {
+    stroke: var(--grey);
+  }
+
+  .scales__field--3 {
+    fill: var(--sage);
+    fill-opacity: 0.45;
+    stroke-width: 1.8;
+  }
+
+  .scales__leader {
+    stroke: var(--rule);
+    stroke-width: 1;
+  }
+
+  .scales__dot {
+    fill: var(--ink);
+  }
+
+  .scales__label {
+    font-family: var(--serif);
+    font-size: 22px;
+    fill: var(--ink);
+  }
+
+  .scales__note {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    fill: var(--ink-2);
+  }
+
+  .scales__cross {
+    stroke: var(--brick);
+    stroke-width: 1.5;
+  }
+</style>

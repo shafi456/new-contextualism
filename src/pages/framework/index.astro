@@ -1,0 +1,249 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Provenance from '../../components/Provenance.astro';
+import ContextDiagram from '../../components/ContextDiagram.astro';
+import RelationMatrix from '../../components/RelationMatrix.astro';
+import Bibliography from '../../components/Bibliography.astro';
+import { citations, registry, relationsFor } from '../../lib/content';
+import { relations, relationsNote } from '../../lib/site';
+import { pad } from '../../lib/format';
+import { url } from '../../lib/url';
+
+const reg = await registry();
+const cite = citations(reg, 'framework');
+const DS = 'reza-2025-deltaic-bangladesh';
+const CBD = 'reza-nitu-2025-people-place-justice';
+const TBS = 'reza-2023-new-contextualism-path';
+[DS, CBD, TBS].forEach((k) => cite.add(k));
+relations.forEach((r) => r.source && cite.add(r.source));
+const withExamples = relations.filter((r) => r.source).length;
+---
+
+<Base
+  title="Framework"
+  description="The ten contextual dimensions of New Contextualism and the relations between them, in an interactive diagram."
+>
+  <PageHeader
+    label="Framework"
+    title="Ten dimensions. Interconnected realities."
+    intro="Context, in New Contextualist writing, is read through ten overlapping dimensions. Select a dimension to see its definition, the questions it asks and its relations with the others."
+    compact
+  >
+    <ul class="framework-key" role="list">
+      <li>
+        <Provenance kind="published-source" />
+        <span>The ten dimensions and the founder’s terms for each (<a href={`#ref-${DS}`}>{cite.label(DS)}</a>)</span>
+      </li>
+      <li>
+        <Provenance kind="editorial-summary" approval="pending" />
+        <span>Definitions and questions</span>
+      </li>
+      <li>
+        <Provenance kind="interpretation" />
+        <span>Relations between dimensions</span>
+      </li>
+    </ul>
+  </PageHeader>
+
+  <section class="framework-diagram" aria-labelledby="diagram-title">
+    <div class="wrap">
+      <h2 class="visually-hidden" id="diagram-title">Interactive contextual diagram</h2>
+      <ContextDiagram reg={reg} />
+      <p class="framework-diagram__help small muted">
+        Use the arrow keys to move between dimensions. Selecting a relation in the panel moves to the related dimension.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="matrix-title">
+    <div class="wrap">
+      <SectionHead index="02" label="Relations" />
+      <div class="grid">
+        <div class="matrix-intro">
+          <h2 id="matrix-title" class="matrix-title">A matrix of relations.</h2>
+          <div class="prose">
+            <p>
+              The published texts describe the dimensions as overlapping, but they do not specify how each relates to the others.
+              The {relations.length} relations recorded here are proposed by the editors as the most direct. {withExamples} of them
+              are illustrated by examples from the published record. Every dimension relates to every other in some way; the
+              matrix marks only the most direct relations.
+            </p>
+          </div>
+          <Provenance kind="interpretation" note="For review against the founder’s publications" />
+        </div>
+        <div class="matrix-figure">
+          <RelationMatrix reg={reg} />
+        </div>
+      </div>
+      <p class="visually-hidden">{relationsNote}</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="index-title">
+    <div class="wrap">
+      <SectionHead index="03" label="The ten dimensions" />
+      <h2 class="visually-hidden" id="index-title">The ten dimensions</h2>
+      <ol class="dim-index" role="list">
+        {
+          reg.dimensions.map((d) => (
+            <li data-reveal>
+              <a href={url(`/framework/${d.id}/`)}>
+                <span class="dim-index__num">{pad(d.data.number)}</span>
+                <span class="dim-index__name">{d.data.name}</span>
+                <span class="dim-index__summary">{d.data.summary}</span>
+                <span class="dim-index__rel">
+                  {relationsFor(d.id).length} relations
+                </span>
+                <span class="dim-index__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="formulation-note small muted">
+        Published formulations differ slightly. The 2023 essay lists the same ten facets (<a href={`#ref-${TBS}`}>{cite.label(TBS)}</a>);
+        the September 2025 essay’s ‘ten-layer lens’ includes a spiritual layer in place of the political (<a href={`#ref-${CBD}`}
+          >{cite.label(CBD)}</a
+        >). See <a href={url('/philosophy/#ten-dimensions')}>The ten contextual dimensions</a>.
+      </p>
+    </div>
+  </section>
+
+  <div class="section">
+    <div class="wrap">
+      <Bibliography reg={reg} keys={cite.cited()} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .framework-key {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+  }
+
+  .framework-key li {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    font-size: 0.875rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .framework-diagram__help {
+    margin-top: 2rem;
+  }
+
+  .matrix-intro {
+    grid-column: 1 / span 5;
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  .matrix-title {
+    font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3.75rem);
+  }
+
+  .matrix-figure {
+    grid-column: 7 / span 6;
+  }
+
+  .dim-index {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .dim-index a {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 4fr) minmax(0, 5fr) 7rem 2rem;
+    gap: 1rem var(--col-gap);
+    align-items: baseline;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .dim-index__num {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dim-index__name {
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.75rem);
+    line-height: 1;
+    transition: color 0.3s var(--ease);
+  }
+
+  .dim-index__summary {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .dim-index__rel {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .dim-index__arrow {
+    justify-self: end;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .dim-index a:hover .dim-index__name {
+    color: var(--brick);
+  }
+
+  .dim-index a:hover .dim-index__arrow {
+    transform: translateX(4px);
+  }
+
+  .formulation-note {
+    margin-top: 1.5rem;
+    max-width: 48rem;
+  }
+
+  @media (max-width: 1080px) {
+    .matrix-intro,
+    .matrix-figure {
+      grid-column: 1 / -1;
+    }
+
+    .matrix-figure {
+      margin-top: 2.5rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .framework-key li {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .dim-index a {
+      grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
+    }
+
+    .dim-index__summary {
+      grid-column: 2;
+    }
+
+    .dim-index__rel {
+      display: none;
+    }
+
+    .dim-index__arrow {
+      grid-row: 1;
+      grid-column: 3;
+    }
+  }
+</style>

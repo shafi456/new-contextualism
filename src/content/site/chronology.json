@@ -1,0 +1,65 @@
+{
+  "items": [
+    {
+      "date": "2004-08",
+      "dateLabel": "2004–2007",
+      "title": "Architect, Barisal City Corporation",
+      "text": "Early work on area development in a deltaic city, including the Bibir Pukur region and the Multipurpose City Market, later identified by the founder as the point at which he first felt the need for this approach.",
+      "sources": ["bracu-faculty-profile", "reza-2023-new-contextualism-path"]
+    },
+    {
+      "date": "2013",
+      "title": "Doctoral research on the early Buddhist architecture of Bengal",
+      "text": "PhD in architectural history and theory, Nottingham Trent University. The founder describes this research as reinforcing his conviction that context shapes successful architecture.",
+      "sources": ["bracu-faculty-profile", "reza-2023-new-contextualism-path"]
+    },
+    {
+      "date": "2013-09",
+      "title": "Teaching at BRAC University",
+      "text": "The founder joins BRAC University, where the philosophy is cultivated in design studios over the following decade.",
+      "sources": ["bracu-faculty-profile", "reza-2023-new-contextualism-path"]
+    },
+    {
+      "date": "2023-06-10",
+      "title": "First public workshop",
+      "text": "‘Exploring New Contextualism: An Approach to Architecture and Urban Design’, a lecture series and hands-on exercise at the School of Architecture and Design, BRAC University, Dhaka.",
+      "sources": ["bracu-2023-workshop-report", "arch-bangla-2023-workshop-report"],
+      "href": "/dialogue/#2023-06-10-exploring-new-contextualism"
+    },
+    {
+      "date": "2023-12-19",
+      "title": "‘A path to a sustainable and equitable future’",
+      "text": "Essay setting out the approach's principles and origins, published in The Business Standard and by Arch-Bangla.",
+      "sources": ["reza-2023-new-contextualism-path"],
+      "href": "/research/reza-2023-new-contextualism-path/"
+    },
+    {
+      "date": "2024-02-17",
+      "title": "Workshop on New Contextualism 2.0",
+      "text": "‘Exploring New Contextualism 2.0: An Approach to Architecture and Urban Design’, Department of Architecture, BRAC University.",
+      "sources": ["contextbd-2024-workshop-listing"],
+      "href": "/dialogue/#2024-02-17-exploring-new-contextualism-2-0"
+    },
+    {
+      "date": "2025-04-23",
+      "title": "‘An architectural philosophy for deltaic Bangladesh’",
+      "text": "Essay in The Daily Star defining the ten dimensions as a ‘tenfold matrix’ and describing New Contextualism 2.0.",
+      "sources": ["reza-2025-deltaic-bangladesh"],
+      "href": "/research/reza-2025-deltaic-bangladesh/"
+    },
+    {
+      "date": "2025-08-16",
+      "title": "Online symposium",
+      "text": "‘Reflections on New Contextualism: Voices from Practice and Academia’, organised by the New Contextual Group.",
+      "sources": ["contextbd-2025-symposium-listing"],
+      "href": "/dialogue/#2025-08-16-reflections-on-new-contextualism"
+    },
+    {
+      "date": "2025-09-16",
+      "title": "‘Architecture and Urbanism for People, Place, and Justice’",
+      "text": "Essay by Reza and Nitu presenting five guiding principles, the ten-layer lens and a set of case studies.",
+      "sources": ["reza-nitu-2025-people-place-justice"],
+      "href": "/research/reza-nitu-2025-people-place-justice/"
+    }
+  ]
+}
