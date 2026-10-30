@@ -1,13 +1,13 @@
 ---
 /**
- * The ten dimensions as a typographic grid. Hovering or focusing one traces
+ * The ten contextual layers as a typographic grid. Hovering or focusing one traces
  * its relations to the others (an editorial interpretation); each cell links
- * to the dimension's page.
+ * to the layer page.
  */
 import type { Dimension } from '../lib/content';
 import { relationsFor } from '../lib/content';
 import { pad } from '../lib/format';
-import { url } from '../lib/url';
+import { to } from '../lib/routes';
 
 interface Props {
   dimensions: Dimension[];
@@ -25,7 +25,7 @@ const names = Object.fromEntries(dimensions.map((d) => [d.id, d.data.name]));
         return (
           <li class="dim-cell" data-dim={d.id} data-related={related.join(' ')}>
             <span class="dim-cell__mark" aria-hidden="true" />
-            <a class="dim-cell__link" href={url(`/framework/${d.id}/`)} aria-describedby={`dim-rel-${d.id}`}>
+            <a class="dim-cell__link" href={to.layer(d.id)} aria-describedby={`dim-rel-${d.id}`}>
               <span class="dim-cell__num">{pad(d.data.number)}</span>
               <span class="dim-cell__name">{d.data.name}</span>
               <span class="dim-cell__keys">{d.data.keywords.join(', ')}</span>
@@ -40,7 +40,7 @@ const names = Object.fromEntries(dimensions.map((d) => [d.id, d.data.name]));
   </ol>
   <p class="dim-readout" aria-hidden="true">
     <span class="label">Relations</span>
-    <span class="dim-readout__text" data-dim-readout>Hover over or focus on a dimension to trace its relations.</span>
+    <span class="dim-readout__text" data-dim-readout>Hover over or focus on a layer to trace its relations.</span>
   </p>
 </div>
 

@@ -48,6 +48,25 @@ export const STATUS_DESCRIPTIONS = {
   conceptual: 'Unbuilt proposals: theses, studio projects and competition entries.',
 } as const;
 
+/** The editorial classification used in the Projects section. */
+export const CATEGORY_LABELS: Record<string, string> = {
+  architectural: 'Architectural design',
+  urban: 'Urban design',
+  'heritage-landscape': 'Heritage and landscape',
+  research: 'Research and documentation',
+  teaching: 'Teaching and studio',
+  comparative: 'Comparative and experimental',
+};
+
+/** How precisely a point on the project map locates a project. */
+export const PRECISION_LABELS: Record<string, string> = {
+  site: 'Site',
+  locality: 'Neighbourhood',
+  city: 'City',
+  district: 'District, approximate',
+  region: 'Region, approximate',
+};
+
 export const TYPE_LABELS: Record<string, string> = {
   book: 'Book',
   'edited-book': 'Edited book',

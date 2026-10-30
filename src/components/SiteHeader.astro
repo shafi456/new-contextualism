@@ -1,7 +1,10 @@
 ---
-import { FOOTER_LINKS, NAV, settings } from '../lib/site';
+import { NAV, UTILITY_LINKS, settings } from '../lib/site';
 import { pad } from '../lib/format';
+import { to } from '../lib/routes';
 import { url } from '../lib/url';
+
+const secondary = [...UTILITY_LINKS.filter((l) => !l.href.endsWith('/search/')), { href: to.contact(), label: 'Contact' }];
 
 const path = Astro.url.pathname;
 const current = (href: string) => (path === href ? 'page' : path.startsWith(href) ? 'true' : undefined);
@@ -48,10 +51,10 @@ const current = (href: string) => (path === href ? 'page' : path.startsWith(href
     <nav aria-label="Primary (menu)">
       <ol class="site-menu__list" role="list">
         {
-          NAV.map((item, i) => (
+          NAV.map((item) => (
             <li>
               <a href={item.href} aria-current={current(item.href)}>
-                <span class="label">{pad(i + 1)}</span>
+                <span class="label">{pad(Number(item.number))}</span>
                 <span class="site-menu__name">{item.label}</span>
               </a>
             </li>
@@ -61,9 +64,8 @@ const current = (href: string) => (path === href ? 'page' : path.startsWith(href
     </nav>
     <ul class="site-menu__secondary" role="list">
       <li><a href={url('/search/')} data-search-open>Search</a></li>
-      <li><a href={url('/dialogue/')}>Dialogue and events</a></li>
       {
-        FOOTER_LINKS.map((l) => (
+        secondary.map((l) => (
           <li>
             <a href={l.href}>{l.label}</a>
           </li>

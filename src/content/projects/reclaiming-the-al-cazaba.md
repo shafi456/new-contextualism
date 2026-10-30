@@ -21,6 +21,20 @@ response: >-
 outcomes: >-
   The essay presents the proposal as an exploration of how the philosophy could guide the revitalisation of a historically layered site beyond Bengal, and as an example of ‘cross-cultural contextualism’ [@reza-2025-deltaic-bangladesh].
 sources: [reza-2025-deltaic-bangladesh]
+categories: [heritage-landscape, comparative]
+places:
+  - name: "Alcazaba of Guadix (to be confirmed)"
+    lat: 37.3
+    lon: -3.137
+    precision: site
+    area: Guadix or Almería
+    note: "The essay’s caption names Guadix."
+  - name: "Alcazaba of Almería (to be confirmed)"
+    lat: 36.842
+    lon: -2.473
+    precision: site
+    area: Guadix or Almería
+    note: "The essay’s text names Almería."
 plate: hilltop
 order: 6
 provenance: editorial-summary

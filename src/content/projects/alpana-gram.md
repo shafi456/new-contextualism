@@ -20,6 +20,13 @@ response: >-
 outcomes: >-
   The founder’s essay describes the project as offering ‘a model for rural revitalisation rooted in cultural expression and ecological sensitivity’ [@reza-2025-deltaic-bangladesh].
 sources: [reza-2025-deltaic-bangladesh]
+categories: [heritage-landscape]
+places:
+  - name: "Chapainawabganj district (approximate)"
+    lat: 24.596
+    lon: 88.271
+    precision: district
+    note: "The village is not named in the source; the marker shows the district."
 plate: village
 order: 7
 provenance: editorial-summary

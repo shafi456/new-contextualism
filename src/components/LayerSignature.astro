@@ -1,11 +1,11 @@
 ---
 /**
- * Ten marks, one per dimension, showing which a project foregrounds — as
+ * Ten marks, one per layer, showing which a project foregrounds — as
  * reported in its sources, or as an editorial reading where they are silent.
  */
 import type { Dimension } from '../lib/content';
 import { pad } from '../lib/format';
-import { url } from '../lib/url';
+import { to } from '../lib/routes';
 
 interface Props {
   dimensions: Dimension[];
@@ -39,7 +39,7 @@ const caption = basis === 'reported' ? 'Emphasis reported in the sources' : 'Edi
             .filter((d) => on(d.id))
             .map((d) => (
               <li>
-                <a href={url(`/framework/${d.id}/`)}>{d.data.name}</a>
+                <a href={to.layer(d.id)}>{d.data.name}</a>
               </li>
             ))}
         </ul>

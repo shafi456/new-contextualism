@@ -1,0 +1,400 @@
+---
+/**
+ * People modules. Contributors to the public record are compiled from the
+ * records, projects and events on the platform; inclusion records a
+ * contribution and implies no membership. The founder's profile is compiled
+ * from published sources, each fact with its citation.
+ */
+import { Image } from 'astro:assets';
+import type { Cite, Registry } from '../../lib/content';
+import { founder, listed } from '../../lib/content';
+import { displayName } from '../../lib/format';
+import { pubYear } from '../../lib/cite';
+import { EVENT_TYPE_LABELS } from '../../lib/provenance';
+import { to } from '../../lib/routes';
+import Provenance from '../Provenance.astro';
+
+interface Props {
+  name: 'contributors' | 'founder';
+  reg: Registry;
+  cite: Cite;
+}
+
+const { name, reg, cite } = Astro.props;
+const person = founder(reg);
+const FOUNDER = person?.data.name ?? 'Mohammad Habib Reza';
+
+// Contributors
+type Contribution = { text: string; href: string };
+const people = new Map<string, Contribution[]>();
+if (name === 'contributors') {
+  const add = (who: string, c: Contribution) => {
+    if (who === FOUNDER) return;
+    people.set(who, [...(people.get(who) ?? []), c]);
+  };
+  for (const pub of listed(reg.publications)) {
+    if (pub.data.collection !== 'new-contextualism') continue;
+    for (const a of pub.data.authors) {
+      if (!a.includes(',')) continue;
+      const role = pub.data.type === 'lecture' ? 'Lecture' : pub.data.authors.length > 1 ? 'Co-author' : 'Author';
+      add(displayName(a), { text: `${role}: ‘${pub.data.title}’ (${pubYear(pub)})`, href: to.record(pub.id) });
+    }
+  }
+  for (const proj of listed(reg.projects)) {
+    for (const t of proj.data.team) {
+      add(t.name, { text: `${t.role ?? 'Team member'}: ‘${proj.data.title}’`, href: to.project(proj.id) });
+    }
+  }
+  for (const ev of reg.events) {
+    for (const part of ev.data.participants) {
+      const role = ev.data.type === 'symposium' ? 'Speaker' : (part.role ?? 'Participant');
+      add(part.name, {
+        text: `${role}, ${EVENT_TYPE_LABELS[ev.data.type].toLowerCase()} (${ev.data.start.getUTCFullYear()})`,
+        href: to.event(ev.id),
+      });
+    }
+  }
+}
+const contributors = [...people.entries()].sort((a, b) => {
+  const fa = a[0].split(' ').pop() ?? a[0];
+  const fb = b[0].split(' ').pop() ?? b[0];
+  return fa.localeCompare(fb);
+});
+
+// Founder
+const p = person?.data;
+const bio = name === 'founder' && person ? cite.md(person.body) : '';
+const ref = (k: string) => {
+  cite.add(k);
+  return cite.label(k);
+};
+const scholarship =
+  name === 'founder' ? reg.publications.filter((x) => x.data.collection === 'founder' && !x.data.archived) : [];
+const ncWritings =
+  name === 'founder'
+    ? reg.publications.filter(
+        (x) =>
+          x.data.collection === 'new-contextualism' &&
+          !x.data.archived &&
+          x.data.authors.includes('Reza, Mohammad Habib') &&
+          x.data.type !== 'lecture',
+      )
+    : [];
+---
+
+{
+  name === 'contributors' && (
+    <div class="contributors">
+      <p class="small muted contributors__note">
+        Compiled automatically from the records, projects and events on this platform. Names are given as they appear in the
+        sources. Inclusion records a contribution; it does not imply membership of any organisation.
+      </p>
+      <ol class="contributors__list" role="list">
+        {contributors.map(([who, items]) => (
+          <li>
+            <span class="contributors__name">{who}</span>
+            <ul role="list">
+              {items.map((c) => (
+                <li>
+                  <a href={c.href}>{c.text}</a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+{
+  name === 'founder' && p && (
+    <div class="founder">
+      <div class="founder__portrait">
+        {p.portrait ? (
+          <figure>
+            <Image src={p.portrait.src} alt={p.portrait.alt} widths={[400, 800, 1200]} sizes="(min-width: 1080px) 24vw, 100vw" />
+            <figcaption class="small muted">{p.portrait.credit}</figcaption>
+          </figure>
+        ) : (
+          <div class="portrait-slot" role="img" aria-label="Placeholder: an approved portrait of the founder has not yet been supplied">
+            <span class="label">Portrait</span>
+            <span class="portrait-slot__note">An approved photograph of the founder will appear here.</span>
+          </div>
+        )}
+      </div>
+      <div class="founder__main">
+        <p class="label">{p.role}</p>
+        <h2 class="founder__name" id="profile">
+          {p.name}
+        </h2>
+        <Provenance kind={p.provenance} approval={p.approval} note="Compiled from published sources" />
+        <div class="prose founder__bio" set:html={bio} />
+
+        <div class="founder__facts">
+          <div class="fact-group">
+            <h3 class="label">Appointments</h3>
+            <ul role="list">
+              {p.appointments.map((a) => (
+                <li>
+                  <span class="fact-group__main">
+                    {a.title}, {a.organisation}
+                  </span>
+                  <span class="fact-group__meta">
+                    {a.period && `${a.period} · `}
+                    <a href={`#ref-${a.source}`}>{ref(a.source)}</a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="fact-group">
+            <h3 class="label">Education</h3>
+            <ul role="list">
+              {p.education.map((e) => (
+                <li>
+                  <span class="fact-group__main">
+                    {e.degree}, {e.institution}
+                  </span>
+                  <span class="fact-group__meta">
+                    {e.year && `${e.year} · `}
+                    <a href={`#ref-${e.source}`}>{ref(e.source)}</a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="fact-group">
+            <h3 class="label">Affiliations, as stated in published biographies</h3>
+            <ul role="list">
+              {p.affiliations.map((a) => (
+                <li>
+                  <span class="fact-group__main">{a.title}</span>
+                  <span class="fact-group__meta">
+                    <a href={`#ref-${a.source}`}>{ref(a.source)}</a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="fact-group">
+            <h3 class="label">Selected lectures and presentations</h3>
+            <ul role="list">
+              {p.presentations.map((x) => (
+                <li>
+                  <span class="fact-group__main">
+                    {x.title}
+                    <span class="muted">{`, ${x.venue}`}</span>
+                  </span>
+                  <span class="fact-group__meta">
+                    {x.date} · <a href={`#ref-${x.source}`}>{ref(x.source)}</a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="fact-group">
+            <h3 class="label">Writing on New Contextualism</h3>
+            <ul role="list">
+              {ncWritings.map((w) => (
+                <li>
+                  <a class="fact-group__main" href={to.record(w.id)}>
+                    {w.data.title}
+                  </a>
+                  <span class="fact-group__meta">
+                    <i>{w.data.venue}</i>, {pubYear(w)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="fact-group">
+            <h3 class="label">Selected scholarship on the history of Bengal</h3>
+            <ul role="list">
+              {scholarship.map((w) => (
+                <li>
+                  <a class="fact-group__main" href={to.record(w.id)}>
+                    {w.data.title}
+                  </a>
+                  <span class="fact-group__meta">{pubYear(w)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {p.links.length > 0 && (
+            <div class="fact-group">
+              <h3 class="label">Profiles elsewhere</h3>
+              <ul role="list" class="profiles">
+                {p.links.map((l) => (
+                  <li>
+                    <a class="ext" href={l.url}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  /* Contributors */
+  .contributors__note {
+    max-width: 34rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .contributors__list {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .contributors__list > li {
+    display: grid;
+    grid-template-columns: minmax(10rem, 2fr) 3fr;
+    gap: 0.25rem 1.5rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .contributors__name {
+    font-family: var(--serif);
+    font-size: 1.3125rem;
+    line-height: 1.2;
+  }
+
+  .contributors__list ul {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .contributors__list ul a {
+    text-decoration-color: var(--rule);
+  }
+
+  .contributors__list ul li + li {
+    margin-top: 0.25rem;
+  }
+
+  /* Founder */
+  .founder {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
+    gap: 2.5rem var(--col-gap);
+    align-items: start;
+  }
+
+  .founder__portrait figure img {
+    width: 100%;
+  }
+
+  .portrait-slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 4 / 5;
+    padding: 1rem;
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(to top right, transparent calc(50% - 0.5px), var(--rule) 50%, transparent calc(50% + 0.5px)),
+      var(--paper);
+  }
+
+  .portrait-slot__note {
+    max-width: 14rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+    background: var(--paper);
+  }
+
+  .founder__main {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .founder__name {
+    font-size: clamp(2.25rem, 1.5rem + 2.4vw, 3.75rem);
+    line-height: 1.02;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .founder__bio {
+    margin-top: 0.75rem;
+    font-size: 1.0625rem;
+  }
+
+  .founder__bio :global(p:first-child) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.15rem + 0.55vw, 1.6rem);
+    line-height: 1.3;
+  }
+
+  .founder__facts {
+    display: grid;
+    gap: 2.25rem;
+    margin-top: 2rem;
+  }
+
+  .fact-group ul {
+    margin: 0.6rem 0 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .fact-group li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 1.5rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .fact-group__meta {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .fact-group__meta a {
+    text-decoration-color: var(--rule);
+  }
+
+  a.fact-group__main {
+    font-family: var(--serif);
+    font-size: 1.1875rem;
+    text-decoration-color: var(--rule);
+  }
+
+  .profiles {
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    .founder {
+      grid-template-columns: 1fr;
+    }
+
+    .founder__portrait {
+      max-width: 22rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fact-group li,
+    .contributors__list > li {
+      grid-template-columns: 1fr;
+    }
+
+    .fact-group__meta {
+      white-space: normal;
+    }
+  }
+</style>

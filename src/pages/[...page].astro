@@ -1,0 +1,70 @@
+---
+/**
+ * Every page of the site structure that is written in src/content/pages:
+ * its Markdown is rendered with citations, and its modules (diagrams, lists,
+ * maps) are rendered in place. All citations, including those made by
+ * modules, are registered first, so that the page's list of sources is
+ * complete before anything is rendered.
+ */
+import type { GetStaticPaths } from 'astro';
+import SectionPage from '../layouts/SectionPage.astro';
+import Module from '../components/modules/Module.astro';
+import { citations, registry } from '../lib/content';
+import { citedKeys } from '../lib/markdown';
+import { moduleCitations, parseModules } from '../lib/modules';
+import { pageByPath } from '../lib/ia';
+
+export const getStaticPaths = (async () => {
+  const reg = await registry();
+  return reg.pages.map((p) => ({
+    params: { page: p.data.path.replace(/^\/|\/$/g, '') || undefined },
+    props: { id: p.id },
+  }));
+}) satisfies GetStaticPaths;
+
+const reg = await registry();
+const entry = reg.pages.find((p) => p.id === Astro.props.id)!;
+const where = `pages/${entry.id}`;
+const cite = citations(reg, where);
+const segments = parseModules(entry.body, where);
+for (const s of segments) {
+  const keys = s.kind === 'md' ? citedKeys(s.text) : moduleCitations(reg, s);
+  keys.forEach((k) => cite.add(k));
+}
+const firstMd = segments.findIndex((s) => s.kind === 'md');
+const rendered = segments.map((s, i) => (s.kind === 'md' ? { ...s, html: cite.md(s.text), first: i === firstMd && i === 0 } : s));
+
+// Modules whose items are third-level headings need a second-level heading
+// before them; where the text supplies none, a hidden one keeps the outline.
+const H3_MODULES = ['projects', 'chronology', 'events', 'pillars', 'focus-areas'];
+const outlineGap = segments.findIndex(
+  (s, i) =>
+    s.kind === 'module' &&
+    H3_MODULES.includes(s.name) &&
+    !segments.slice(0, i).some((p) => p.kind === 'md' && /^##\s/m.test(p.text)),
+);
+const title = pageByPath(entry.data.path).title;
+---
+
+<SectionPage
+  path={entry.data.path}
+  reg={reg}
+  intro={entry.data.intro}
+  provenance={entry.data.provenance}
+  approval={entry.data.approval === 'none' ? undefined : entry.data.approval}
+  updated={entry.data.updated}
+  cited={cite.cited()}
+>
+  {
+    rendered.map((s, i) =>
+      s.kind === 'md' ? (
+        <div class:list={['prose page-prose', { 'page-prose--first': s.first }]} set:html={s.html} />
+      ) : (
+        <>
+          {i === outlineGap && <h2 class="visually-hidden">{title}</h2>}
+          <Module name={s.name} attrs={s.attrs} reg={reg} cite={cite} path={entry.data.path} />
+        </>
+      ),
+    )
+  }
+</SectionPage>

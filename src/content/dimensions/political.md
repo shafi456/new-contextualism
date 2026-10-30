@@ -1,5 +1,5 @@
 ---
-number: 3
+number: 4
 name: Political
 summary: Who decides — the governance, patronage and rules that shape a place.
 keywords: [governance, patronage, regulations]
@@ -12,7 +12,7 @@ questions:
 provenance: editorial-summary
 approval: pending
 ---
-The political dimension examines how decisions about place are made and enforced: governance, patronage and regulations [@reza-2025-deltaic-bangladesh]. It asks who holds authority over land, water and public space, whose interests shape a brief, and how rules enable or obstruct change.
+The political layer examines how decisions about place are made and enforced: governance, patronage and regulations [@reza-2025-deltaic-bangladesh]. It asks who holds authority over land, water and public space, whose interests shape a brief, and how rules enable or obstruct change.
 
 The Kallyanpur Khal thesis is an instructive case. It gave the political layer particular weight because repeated efforts by the authorities to dredge the canal and remove encroachments had not produced a lasting recovery [@reza-nitu-2025-people-place-justice].
 

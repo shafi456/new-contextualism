@@ -1,0 +1,79 @@
+---
+/** Previous and next pages, in the reading order of the site structure. */
+interface Link {
+  href: string;
+  label: string;
+  name: string;
+}
+interface Props {
+  prev?: Link;
+  next?: Link;
+  label?: string;
+}
+const { prev, next, label = 'Previous and next pages' } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="wrap pager" aria-label={label} data-print="hide">
+      {prev ? (
+        <a href={prev.href} rel="prev">
+          <span class="label">Previous · {prev.label}</span>
+          <span class="pager__name">{prev.name}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <a href={next.href} rel="next" class="pager__next">
+          <span class="label">Next · {next.label}</span>
+          <span class="pager__name">{next.name}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--col-gap);
+    margin-top: var(--section);
+  }
+
+  .pager a {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+    text-decoration: none;
+  }
+
+  .pager__next {
+    text-align: right;
+  }
+
+  .pager__name {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.5rem);
+    line-height: 1.05;
+    transition: color 0.3s var(--ease);
+  }
+
+  .pager a:hover .pager__name {
+    color: var(--brick);
+  }
+
+  @media (max-width: 640px) {
+    .pager {
+      grid-template-columns: 1fr;
+      row-gap: 1.5rem;
+    }
+
+    .pager__next {
+      text-align: left;
+    }
+  }
+</style>

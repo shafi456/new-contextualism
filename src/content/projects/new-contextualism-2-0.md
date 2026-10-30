@@ -3,9 +3,9 @@ title: New Contextualism 2.0
 status: ongoing
 kind: Research programme
 documented: 2024
-location: BRAC University, Dhaka
+location: BRAC University, Dhaka, Bangladesh
 summary: The further development of the approach at BRAC University, with greater emphasis on sustainability frameworks, nature-inspired design and proactive resilience.
-layers: [ecological, scientific-technological, social, economic, urban]
+layers: [ecological, scientific, social, economic, urban]
 layersBasis: editorial
 layersNote: The published account does not name layers; this reading is editorial, based on its four areas of emphasis.
 context: >-
@@ -16,6 +16,14 @@ questions:
 process: >-
   The 2025 essay names four areas of emphasis: nature-inspired design (biomimicry), learning from the strategies of local ecosystems and organisms; deep sustainability integration across the design lifecycle, beyond superficial ‘greenwashing’; alignment with the UN Sustainable Development Goals, mapping design intentions and outcomes against them; and proactive resilience, anticipating climate impacts such as sea-level rise and increased storm intensity [@reza-2025-deltaic-bangladesh; @united-nations-2015-agenda-2030].
 sources: [reza-2025-deltaic-bangladesh, contextbd-2024-workshop-listing]
+categories: [research]
+places:
+  - name: "BRAC University, Dhaka"
+    lat: 23.81
+    lon: 90.41
+    precision: city
+    area: Dhaka
+    note: "The marker shows the city."
 plate: strata
 order: 8
 provenance: editorial-summary

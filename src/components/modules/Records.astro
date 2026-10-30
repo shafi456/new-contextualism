@@ -1,0 +1,313 @@
+---
+/**
+ * Archive modules: lists of records selected by collection, type or topic;
+ * the full archive with filters (kept in the address bar); reading lists of a
+ * whole collection; and lectures and presentations.
+ */
+import type { Cite, Publication, Registry } from '../../lib/content';
+import { archiveRecords, founder, listed } from '../../lib/content';
+import { pubYear } from '../../lib/cite';
+import { displayName, familyName } from '../../lib/format';
+import { COLLECTION_LABELS, TYPE_LABELS } from '../../lib/provenance';
+import RecordList from '../RecordList.astro';
+import Bibliography from '../Bibliography.astro';
+
+interface Props {
+  name: 'records' | 'archive' | 'bibliography' | 'lectures';
+  reg: Registry;
+  cite: Cite;
+  attrs: { collection?: string; type?: string; topic?: string; empty?: string; compact?: string; grouped?: string };
+}
+
+const { name, reg, cite, attrs } = Astro.props;
+const list = (v?: string) => v?.split(',').map((s) => s.trim()).filter(Boolean) ?? [];
+
+let records: Publication[] = [];
+if (name === 'records') {
+  const collections = list(attrs.collection);
+  const types = list(attrs.type);
+  const topic = attrs.topic?.toLowerCase();
+  records = listed(reg.publications).filter(
+    (p) =>
+      (collections.length ? collections.includes(p.data.collection) : ['new-contextualism', 'founder'].includes(p.data.collection)) &&
+      (!types.length || types.includes(p.data.type)) &&
+      (!topic || p.data.topics.map((t) => t.toLowerCase()).includes(topic)),
+  );
+}
+
+// The archive and its filters
+const archive = name === 'archive' ? archiveRecords(reg) : [];
+const tally = <T extends string>(values: T[]) => {
+  const m = new Map<T, number>();
+  values.forEach((v) => m.set(v, (m.get(v) ?? 0) + 1));
+  return m;
+};
+const types = [...tally(archive.map((r) => r.data.type))].sort((a, b) => TYPE_LABELS[a[0]].localeCompare(TYPE_LABELS[b[0]]));
+const authors = [...tally(archive.flatMap((r) => [...r.data.authors, ...r.data.editors]))]
+  .sort((a, b) => familyName(a[0]).localeCompare(familyName(b[0])))
+  .map(([n, c]) => ({ value: displayName(n).toLowerCase(), label: displayName(n), n: c }));
+const years = [...tally(archive.map((r) => String(pubYear(r) ?? '')).filter(Boolean))].sort((a, b) => b[0].localeCompare(a[0]));
+const layers = reg.dimensions
+  .map((d) => ({ d, n: archive.filter((r) => r.data.dimensions.includes(d.id)).length }))
+  .filter((x) => x.n > 0);
+const topics = [...tally(archive.flatMap((r) => r.data.topics.map((t) => t.toLowerCase())))].sort((a, b) => a[0].localeCompare(b[0]));
+const collections = [...tally(archive.map((r) => r.data.collection))];
+
+// Reading lists
+const bibKeys =
+  name === 'bibliography'
+    ? listed(reg.publications)
+        .filter((p) => list(attrs.collection ?? 'reference').includes(p.data.collection))
+        .map((p) => p.id)
+    : [];
+
+// Lectures
+const lectures = name === 'lectures' ? archiveRecords(reg).filter((p) => p.data.type === 'lecture') : [];
+const person = name === 'lectures' ? founder(reg) : undefined;
+const presentations = person?.data.presentations ?? [];
+const ref = (key: string) => {
+  cite.add(key);
+  return cite.label(key);
+};
+---
+
+{
+  name === 'records' &&
+    (records.length ? (
+      <RecordList reg={reg} records={records} compact={attrs.compact !== 'false'} />
+    ) : (
+      <p class="pending">
+        <span class="label">None yet</span>
+        {attrs.empty ?? 'No records of this kind have yet been added to the archive.'}
+      </p>
+    ))
+}
+
+{
+  name === 'archive' && (
+    <div class="archive-module">
+      <form class="filters archive-filters" data-filters hidden aria-label="Filter the archive">
+        <div class="filters__grid">
+          <label class="filter filter--search">
+            <span class="label">Search within the archive</span>
+            <input type="search" name="q" autocomplete="off" placeholder="Title, author, venue or topic" />
+          </label>
+          <label class="filter">
+            <span class="label">Type</span>
+            <select name="type">
+              <option value="">All types</option>
+              {types.map(([t, n]) => (
+                <option value={t}>{`${TYPE_LABELS[t]} (${n})`}</option>
+              ))}
+            </select>
+          </label>
+          <label class="filter">
+            <span class="label">Author</span>
+            <select name="author">
+              <option value="">All authors</option>
+              {authors.map((a) => (
+                <option value={a.value}>{`${a.label} (${a.n})`}</option>
+              ))}
+            </select>
+          </label>
+          <label class="filter">
+            <span class="label">Year</span>
+            <select name="year">
+              <option value="">All years</option>
+              {years.map(([y, n]) => (
+                <option value={y}>{`${y} (${n})`}</option>
+              ))}
+            </select>
+          </label>
+          <label class="filter">
+            <span class="label">Layer</span>
+            <select name="layer">
+              <option value="">All layers</option>
+              {layers.map(({ d, n }) => (
+                <option value={d.id}>{`${d.data.name} (${n})`}</option>
+              ))}
+            </select>
+          </label>
+          <label class="filter">
+            <span class="label">Topic</span>
+            <select name="topic">
+              <option value="">All topics</option>
+              {topics.map(([t, n]) => (
+                <option value={t}>{`${t[0].toUpperCase()}${t.slice(1)} (${n})`}</option>
+              ))}
+            </select>
+          </label>
+          <label class="filter">
+            <span class="label">Collection</span>
+            <select name="collection">
+              <option value="">Both collections</option>
+              {collections.map(([c, n]) => (
+                <option value={c}>{`${COLLECTION_LABELS[c]} (${n})`}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div class="filters__foot">
+          <p class="filters__count" role="status" aria-live="polite" data-filter-count />
+          <button type="reset" class="filters__reset" data-filter-reset>
+            Clear filters
+          </button>
+        </div>
+      </form>
+
+      <RecordList reg={reg} records={archive} filterable />
+      <p class="pending archive-empty" data-filter-empty hidden>
+        <span class="label">No matching records</span>
+        No records match these filters. <button type="button" class="link-button" data-filter-clear>Clear the filters</button> to
+        see the whole archive.
+      </p>
+    </div>
+  )
+}
+
+{name === 'bibliography' && <Bibliography reg={reg} keys={bibKeys} heading="" headingLevel={2} grouped={attrs.grouped !== 'false'} />}
+
+{
+  name === 'lectures' && (
+    <div class="lectures-module">
+      {lectures.length > 0 ? (
+        <RecordList reg={reg} records={lectures} compact />
+      ) : (
+        <p class="pending">
+          <span class="label">None yet</span>
+          No lectures have yet been added to the archive.
+        </p>
+      )}
+      {presentations.length > 0 && (
+        <div class="presentations">
+          <p class="label">Other presentations by the founder, as listed in published sources</p>
+          <ul role="list">
+            {presentations.map((x) => (
+              <li>
+                <span class="presentations__title">
+                  {x.title}
+                  <span class="muted">, {x.venue}</span>
+                </span>
+                <span class="presentations__meta">
+                  {x.date} · <a href={`#ref-${x.source}`}>{ref(x.source)}</a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .archive-filters {
+    margin-bottom: 2.5rem;
+  }
+
+  .archive-empty {
+    margin-top: 1.5rem;
+  }
+
+  .presentations {
+    margin-top: 3rem;
+  }
+
+  .presentations ul {
+    margin: 0.6rem 0 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .presentations li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 1.5rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .presentations__meta {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .presentations__meta a {
+    text-decoration-color: var(--rule);
+  }
+
+  @media (max-width: 640px) {
+    .presentations li {
+      grid-template-columns: 1fr;
+    }
+
+    .presentations__meta {
+      white-space: normal;
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filters]');
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-record]')];
+  const count = document.querySelector<HTMLElement>('[data-filter-count]');
+  const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
+  const FIELDS = ['q', 'type', 'author', 'year', 'layer', 'topic', 'collection'] as const;
+
+  if (form) {
+    form.hidden = false;
+    const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null)?.value ?? '';
+
+    const apply = (updateUrl = true) => {
+      const q = value('q').trim().toLowerCase();
+      const has = (attr: string | undefined, v: string) => !v || (attr ?? '').split('|').includes(v);
+      let shown = 0;
+      for (const row of rows) {
+        const d = row.dataset;
+        const match =
+          (!q || q.split(/\s+/).every((t) => (d.text ?? '').includes(t))) &&
+          (!value('type') || d.type === value('type')) &&
+          has(d.authors, value('author')) &&
+          (!value('year') || d.year === value('year')) &&
+          has(d.dimensions, value('layer')) &&
+          has(d.topics, value('topic')) &&
+          (!value('collection') || d.collection === value('collection'));
+        row.hidden = !match;
+        if (match) shown++;
+      }
+      if (count) {
+        count.textContent =
+          shown === rows.length ? `Showing all ${rows.length} records` : `Showing ${shown} of ${rows.length} records`;
+      }
+      if (empty) empty.hidden = shown > 0;
+      if (updateUrl) {
+        const params = new URLSearchParams();
+        FIELDS.forEach((f) => value(f) && params.set(f, value(f)));
+        const qs = params.toString();
+        history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+      }
+    };
+
+    // Restore a shared view from the address bar.
+    const params = new URLSearchParams(location.search);
+    FIELDS.forEach((f) => {
+      const el = form.elements.namedItem(f) as HTMLInputElement | HTMLSelectElement | null;
+      const v = params.get(f) ?? (f === 'layer' ? params.get('dimension') : null);
+      if (el && v !== null) el.value = v;
+    });
+    apply(false);
+
+    let t = 0;
+    form.addEventListener('input', () => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => apply(), 80);
+    });
+    form.addEventListener('submit', (e) => e.preventDefault());
+    form.addEventListener('reset', () => window.setTimeout(() => apply(), 0));
+    document.querySelector('[data-filter-clear]')?.addEventListener('click', () => {
+      form.reset();
+    });
+  }
+</script>

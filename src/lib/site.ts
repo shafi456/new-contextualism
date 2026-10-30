@@ -1,12 +1,17 @@
 /**
- * Site-wide data that is not a collection: settings, chronology and the
- * editorial map of relations between dimensions. Each file is validated when
- * the site is built, so an invalid edit fails the build instead of shipping.
+ * Site-wide data that is not a collection: settings, chronology, glossary,
+ * frequently asked questions and the editorial map of relations between
+ * layers. Each file is validated when the site is built, so an invalid edit
+ * fails the build instead of shipping.
  */
 import { z } from 'astro/zod';
 import settingsJson from '../content/site/settings.json';
 import chronologyJson from '../content/site/chronology.json';
+import glossaryJson from '../content/site/glossary.json';
+import faqJson from '../content/site/faq.json';
 import relationsJson from '../content/framework/relations.json';
+import { PROVENANCE } from './provenance';
+import { SECTIONS, UTILITIES, pageByPath } from './ia';
 import { url } from './url';
 
 const statement = z.object({
@@ -67,19 +72,54 @@ export const relations = relationsData.relations.map((r) => ({
 }));
 export type Relation = (typeof relations)[number];
 
-export const NAV = [
-  { href: url('/movement/'), label: 'The Movement' },
-  { href: url('/philosophy/'), label: 'Philosophy' },
-  { href: url('/framework/'), label: 'Framework' },
-  { href: url('/projects/'), label: 'Projects' },
-  { href: url('/research/'), label: 'Research' },
-  { href: url('/about/'), label: 'About' },
-] as const;
+const glossarySchema = z.object({
+  terms: z.array(
+    z.object({
+      term: z.string(),
+      /** Markdown; may cite records with [@key]. */
+      definition: z.string(),
+      provenance: z.enum(PROVENANCE).default('editorial-summary'),
+      /** Pages for further reading, as site paths. */
+      see: z.array(z.string()).default([]),
+    }),
+  ),
+});
 
-export const FOOTER_LINKS = [
-  { href: url('/contact/'), label: 'Contact' },
-  { href: url('/research/'), label: 'Publications' },
-  { href: url('/privacy/'), label: 'Privacy' },
-  { href: url('/accessibility/'), label: 'Accessibility' },
-  { href: url('/editorial-standards/'), label: 'Editorial standards' },
-] as const;
+const faqSchema = z.object({
+  items: z.array(
+    z.object({
+      question: z.string(),
+      /** Markdown; may cite records with [@key]. */
+      answer: z.string(),
+    }),
+  ),
+});
+
+export const glossary = glossarySchema
+  .parse(glossaryJson)
+  .terms.slice()
+  .sort((a, b) => a.term.localeCompare(b.term, 'en', { sensitivity: 'base' }));
+glossary.forEach((g) => g.see.forEach((path) => pageByPath(path)));
+export const faq = faqSchema.parse(faqJson).items;
+
+/** The six sections, for the header and menus. */
+export const NAV = SECTIONS.map((s) => ({ href: url(s.path), label: s.nav, number: s.number }));
+
+const link = (path: string, label?: string) => {
+  const page = pageByPath(path);
+  return { href: url(path), label: label ?? page.short ?? page.title };
+};
+
+/** Global utilities, in the order of the site structure. */
+export const UTILITY_LINKS = UTILITIES.filter((p) => p.path !== '/accessibility/').map((p) => link(p.path));
+
+/** Governance and policy pages, for the footer. */
+export const POLICY_LINKS = [
+  link('/governance/', 'About the platform'),
+  link('/governance/editorial-standards/'),
+  link('/governance/corrections/', 'Corrections'),
+  link('/governance/copyright/'),
+  link('/governance/privacy-and-terms/'),
+  link('/accessibility/'),
+  link('/governance/contact/'),
+];

@@ -14,7 +14,7 @@ alsoPublished:
     url: https://arch-bangla.com/new-contextualism-a-path-to-sustainable-equitable-future/
   - venue: ResearchGate (listing)
     url: https://www.researchgate.net/publication/397706984_New_contextualism_A_path_to_a_sustainable_and_equitable_future
-dimensions: [social, economic, political, historical, ecological, scientific-technological, geographical, cultural, urban, architectural]
+dimensions: [social, economic, political, historical, ecological, scientific, geographical, cultural, urban, architectural]
 topics: [principles, origins, prediction, pedagogy, equity, critical regionalism]
 summary: The founder’s first extended essay on the approach, setting out its principles, its origins in practice and doctoral research, and its place in teaching at BRAC University.
 provenance: published-source

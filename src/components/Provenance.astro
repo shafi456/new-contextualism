@@ -4,7 +4,7 @@
  * editorial summary, proposed statement, founder-approved, or interpretation.
  */
 import { PROVENANCE_META, type Provenance } from '../lib/provenance';
-import { url } from '../lib/url';
+import { to } from '../lib/routes';
 
 interface Props {
   kind: Provenance;
@@ -21,7 +21,7 @@ const pending = approval === 'pending' && kind !== 'published-source';
 <p class:list={['provenance', `provenance--${kind}`, className]}>
   <span class="provenance__item"><span class="provenance__mark" aria-hidden="true"></span><a
       class="provenance__label"
-      href={url('/editorial-standards/#provenance-labels')}
+      href={to.standards('#provenance-labels')}
       title={meta.description}>{meta.label}</a
     ></span>
   {pending && <span class="provenance__item provenance__extra">Awaiting the founder’s approval</span>}
@@ -41,6 +41,11 @@ const pending = approval === 'pending' && kind !== 'published-source';
   /* Items flow as text; a separator stays with the item it follows. */
   .provenance__item {
     white-space: nowrap;
+  }
+
+  /* A long note may wrap within itself on narrow screens. */
+  .provenance__extra:last-child {
+    white-space: normal;
   }
 
   .provenance__item:not(:last-child)::after {

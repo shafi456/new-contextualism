@@ -1,43 +1,35 @@
 ---
-import Base from '../layouts/Base.astro';
-import PageHeader from '../components/PageHeader.astro';
+import SectionPage from '../layouts/SectionPage.astro';
 import { listed, registry } from '../lib/content';
 import { STATUS_LABELS, TYPE_LABELS } from '../lib/provenance';
+import { SECTIONS, UTILITIES, isOverview } from '../lib/ia';
+import { to } from '../lib/routes';
 import { url } from '../lib/url';
 
 const reg = await registry();
 // A complete index of the platform, shown when scripts are unavailable.
 const groups = [
-  {
-    title: 'Sections',
-    items: [
-      ['The Movement', '/movement/'],
-      ['Philosophy', '/philosophy/'],
-      ['Framework', '/framework/'],
-      ['Projects', '/projects/'],
-      ['Research', '/research/'],
-      ['About', '/about/'],
-      ['Dialogue and events', '/dialogue/'],
-      ['Contact', '/contact/'],
-    ],
-  },
-  { title: 'Dimensions', items: reg.dimensions.map((d) => [d.data.name, `/framework/${d.id}/`]) },
+  ...SECTIONS.map((s) => ({
+    title: `${s.number} · ${s.title}`,
+    items: s.pages.map((p) => [`${p.number} ${isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title}`, url(p.path)]),
+  })),
+  { title: 'Utilities', items: UTILITIES.map((p) => [p.title, url(p.path)]) },
+  { title: 'The ten contextual layers', items: reg.dimensions.map((d) => [d.data.name, to.layer(d.id)]) },
   {
     title: 'Projects',
-    items: listed(reg.projects).map((p) => [`${p.data.title} (${STATUS_LABELS[p.data.status].toLowerCase()})`, `/projects/${p.id}/`]),
+    items: listed(reg.projects).map((p) => [`${p.data.title} (${STATUS_LABELS[p.data.status].toLowerCase()})`, to.project(p.id)]),
   },
   {
     title: 'Records',
     items: listed(reg.publications)
       .filter((p) => ['new-contextualism', 'founder'].includes(p.data.collection))
-      .map((p) => [`${p.data.title} (${TYPE_LABELS[p.data.type].toLowerCase()}, ${reg.labels.get(p.id)})`, `/research/${p.id}/`]),
+      .map((p) => [`${p.data.title} (${TYPE_LABELS[p.data.type].toLowerCase()}, ${reg.labels.get(p.id)})`, to.record(p.id)]),
   },
 ];
 ---
 
-<Base title="Search" description="Search the New Contextualism platform." noindex>
-  <PageHeader label="Search" title="Search" compact />
-  <div class="wrap search-page">
+<SectionPage path="/search/" reg={reg} description="Search the New Contextualism platform.">
+  <div class="search-page">
     <form role="search" action={url('/search/')} method="get" data-search-page hidden>
       <label class="visually-hidden" for="search-page-input">Search terms</label>
       <input
@@ -47,7 +39,7 @@ const groups = [
         type="search"
         autocomplete="off"
         spellcheck="false"
-        placeholder="Philosophy, dimensions, projects, research…"
+        placeholder="Philosophy, layers, projects, research…"
       />
     </form>
     <p class="label search-dialog__status" role="status" aria-live="polite" data-search-page-status></p>
@@ -64,7 +56,7 @@ const groups = [
               <ul role="list">
                 {g.items.map(([t, u]) => (
                   <li>
-                    <a href={url(u)}>{t}</a>
+                    <a href={u}>{t}</a>
                   </li>
                 ))}
               </ul>
@@ -74,7 +66,7 @@ const groups = [
       </div>
     </section>
   </div>
-</Base>
+</SectionPage>
 
 <style>
   .search-page {

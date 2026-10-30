@@ -64,7 +64,7 @@
     },
     {
       "a": "historical",
-      "b": "scientific-technological",
+      "b": "scientific",
       "note": "Prediction depends on history: data and models are only as good as our understanding of past patterns.",
       "source": "reza-2025-deltaic-bangladesh"
     },
@@ -94,7 +94,7 @@
     },
     {
       "a": "ecological",
-      "b": "scientific-technological",
+      "b": "scientific",
       "note": "Ecosystems are a source of technical knowledge: mangroves dissipate wave energy, termite mounds cool passively.",
       "source": "reza-2025-deltaic-bangladesh"
     },
@@ -116,13 +116,13 @@
       "source": "reza-2023-new-contextualism-path"
     },
     {
-      "a": "scientific-technological",
+      "a": "scientific",
       "b": "urban",
       "note": "Data analytics and scenario planning help anticipate how cities and their needs will change.",
       "source": "reza-2023-new-contextualism-path"
     },
     {
-      "a": "scientific-technological",
+      "a": "scientific",
       "b": "architectural",
       "note": "Material properties set the limits and possibilities of form, from terracotta to contemporary engineering.",
       "source": "reza-2025-deltaic-bangladesh"

@@ -1,6 +1,6 @@
 ---
 import { settings } from '../lib/site';
-import { url } from '../lib/url';
+import { to } from '../lib/routes';
 ---
 
 <aside class="prepub" aria-label="Edition">
@@ -8,7 +8,7 @@ import { url } from '../lib/url';
     <p class="label prepub__label">Pre-publication edition</p>
     <p class="prepub__note">
       {settings.prepublicationNote}
-      <a href={url('/editorial-standards/')}>Editorial standards</a>
+      <a href={to.standards()}>Editorial standards</a>
     </p>
   </div>
 </aside>

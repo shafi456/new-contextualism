@@ -1,0 +1,221 @@
+---
+/**
+ * The template for every page of the site structure: breadcrumbs, page
+ * header, the section's contents beside the text (or above it, on
+ * full-width pages), provenance, the page's sources and a pager in reading
+ * order. Numbers and titles come from src/lib/ia.ts.
+ */
+import Base from './Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionNav from '../components/SectionNav.astro';
+import Pager from '../components/Pager.astro';
+import Provenance from '../components/Provenance.astro';
+import Bibliography from '../components/Bibliography.astro';
+import type { Registry } from '../lib/content';
+import type { Provenance as ProvenanceKind } from '../lib/provenance';
+import { UTILITY_SECTION, isOverview, itemId, locate, neighbours } from '../lib/ia';
+import { formatDate } from '../lib/format';
+import { url } from '../lib/url';
+
+interface Props {
+  /** The page's place in the site structure. */
+  path: string;
+  reg: Registry;
+  /** Overrides, for pages below a structure page (e.g. a single layer). */
+  title?: string;
+  label?: string;
+  description?: string;
+  /** A last breadcrumb, for pages below a structure page. */
+  crumb?: string;
+  intro?: string;
+  provenance?: ProvenanceKind;
+  approval?: 'pending' | 'approved';
+  provenanceNote?: string;
+  updated?: Date;
+  /** Records cited on the page, for its list of sources. */
+  cited?: string[];
+  /** Links listed under the current page in the contents (default: its sub-items). */
+  subnav?: { href: string; label: string; current?: boolean }[];
+  layout?: 'text' | 'wide';
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  pager?: { prev?: { href: string; label: string; name: string }; next?: { href: string; label: string; name: string } };
+}
+
+const props = Astro.props;
+const found = locate(props.path);
+if (!found.page) throw new Error(`SectionPage: ${props.path} is not in the site structure`);
+const page = found.page;
+const section = found.section ?? UTILITY_SECTION;
+const overview = isOverview(found.section, page);
+const layout = props.layout ?? page.layout ?? 'text';
+
+const title = props.title ?? (overview && page.title === 'Overview' ? section.title : page.title);
+const label = props.label ?? (!page.number ? 'Utilities' : title === section.title ? page.title : section.title);
+const index = props.label ? undefined : page.number || undefined;
+const docTitle = props.title
+  ? `${props.title} · ${page.short ?? page.title}`
+  : overview || !found.section
+    ? title
+    : `${page.short ?? page.title} · ${section.title}`;
+
+const trail: { href?: string; label: string }[] = [{ href: url('/'), label: 'Home' }];
+if (found.section && !overview) trail.push({ href: url(section.path), label: section.title });
+if (!found.section) trail.push({ href: url('/sitemap/'), label: 'Utilities' });
+trail.push({ href: props.crumb ? url(page.path) : undefined, label: overview ? section.title : (page.short ?? page.title) });
+if (props.crumb) trail.push({ href: undefined, label: props.crumb });
+
+const subnav = props.subnav ?? (page.items ?? []).map((item) => ({ href: `#${itemId(item)}`, label: item }));
+
+const n = neighbours(page.path);
+const pager = props.pager ?? {
+  prev: n.prev && {
+    href: url(n.prev.page.path),
+    label: n.prev.page.number,
+    name: n.prev.page.title === 'Overview' ? n.prev.section.title : (n.prev.page.short ?? n.prev.page.title),
+  },
+  next: n.next && {
+    href: url(n.next.page.path),
+    label: n.next.page.number,
+    name: n.next.page.title === 'Overview' ? n.next.section.title : (n.next.page.short ?? n.next.page.title),
+  },
+};
+const description = props.description ?? props.intro ?? page.summary;
+---
+
+<Base title={docTitle} description={description} type={props.type} jsonLd={props.jsonLd}>
+  <Breadcrumbs trail={trail} />
+  <PageHeader label={label} index={index} title={title} intro={props.intro} compact={!overview}>
+    <slot name="header" />
+  </PageHeader>
+
+  <div class:list={['wrap section-page', `section-page--${layout}`]}>
+    <div class="section-page__disclosure">
+      <SectionNav section={section} current={page.path} variant="disclosure" />
+    </div>
+    {
+      layout === 'wide' ? (
+        <div class="section-page__strip">
+          <SectionNav section={section} current={page.path} variant="strip" />
+        </div>
+      ) : (
+        <aside class="section-page__nav">
+          <SectionNav section={section} current={page.path} subnav={subnav} variant="side" />
+        </aside>
+      )
+    }
+    <div class="section-page__body" data-page-body>
+      {
+        (props.provenance || props.updated) && (
+          <div class="page-meta">
+            {props.provenance && <Provenance kind={props.provenance} approval={props.approval} note={props.provenanceNote} />}
+            {props.updated && <p class="label page-meta__updated">Updated {formatDate(props.updated)}</p>}
+          </div>
+        )
+      }
+      <slot />
+      {
+        props.cited && props.cited.length > 0 && (
+          <div class="section-page__sources">
+            <Bibliography reg={props.reg} keys={props.cited} />
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <Pager prev={pager.prev} next={pager.next} />
+</Base>
+
+<style>
+  .section-page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+
+  .section-page__disclosure {
+    display: none;
+  }
+
+  .section-page__nav {
+    grid-column: 1 / span 3;
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    max-height: calc(100vh - var(--header-h) - 3rem);
+    overflow-y: auto;
+    padding-top: 0.25rem;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+  }
+
+  .section-page__body {
+    grid-column: 5 / span 8;
+    min-width: 0;
+  }
+
+  .section-page__strip {
+    grid-column: 1 / -1;
+    margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .section-page--wide .section-page__body {
+    grid-column: 1 / -1;
+  }
+
+  .page-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+    margin-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+
+  .page-meta__updated {
+    font-size: 0.6875rem;
+  }
+
+  .section-page__sources {
+    margin-top: var(--section);
+  }
+
+  @media (max-width: 1080px) {
+    .section-page__disclosure {
+      display: block;
+      grid-column: 1 / -1;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-page__nav,
+    .section-page__strip {
+      display: none;
+    }
+
+    .section-page__body {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+
+<script>
+  // Mark the sub-item being read in the section contents.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('[data-snav-item]').forEach((a) => links.set(a.dataset.snavItem ?? '', a));
+  const body = document.querySelector('[data-page-body]');
+  if (links.size && body && 'IntersectionObserver' in window) {
+    const targets = [...links.keys()].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          links.get(entry.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-20% 0px -70% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+</script>

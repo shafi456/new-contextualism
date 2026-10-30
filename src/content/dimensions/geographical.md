@@ -12,6 +12,6 @@ questions:
 provenance: editorial-summary
 approval: pending
 ---
-The geographical dimension situates a place within wider territories: its location, connectivity and regional influences [@reza-2025-deltaic-bangladesh]. It reads a site at scales beyond the plot: the delta, the region, and the routes of trade, pilgrimage and movement that connect it to elsewhere.
+The geographical layer situates a place within wider territories: its location, connectivity and regional influences [@reza-2025-deltaic-bangladesh]. It reads a site at scales beyond the plot: the delta, the region, and the routes of trade, pilgrimage and movement that connect it to elsewhere.
 
 The founder offers an example from Bengal. Understanding the *al*, the raised earthen embankment crucial for agriculture and movement in the delta, informs approaches to infrastructure and settlement design in flood-prone areas: ‘a lesson derived directly from the geographical and historical context’ [@reza-2025-deltaic-bangladesh].

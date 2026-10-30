@@ -1,20 +1,21 @@
 ---
 /**
- * The interactive contextual diagram: the ten dimensions as nodes on a ring,
+ * The interactive contextual diagram: the ten contextual layers as nodes on a ring,
  * joined by the relations proposed between them.
  *
  * Accessibility: the labels are an ARIA tablist (arrow keys, Home, End) and
- * each dimension has a tabpanel with the same information as the drawing.
+ * each layer has a tabpanel with the same information as the drawing.
  * Without JavaScript every panel is shown in sequence.
  *
- * mode="static" draws the ring centred on one dimension, with labels as links
- * (used on each dimension's page).
+ * mode="static" draws the ring centred on one layer, with labels as links
+ * (used on each layer page).
  */
 import type { Dimension, Registry } from '../lib/content';
 import { projectsForDimension, recordsForDimension, relationsFor } from '../lib/content';
 import { relations } from '../lib/site';
 import { pad } from '../lib/format';
 import { url } from '../lib/url';
+import { to } from '../lib/routes';
 
 interface Props {
   reg: Registry;
@@ -123,7 +124,7 @@ const interactive = mode === 'interactive';
 
       {
         interactive ? (
-          <div class="ctx__labels" role="tablist" aria-label="The ten dimensions">
+          <div class="ctx__labels" role="tablist" aria-label="The ten contextual layers">
             {dims.map((d) => (
               <button
                 type="button"
@@ -154,7 +155,7 @@ const interactive = mode === 'interactive';
                     <span class="ctx__name">{d.data.shortName ?? d.data.name}</span>
                   </span>
                 ) : (
-                  <a href={url(`/framework/${d.id}/`)}>
+                  <a href={to.layer(d.id)}>
                     <span class="ctx__num">{pad(d.data.number)}</span>
                     <span class="ctx__name">{d.data.shortName ?? d.data.name}</span>
                   </a>
@@ -185,7 +186,7 @@ const interactive = mode === 'interactive';
               data-panel={d.id}
             >
               <p class="label">
-                <span class="index">{pad(d.data.number)}</span> / {pad(N)} · Dimension
+                <span class="index">{pad(d.data.number)}</span> / {pad(N)} · Layer
               </p>
               <h3 class="ctx__title">{d.data.name}</h3>
               <p class="ctx__summary">{d.data.summary}</p>
@@ -220,8 +221,8 @@ const interactive = mode === 'interactive';
                 </ul>
               </div>
               <p class="ctx__more">
-                <a class="arrow-link" href={url(`/framework/${d.id}/`)}>
-                  Read the dimension <span class="arrow">→</span>
+                <a class="arrow-link" href={to.layer(d.id)}>
+                  Read the definition <span class="arrow">→</span>
                 </a>
                 <span class="ctx__counts">
                   {records} archive record{records === 1 ? '' : 's'} · {projects} project{projects === 1 ? '' : 's'}

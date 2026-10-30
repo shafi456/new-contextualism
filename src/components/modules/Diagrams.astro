@@ -1,0 +1,193 @@
+---
+/**
+ * The framework's diagrams and tables, as modules: the ten layers (grid,
+ * table, index), the contextual diagram (interactive or as a network), the
+ * relations matrix, the scales of context and the Read–Plan–Process
+ * sequence. Each states the source of what it shows.
+ */
+import type { Cite, Registry } from '../../lib/content';
+import { relationsFor } from '../../lib/content';
+import { relations } from '../../lib/site';
+import { pad } from '../../lib/format';
+import { to } from '../../lib/routes';
+import DimensionGrid from '../DimensionGrid.astro';
+import DimensionTable from '../DimensionTable.astro';
+import ContextDiagram from '../ContextDiagram.astro';
+import RelationMatrix from '../RelationMatrix.astro';
+import ScalesDiagram from '../ScalesDiagram.astro';
+import ProcessDiagram from '../ProcessDiagram.astro';
+import Chronology from '../Chronology.astro';
+import { chronology } from '../../lib/site';
+
+interface Props {
+  name: string;
+  reg: Registry;
+  cite: Cite;
+}
+
+const { name, reg, cite } = Astro.props;
+const ref = (key: string): [string, string] => {
+  cite.add(key);
+  return [cite.label(key), `#ref-${key}`];
+};
+const DS = 'reza-2025-deltaic-bangladesh';
+const withExamples = relations.filter((r) => r.source).length;
+---
+
+{name === 'chronology' && <Chronology items={chronology} cite={ref} />}
+
+{
+  name === 'layer-grid' && (
+    <div data-reveal>
+      <DimensionGrid dimensions={reg.dimensions} />
+    </div>
+  )
+}
+
+{name === 'layer-table' && <DimensionTable dimensions={reg.dimensions} citation={ref(DS)} />}
+
+{
+  name === 'layer-index' && (
+    <ol class="layer-index" role="list">
+      {reg.dimensions.map((d) => (
+        <li data-reveal>
+          <a href={to.layer(d.id)}>
+            <span class="layer-index__num">{pad(d.data.number)}</span>
+            <span class="layer-index__name">{d.data.name}</span>
+            <span class="layer-index__summary">{d.data.summary}</span>
+            <span class="layer-index__rel">{relationsFor(d.id).length} relations</span>
+            <span class="layer-index__arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+{
+  name === 'context-diagram' && (
+    <div class="ctx-module">
+      <ContextDiagram reg={reg} />
+      <p class="small muted ctx-module__help">
+        Use the arrow keys to move between layers. Selecting a relation in the panel moves to the related layer. The layers and
+        the founder’s terms for each are from <a href={ref(DS)[1]}>{ref(DS)[0]}</a>; the relations are an editorial
+        interpretation.
+      </p>
+    </div>
+  )
+}
+
+{
+  name === 'context-network' && (
+    <figure class="diagram ctx-network">
+      <ContextDiagram reg={reg} mode="static" selected="" />
+      <figcaption class="diagram__caption">
+        <span class="label label--ink">Diagram</span>
+        <span>
+          The ten layers and the {relations.length} relations proposed between them, {withExamples} of them illustrated from the
+          published record. Editorial interpretation; explore it in the <a href={to.framework()}>Foundational Framework</a>.
+        </span>
+      </figcaption>
+    </figure>
+  )
+}
+
+{
+  name === 'relation-matrix' && (
+    <div class="matrix-module">
+      <RelationMatrix reg={reg} />
+    </div>
+  )
+}
+
+{name === 'scales' && <ScalesDiagram citation={ref('reza-2023-new-contextualism-path')} />}
+
+{name === 'process' && <ProcessDiagram dimensions={reg.dimensions} citation={ref('reza-nitu-2025-people-place-justice')} />}
+
+<style>
+  .layer-index {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .layer-index a {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 4fr) minmax(0, 5fr) 6.5rem 2rem;
+    gap: 1rem var(--col-gap);
+    align-items: baseline;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .layer-index__num {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .layer-index__name {
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.75rem);
+    line-height: 1;
+    transition: color 0.3s var(--ease);
+  }
+
+  .layer-index__summary {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .layer-index__rel {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .layer-index__arrow {
+    justify-self: end;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .layer-index a:hover .layer-index__name {
+    color: var(--brick);
+  }
+
+  .layer-index a:hover .layer-index__arrow {
+    transform: translateX(4px);
+  }
+
+  .ctx-module__help {
+    margin-top: 2rem;
+    max-width: 44rem;
+  }
+
+  .ctx-network :global(.ctx__stage) {
+    max-width: 40rem;
+    margin-inline: 0;
+  }
+
+  .matrix-module {
+    max-width: 52rem;
+  }
+
+  @media (max-width: 720px) {
+    .layer-index a {
+      grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
+    }
+
+    .layer-index__summary {
+      grid-column: 2;
+    }
+
+    .layer-index__rel {
+      display: none;
+    }
+
+    .layer-index__arrow {
+      grid-row: 1;
+      grid-column: 3;
+    }
+  }
+</style>

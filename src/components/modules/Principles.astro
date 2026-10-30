@@ -1,0 +1,377 @@
+---
+/**
+ * The principles of New Contextualism as published: three formulations
+ * aligned by theme, the three aims summarised by Reza and Nitu (2025), the
+ * focus areas of New Contextualism 2.0, and the platform's proposed mission
+ * and vision. Principles are quoted as they appear in each source.
+ */
+import type { Cite } from '../../lib/content';
+import Provenance from '../Provenance.astro';
+import { settings } from '../../lib/site';
+import { pad } from '../../lib/format';
+
+interface Props {
+  name: 'formulations' | 'pillars' | 'focus-areas' | 'statements';
+  cite: Cite;
+}
+
+const { name, cite } = Astro.props;
+const ref = (key: string): [string, string] => {
+  cite.add(key);
+  return [cite.label(key), `#ref-${key}`];
+};
+
+const formulations =
+  name === 'formulations'
+    ? [
+        { label: 'June 2023', title: 'Workshop at BRAC University', cite: ref('bracu-2023-workshop-report') },
+        { label: 'April 2025', title: 'The Daily Star', cite: ref('reza-2025-deltaic-bangladesh') },
+        { label: 'September 2025', title: 'Context BD', cite: ref('reza-nitu-2025-people-place-justice') },
+      ]
+    : [];
+const themes: { theme: string; cells: (string | null)[] }[] = [
+  {
+    theme: 'Anticipating the future',
+    cells: [
+      'Forward-looking design informed by accurate predictions of the future',
+      'Forward-Thinking Design Anchored in Prediction',
+      'Forward-thinking design; Informed by prediction',
+    ],
+  },
+  {
+    theme: 'Learning from history',
+    cells: [
+      'A profound understanding of historical trends',
+      'Historical Grounding as Foundational Knowledge',
+      'Learning from the past',
+    ],
+  },
+  {
+    theme: 'A broad reading of context',
+    cells: [
+      'Recognition of the diverse and extensive nature of context',
+      'Holistic Context Understanding – The Tenfold Matrix',
+      'A broad sense of context',
+    ],
+  },
+  {
+    theme: 'The universal and the particular',
+    cells: [null, 'Balancing the Universal and the Particular – The Art of Hybridization', null],
+  },
+  {
+    theme: 'Adaptability and resilience',
+    cells: [null, 'Designing for Adaptability and Resilience', null],
+  },
+  {
+    theme: 'Equity and justice',
+    cells: ['A focus on equity and justice through inclusive and diverse designs', null, 'Equity and justice'],
+  },
+];
+
+// Quoted verbatim from Reza and Nitu (2025).
+const pillars = [
+  {
+    title: 'Sense of place and identity',
+    quote: 'Sense of place and identity, honoring culture and memory while embracing contemporary design.',
+  },
+  {
+    title: 'Sustainability',
+    quote: 'Sustainability minimizes energy, carbon, and waste while adapting to the local climate.',
+  },
+  {
+    title: 'Social engagement',
+    quote: 'Social engagement creates inclusive, life-giving spaces that encourage interaction and well-being.',
+  },
+];
+
+const focusAreas = [
+  {
+    title: 'Nature-inspired design',
+    text: 'Learning from the strategies by which local ecosystems and organisms thrive in specific conditions.',
+  },
+  {
+    title: 'Deep sustainability integration',
+    text: 'Embedding sustainability across the design lifecycle, from material sourcing to waste reduction, beyond superficial ‘greenwashing’.',
+  },
+  {
+    title: 'Alignment with the SDGs',
+    text: 'Mapping design intentions and outcomes against the United Nations Sustainable Development Goals.',
+  },
+  {
+    title: 'Proactive resilience',
+    text: 'Anticipating future climate impacts, such as sea-level rise and increased storm intensity.',
+  },
+];
+const DS = name === 'formulations' || name === 'focus-areas' ? ref('reza-2025-deltaic-bangladesh') : undefined;
+const CBD = name === 'formulations' || name === 'pillars' ? ref('reza-nitu-2025-people-place-justice') : undefined;
+const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : undefined;
+---
+
+{
+  name === 'formulations' && (
+    <div class="formulations-module">
+      <div class="formulations" data-reveal>
+        <table>
+          <caption class="visually-hidden">Principles of New Contextualism in three published formulations, aligned by theme</caption>
+          <thead>
+            <tr>
+              <th scope="col">
+                <span class="label">Theme</span>
+              </th>
+              {formulations.map((f) => (
+                <th scope="col">
+                  <span class="formulations__date">{f.label}</span>
+                  <span class="formulations__source">
+                    {f.title} (<a href={f.cite[1]}>{f.cite[0]}</a>)
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {themes.map((t) => (
+              <tr>
+                <th scope="row">{t.theme}</th>
+                {t.cells.map((c) => (c ? <td>{c}</td> : <td class="formulations__empty">Not named as a principle</td>))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="formulations__note small muted">
+        In April 2025 equity and justice are described as ‘central to its ethos’ rather than listed among the tenets
+        (<a href={DS![1]}>{DS![0]}</a>). The September 2025 essay adds a sequence of three phases (Read, Plan and Process) and
+        a ten-layer lens that differs slightly from the ten layers listed in April 2025 (<a href={CBD![1]}>{CBD![0]}</a>).
+      </p>
+      <Provenance kind="interpretation" note="Editorial alignment of quoted principles" />
+    </div>
+  )
+}
+
+{
+  name === 'pillars' && (
+    <div class="pillars">
+      <p class="label">Three aims, as summarised by Reza and Nitu (2025)</p>
+      <ol class="pillars__list" role="list">
+        {pillars.map((p, i) => (
+          <li data-reveal>
+            <span class="pillars__num">{pad(i + 1)}</span>
+            <h3 class="pillars__title">{p.title}</h3>
+            <p class="pillars__text">‘{p.quote}’</p>
+          </li>
+        ))}
+      </ol>
+      <p class="small muted">
+        Quoted from <a href={CBD![1]}>{CBD![0]}</a>.
+      </p>
+    </div>
+  )
+}
+
+{
+  name === 'focus-areas' && (
+    <div class="focus-module">
+      <ol class="focus" role="list">
+        {focusAreas.map((f, i) => (
+          <li data-reveal>
+            <span class="label">{pad(i + 1)}</span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="small muted">
+        Summarised from <a href={DS![1]}>{DS![0]}</a>. On the Sustainable Development Goals, see <a href={SDG![1]}>{SDG![0]}</a>.
+      </p>
+    </div>
+  )
+}
+
+{
+  name === 'statements' && (
+    <div class="statements-module">
+      <div class="statements">
+        <div class="statement" data-reveal>
+          <p class="label">Mission</p>
+          <p class="statement__text">{settings.mission.text}</p>
+          <Provenance kind={settings.mission.provenance} approval="pending" />
+        </div>
+        <div class="statement" data-reveal>
+          <p class="label">Vision</p>
+          <p class="statement__text">{settings.vision.text}</p>
+          <Provenance kind={settings.vision.provenance} approval="pending" />
+        </div>
+      </div>
+      <p class="small muted statements__note">
+        These statements are drafts put forward for discussion. They have no official status until approved by the founder.
+      </p>
+    </div>
+  )
+}
+
+<style>
+  /* Formulations */
+  .formulations {
+    overflow-x: auto;
+  }
+
+  .formulations table {
+    width: 100%;
+    min-width: 46rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .formulations th,
+  .formulations td {
+    padding: 1rem 1.25rem 1.1rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: top;
+    font-weight: 400;
+  }
+
+  .formulations thead th {
+    border-bottom: 1px solid var(--ink);
+    vertical-align: bottom;
+  }
+
+  .formulations thead th:first-child {
+    width: 18%;
+  }
+
+  .formulations__date {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+
+  .formulations__source {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+  }
+
+  .formulations tbody th {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .formulations td {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .formulations__empty {
+    color: var(--ink-2);
+    font-size: 0.8125rem !important;
+    font-style: italic;
+  }
+
+  .formulations__note {
+    margin: 1.25rem 0 1rem;
+    max-width: 48rem;
+  }
+
+  /* Aims */
+  .pillars__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--col-gap);
+    margin: 1rem 0;
+  }
+
+  .pillars__list li {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .pillars__num {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pillars__title {
+    font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2.125rem);
+  }
+
+  .pillars__text {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    max-width: 22rem;
+  }
+
+  /* New Contextualism 2.0 */
+  .focus {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem var(--col-gap);
+    margin: 0 0 1rem;
+  }
+
+  .focus li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .focus h3 {
+    font-size: 1.625rem;
+    line-height: 1.1;
+  }
+
+  .focus p {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  /* Statements */
+  .statements {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem var(--col-gap);
+  }
+
+  .statement {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .statement__text {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 1.25rem + 1.2vw, 2.4rem);
+    line-height: 1.12;
+    max-width: 26ch;
+  }
+
+  .statements__note {
+    margin-top: 2rem;
+    max-width: 40rem;
+  }
+
+  @media (max-width: 900px) {
+    .pillars__list,
+    .statements {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .focus {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

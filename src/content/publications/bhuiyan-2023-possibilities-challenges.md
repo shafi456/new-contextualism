@@ -9,7 +9,7 @@ venue: "Workshop ‘Exploring New Contextualism: An Approach to Architecture and
 place: School of Architecture and Design, BRAC University, Dhaka
 url: https://www.bracu.ac.bd/news/daylong-workshop-and-lecture-sessions-held-exploring-new-contextualism-approach-architecture
 event: 2023-06-10-exploring-new-contextualism
-dimensions: [social, economic, political, historical, ecological, scientific-technological, geographical, cultural, urban, architectural]
+dimensions: [social, economic, political, historical, ecological, scientific, geographical, cultural, urban, architectural]
 topics: [workshop, critique, sustainability]
 summary: A critical lecture on the strengths and limitations of the approach, including an analysis of its ten parameters.
 provenance: published-source

@@ -9,12 +9,15 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { buildLabels, pubYear, type Publication } from './cite';
 import { renderInline, renderMarkdown, type CiteContext } from './markdown';
 import { chronology, relations, type Relation } from './site';
+import { ALL_PAGES, DEDICATED, itemId, locate } from './ia';
+import { headings, parseModules } from './modules';
+import { slugify } from './format';
 
 export type Dimension = CollectionEntry<'dimensions'>;
 export type Project = CollectionEntry<'projects'>;
 export type EventEntry = CollectionEntry<'events'>;
-export type PhilosophySection = CollectionEntry<'philosophy'>;
 export type Person = CollectionEntry<'people'>;
+export type Page = CollectionEntry<'pages'>;
 export type { Publication };
 
 const PROD = import.meta.env.PROD;
@@ -29,8 +32,10 @@ export interface Registry {
   labels: Map<string, string>;
   events: EventEntry[];
   event: Map<string, EventEntry>;
-  philosophy: PhilosophySection[];
   people: Person[];
+  pages: Page[];
+  /** Pages by path, e.g. "/philosophy/principles/". */
+  page: Map<string, Page>;
 }
 
 let cached: Promise<Registry> | undefined;
@@ -43,20 +48,19 @@ export function registry(): Promise<Registry> {
 }
 
 async function load(): Promise<Registry> {
-  const [dimensions, projects, publications, events, philosophy, people] = await Promise.all([
+  const [dimensions, projects, publications, events, people, pages] = await Promise.all([
     getCollection('dimensions'),
     getCollection('projects', notDraft),
     getCollection('publications', notDraft),
     getCollection('events', notDraft),
-    getCollection('philosophy'),
     getCollection('people'),
+    getCollection('pages'),
   ]);
 
   dimensions.sort((a, b) => a.data.number - b.data.number);
   projects.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
   publications.sort(byDateDesc);
   events.sort((a, b) => b.data.start.getTime() - a.data.start.getTime());
-  philosophy.sort((a, b) => a.data.order - b.data.order);
 
   const reg: Registry = {
     dimensions,
@@ -67,8 +71,9 @@ async function load(): Promise<Registry> {
     labels: buildLabels(publications),
     events,
     event: new Map(events.map((e) => [e.id, e])),
-    philosophy,
     people,
+    pages,
+    page: new Map(pages.map((p) => [p.data.path, p])),
   };
   validate(reg);
   return reg;
@@ -96,7 +101,7 @@ function validate(reg: Registry) {
   }
   for (const c of chronology) c.sources.forEach((k) => src(k, `chronology "${c.title}"`));
   for (const d of reg.dimensions) src(d.data.keywordsSource, `dimensions/${d.id}`);
-  for (const s of reg.philosophy) if (s.data.quote) src(s.data.quote.source, `philosophy/${s.id} quote`);
+  validateStructure(reg, errors);
   for (const p of reg.projects) {
     p.data.layers.forEach((l) => dim(l, `projects/${p.id}`));
     p.data.sources.forEach((k) => src(k, `projects/${p.id}`));
@@ -120,6 +125,40 @@ function validate(reg: Registry) {
   if (errors.length) {
     throw new Error(`Content integrity check failed:\n  - ${errors.join('\n  - ')}`);
   }
+}
+
+/**
+ * The pages must match the agreed site structure (src/lib/ia.ts): every page
+ * belongs to it, every page in it exists, each page covers its sub-items as
+ * second-level headings, and no record's address collides with a page.
+ */
+function validateStructure(reg: Registry, errors: string[]) {
+  const seen = new Set<string>();
+  for (const p of reg.pages) {
+    const where = `pages/${p.id}`;
+    const { page } = locate(p.data.path);
+    if (!page) {
+      errors.push(`${where}: path ${p.data.path} is not in the site structure (src/lib/ia.ts)`);
+      continue;
+    }
+    if (seen.has(p.data.path)) errors.push(`${where}: a second page claims ${p.data.path}`);
+    seen.add(p.data.path);
+    parseModules(p.body, where);
+    const ids = headings(p.body).map((h) => slugify(h));
+    for (const item of page.items ?? []) {
+      if (!ids.includes(itemId(item))) errors.push(`${where}: missing the sub-item heading "## ${item}"`);
+    }
+  }
+  for (const page of ALL_PAGES) {
+    if (!DEDICATED.includes(page.path) && !seen.has(page.path) && !page.path.includes('#')) {
+      errors.push(`site structure: no page in src/content/pages for ${page.number} ${page.title} (${page.path})`);
+    }
+  }
+  const taken = new Set(ALL_PAGES.map((p) => p.path));
+  const clash = (path: string, what: string) => taken.has(path) && errors.push(`${what}: address ${path} is used by a page`);
+  reg.projects.forEach((p) => clash(`/projects/${p.id}/`, `projects/${p.id}`));
+  reg.publications.forEach((p) => clash(`/research/${p.id}/`, `publications/${p.id}`));
+  reg.dimensions.forEach((d) => clash(`/philosophy/layers/${d.id}/`, `dimensions/${d.id}`));
 }
 
 /* ------------------------------------------------------------ Citations */
@@ -153,7 +192,22 @@ export function citations(reg: Registry, where: string) {
   };
 }
 
+export type Cite = ReturnType<typeof citations>;
+
 /* ------------------------------------------------------------- Queries */
+
+/** Listed projects selected by flag, category or status (all if none given). */
+export function projectsWhere(
+  reg: Registry,
+  { filter, category, status }: { filter?: string; category?: string; status?: string },
+): Project[] {
+  return listed(reg.projects).filter(
+    (p) =>
+      (filter !== 'featured' || p.data.featured) &&
+      (!category || category.split(',').some((c) => (p.data.categories as string[]).includes(c.trim()))) &&
+      (!status || p.data.status === status),
+  );
+}
 
 export function relationsFor(id: string): (Relation & { other: string })[] {
   return relations

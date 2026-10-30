@@ -168,9 +168,9 @@ const attr = (list: string[]) => list.map((s) => s.toLowerCase()).join('|');
 
     .record__meta {
       grid-column: 2;
-      grid-auto-flow: column;
-      justify-content: start;
-      gap: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.15rem 1rem;
     }
 
     .record__source {

@@ -3,10 +3,12 @@ import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import Provenance from '../../components/Provenance.astro';
 import RecordList from '../../components/RecordList.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { citations, listed, registry } from '../../lib/content';
-import { apa, bibtex, chicago, pubYear } from '../../lib/cite';
+import { apa, bibtex, chicago, pubYear, ris } from '../../lib/cite';
 import { displayName, formatDate, joinList } from '../../lib/format';
 import { COLLECTION_LABELS, TYPE_LABELS } from '../../lib/provenance';
+import { to } from '../../lib/routes';
 import { url } from '../../lib/url';
 
 export const getStaticPaths = (async () => {
@@ -59,11 +61,15 @@ const jsonLd = {
 ---
 
 <Base title={d.title} description={d.summary ?? `${typeLabel}${year ? `, ${year}` : ''}: ${d.title}`} type="article" jsonLd={jsonLd}>
+  <Breadcrumbs
+    trail={[
+      { href: url('/'), label: 'Home' },
+      { href: url('/research/'), label: 'Research' },
+      { href: to.archive(), label: 'Bibliographic Archive' },
+      { label: COLLECTION_LABELS[d.collection] },
+    ]}
+  />
   <article class="wrap record-page">
-    <nav class="crumbs label" aria-label="Breadcrumb">
-      <a href={url('/research/')}>Research</a> <span aria-hidden="true">/</span>
-      <span>{COLLECTION_LABELS[d.collection]}</span>
-    </nav>
 
     {d.archived && <p class="pending archived">This record is archived. It is kept at this address for reference.</p>}
 
@@ -114,6 +120,9 @@ const jsonLd = {
             <button type="button" role="tab" aria-selected="false" aria-controls="cite-bibtex" id="tab-bibtex" tabindex="-1" data-cite-tab
               >BibTeX</button
             >
+            <button type="button" role="tab" aria-selected="false" aria-controls="cite-ris" id="tab-ris" tabindex="-1" data-cite-tab
+              >RIS</button
+            >
           </div>
           <div role="tabpanel" id="cite-chicago" aria-labelledby="tab-chicago" class="cite-box__panel">
             <p class="cite-box__text" data-copy-source set:html={chicago(rec, label)} />
@@ -124,10 +133,14 @@ const jsonLd = {
           <div role="tabpanel" id="cite-bibtex" aria-labelledby="tab-bibtex" class="cite-box__panel" hidden>
             <pre class="cite-box__code" data-copy-source>{bibtex(rec)}</pre>
           </div>
+          <div role="tabpanel" id="cite-ris" aria-labelledby="tab-ris" class="cite-box__panel" hidden>
+            <pre class="cite-box__code" data-copy-source>{ris(rec)}</pre>
+          </div>
           <p class="cite-box__foot">
             <button type="button" class="link-button" data-copy>Copy citation</button>
             <span class="small muted" role="status" aria-live="polite" data-copy-status></span>
             <span class="small muted">In-text: ({label})</span>
+            <a class="small" href={url(`/research/${rec.id}.ris`)} download>Download RIS</a>
           </p>
         </section>
       </div>
@@ -221,7 +234,7 @@ const jsonLd = {
               <>
                 <dt class="label">Event</dt>
                 <dd>
-                  <a href={url(`/dialogue/#${event.id}`)}>{event.data.title}</a>
+                  <a href={to.event(event.id)}>{event.data.title}</a>
                 </dd>
               </>
             )
@@ -229,12 +242,12 @@ const jsonLd = {
           {
             d.dimensions.length > 0 && (
               <>
-                <dt class="label">Dimensions</dt>
+                <dt class="label">Layers</dt>
                 <dd>
                   <ul role="list" class="tags">
                     {d.dimensions.map((id) => (
                       <li>
-                        <a href={url(`/framework/${id}/`)}>{reg.dimension.get(id)?.data.name}</a>
+                        <a href={to.layer(id)}>{reg.dimension.get(id)?.data.name}</a>
                       </li>
                     ))}
                   </ul>
@@ -250,7 +263,7 @@ const jsonLd = {
                   <ul role="list" class="tags">
                     {d.topics.map((t) => (
                       <li>
-                        <a href={url(`/research/?topic=${encodeURIComponent(t.toLowerCase())}`)}>{t}</a>
+                        <a href={to.archive({ topic: t.toLowerCase() })}>{t}</a>
                       </li>
                     ))}
                   </ul>
@@ -264,7 +277,7 @@ const jsonLd = {
                 <dt class="label">Cited in</dt>
                 <dd>
                   {citedBy.map((p, i) => (
-                    <>{i > 0 && '; '}<a href={url(`/research/${p.id}/`)}>{reg.labels.get(p.id)}</a></>
+                    <>{i > 0 && '; '}<a href={to.record(p.id)}>{reg.labels.get(p.id)}</a></>
                   ))}
                 </dd>
               </>
@@ -276,7 +289,7 @@ const jsonLd = {
                 <dt class="label">Cites</dt>
                 <dd>
                   {cites.map((p, i) => (
-                    <>{i > 0 && '; '}<a href={url(`/research/${p.id}/`)}>{reg.labels.get(p.id)}</a></>
+                    <>{i > 0 && '; '}<a href={to.record(p.id)}>{reg.labels.get(p.id)}</a></>
                   ))}
                 </dd>
               </>
@@ -290,7 +303,7 @@ const jsonLd = {
                   <ul role="list" class="plain">
                     {projects.map((p) => (
                       <li>
-                        <a href={url(`/projects/${p.id}/`)}>{p.data.title}</a>
+                        <a href={to.project(p.id)}>{p.data.title}</a>
                       </li>
                     ))}
                   </ul>
@@ -303,8 +316,8 @@ const jsonLd = {
               <>
                 <dt class="label">Defines</dt>
                 <dd>
-                  The terms for {dimensionsUsing.length === reg.dimensions.length ? 'all ten dimensions' : `${dimensionsUsing.length} dimensions`}{' '}
-                  (<a href={url('/framework/')}>Framework</a>)
+                  The terms for {dimensionsUsing.length === reg.dimensions.length ? 'all ten layers' : `${dimensionsUsing.length} layers`}{' '}
+                  (<a href={to.layers()}>The Ten Contextual Layers</a>)
                 </dd>
               </>
             )
@@ -331,16 +344,6 @@ const jsonLd = {
 </Base>
 
 <style>
-  .crumbs {
-    display: flex;
-    gap: 0.6rem;
-    padding-top: 1.5rem;
-  }
-
-  .crumbs a {
-    text-decoration-color: var(--rule);
-  }
-
   .archived {
     margin-top: 1.5rem;
   }

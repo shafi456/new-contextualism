@@ -1,0 +1,202 @@
+---
+/**
+ * Events of the given types (comma-separated), forthcoming first, each with
+ * its programme, people and sources. Without matching events, an honest
+ * notice is shown.
+ */
+import type { Cite, EventEntry, Registry } from '../../lib/content';
+import { eventIsUpcoming } from '../../lib/content';
+import { eventsFor } from '../../lib/modules';
+import { formatDate } from '../../lib/format';
+import { EVENT_TYPE_LABELS } from '../../lib/provenance';
+import { to } from '../../lib/routes';
+import Provenance from '../Provenance.astro';
+
+interface Props {
+  reg: Registry;
+  cite: Cite;
+  attrs: { type?: string; empty?: string };
+}
+
+const { reg, cite, attrs } = Astro.props;
+const events = eventsFor(reg, attrs.type);
+const upcoming = events.filter((e) => eventIsUpcoming(e)).reverse();
+const past = events.filter((e) => !eventIsUpcoming(e));
+const rendered = new Map(events.map((e) => [e.id, cite.md(e.body)]));
+events.forEach((e) => e.data.sources.forEach((k) => cite.add(k)));
+
+const when = (e: EventEntry) =>
+  e.data.end && e.data.end.getTime() !== e.data.start.getTime()
+    ? `${formatDate(e.data.start)} – ${formatDate(e.data.end)}`
+    : formatDate(e.data.start);
+const FORMAT = { 'in-person': 'In person', online: 'Online', hybrid: 'In person and online' } as const;
+---
+
+{
+  events.length === 0 ? (
+    <p class="pending">
+      <span class="label">None recorded</span>
+      {attrs.empty ?? 'No events of this kind have yet been recorded on this platform.'}
+    </p>
+  ) : (
+    <div class="events-module">
+      {upcoming.length === 0 && (
+        <p class="pending events-module__none">
+          <span class="label">Forthcoming</span>
+          No events of this kind are currently scheduled. Past events are listed below.
+        </p>
+      )}
+      {[...upcoming, ...past].map((e) => (
+        <article class="event" id={e.id} aria-labelledby={`${e.id}-title`} data-reveal>
+          <div class="event__when">
+            <p class="event__date">{when(e)}</p>
+            <p class="label">{eventIsUpcoming(e) ? 'Forthcoming' : 'Past event'}</p>
+          </div>
+          <div class="event__body">
+            <p class="label">
+              {EVENT_TYPE_LABELS[e.data.type]} · {FORMAT[e.data.format]}
+            </p>
+            <h3 class="event__title" id={`${e.id}-title`}>
+              {e.data.title}
+            </h3>
+            <p class="event__summary">{e.data.summary}</p>
+            <dl class="facts event__facts">
+              {e.data.location && (
+                <>
+                  <dt class="label">Where</dt>
+                  <dd>{e.data.location}</dd>
+                </>
+              )}
+              {e.data.time && (
+                <>
+                  <dt class="label">Time</dt>
+                  <dd>{e.data.time}</dd>
+                </>
+              )}
+              {e.data.organiser && (
+                <>
+                  <dt class="label">Organiser</dt>
+                  <dd>{e.data.organiser}</dd>
+                </>
+              )}
+              {e.data.programme.length > 0 && (
+                <>
+                  <dt class="label">Programme</dt>
+                  <dd>
+                    <ol role="list" class="programme">
+                      {e.data.programme.map((item) => (
+                        <li>
+                          {item.record ? <a href={to.record(item.record)}>{item.title}</a> : item.title}
+                          {item.speaker && <span class="muted"> · {item.speaker}</span>}
+                        </li>
+                      ))}
+                    </ol>
+                  </dd>
+                </>
+              )}
+              {e.data.participants.length > 0 && (
+                <>
+                  <dt class="label">{e.data.type === 'symposium' ? 'Speakers' : 'Facilitators'}</dt>
+                  <dd>
+                    <ul role="list" class="programme">
+                      {e.data.participants.map((pt) => (
+                        <li>
+                          {pt.name}
+                          {pt.role && e.data.type === 'symposium' && <span class="muted"> · {pt.role}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </>
+              )}
+              {e.data.registration && eventIsUpcoming(e) && (
+                <>
+                  <dt class="label">Registration</dt>
+                  <dd>
+                    <a class="ext" href={e.data.registration}>
+                      Register
+                    </a>
+                  </dd>
+                </>
+              )}
+              <dt class="label">Sources</dt>
+              <dd>
+                {e.data.sources.map((k, i) => (
+                  <>
+                    {i > 0 && '; '}
+                    <a href={`#ref-${k}`}>{cite.label(k)}</a>
+                  </>
+                ))}
+              </dd>
+            </dl>
+            {rendered.get(e.id) && <div class="prose event__desc" set:html={rendered.get(e.id)} />}
+            <Provenance kind={e.data.provenance} />
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .events-module__none {
+    max-width: 40rem;
+  }
+
+  .event {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
+    gap: 1.5rem var(--col-gap);
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ink);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .event:target {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--sage) 28%, transparent), transparent 12rem);
+  }
+
+  .event__date {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2.25rem);
+    line-height: 1.05;
+    margin-bottom: 0.5rem;
+  }
+
+  .event__body {
+    display: grid;
+    gap: 1rem;
+    max-width: 48rem;
+  }
+
+  .event__title {
+    font-size: var(--fs-h3);
+  }
+
+  .event__summary {
+    font-size: 1.0625rem;
+  }
+
+  .event__facts {
+    margin-top: 0.5rem;
+  }
+
+  .programme {
+    margin: 0;
+  }
+
+  .programme li + li {
+    margin-top: 0.35rem;
+  }
+
+  .event__desc {
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 900px) {
+    .event {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

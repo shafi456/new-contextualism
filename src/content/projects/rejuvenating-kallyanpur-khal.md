@@ -19,6 +19,13 @@ process: >-
 response: >-
   The canal is framed not as leftover infrastructure but as a civic spine, combining flood management with community access. The thesis explored reintroducing navigability through boating services within a transit-oriented development, and devised a strategic plan intended to be replicable for canal revival elsewhere. At the neighbourhood scale, a transit station is designed as the first point of interaction with the canal during daily commutes, and edge treatments are proposed to encourage frequent community engagement [@reza-nitu-2025-people-place-justice].
 sources: [reza-nitu-2025-people-place-justice]
+categories: [urban, teaching]
+places:
+  - name: "Kallyanpur, Dhaka"
+    lat: 23.783
+    lon: 90.358
+    precision: locality
+    area: Dhaka
 plate: canal
 featured: true
 order: 2

@@ -232,7 +232,7 @@ const drawings: Record<string, (r: Rng, noise: Noise) => string> = {
    * Sun-path chart for latitude 23.8° N (Dhaka): solstices in ink,
    * equinox in brick, on a polar grid of altitude and azimuth.
    */
-  'scientific-technological'() {
+  scientific() {
     const c: Vec = [600, 450];
     const R = 380;
     const lat = (23.8 * Math.PI) / 180;
@@ -488,7 +488,7 @@ export const DIMENSION_PLATE_NOTES: Record<string, string> = {
   political: 'Jurisdiction: overlapping administrative boundaries drawn over an urban fabric.',
   historical: 'Palimpsest: successive street grids, a buried watercourse and the trace of an old enclosure.',
   ecological: 'Watershed: terrain contours and the paths water takes across them.',
-  'scientific-technological': 'Sun-path chart for latitude 23.8° N: summer and winter solstices in black, equinox in red.',
+  scientific: 'Sun-path chart for latitude 23.8° N: summer and winter solstices in black, equinox in red.',
   geographical: 'Territory: the distributaries of a delta, its settlements and the routes between them.',
   cultural: 'Sequence: a route through thresholds and courts.',
   urban: 'Figure–ground: urban fabric, avenues, open space and a transit line.',

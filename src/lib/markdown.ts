@@ -15,8 +15,23 @@ marked.use({
   renderer: {
     heading({ tokens, depth }) {
       const html = this.parser.parseInline(tokens);
-      const id = slugify(html.replace(/<[^>]+>/g, ''));
+      const id = slugify(decodeEntities(html.replace(/<[^>]+>/g, '')));
       return `<h${depth} id="${id}">${html}</h${depth}>\n`;
+    },
+    /**
+     * Callouts: a blockquote that opens with [!PENDING] marks material that
+     * has not yet been documented; [!NOTE] marks an editorial note. Text after
+     * the marker on the same line becomes the callout's label.
+     */
+    blockquote({ tokens }) {
+      const body = this.parser.parse(tokens);
+      const m = body.match(/^<p>\[!(PENDING|NOTE)\][ \t]*([^\n<]*)\n?/);
+      if (!m) return `<blockquote>\n${body}</blockquote>\n`;
+      const kind = m[1].toLowerCase();
+      const title = m[2].trim() || (kind === 'pending' ? 'Awaiting documentation' : 'Editorial note');
+      const rest = `<p>${body.slice(m[0].length)}`.replace(/^<p><\/p>\n?/, '');
+      const cls = kind === 'pending' ? 'callout pending' : 'callout callout--note';
+      return `<div class="${cls}"><span class="label">${title}</span>${rest}</div>\n`;
     },
     link({ href, title, tokens }) {
       const text = this.parser.parseInline(tokens);
@@ -27,6 +42,9 @@ marked.use({
     },
   },
 });
+
+const ENTITIES: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
+const decodeEntities = (s: string) => s.replace(/&(?:amp|lt|gt|quot|#39);/g, (e) => ENTITIES[e]);
 
 const CITATION = /\[(@[\w.-]+(?:\s*;\s*@[\w.-]+)*)\]/g;
 

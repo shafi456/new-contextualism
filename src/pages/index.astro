@@ -7,11 +7,13 @@ import Quote from '../components/Quote.astro';
 import DimensionGrid from '../components/DimensionGrid.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import RecordList from '../components/RecordList.astro';
-import { archiveRecords, eventIsUpcoming, founder, listed, registry } from '../lib/content';
+import { archiveRecords, eventIsUpcoming, listed, registry } from '../lib/content';
 import { HERO_PLATE } from '../lib/media';
 import { settings } from '../lib/site';
+import { HOME, sectionByKey } from '../lib/ia';
 import { STATUS_LABELS } from '../lib/provenance';
 import { pubYear } from '../lib/cite';
+import { to } from '../lib/routes';
 import { url } from '../lib/url';
 
 const reg = await registry();
@@ -22,48 +24,58 @@ const counts = (['completed', 'ongoing', 'conceptual'] as const).map((s) => ({
   status: s,
   n: projects.filter((p) => p.data.status === s).length,
 }));
-const person = founder(reg);
-const nc = archiveRecords(reg).filter((p) => p.data.collection === 'new-contextualism');
-const selected = nc.filter((p) => p.data.type !== 'lecture').slice(0, 5);
 const allRecords = archiveRecords(reg);
+const latest = allRecords.slice(0, 5);
 const years = allRecords.map((p) => pubYear(p) ?? 0).filter(Boolean);
 const types = new Set(allRecords.map((p) => p.data.type));
 const upcoming = reg.events.filter((e) => eventIsUpcoming(e));
 const lastEvent = reg.events.find((e) => !eventIsUpcoming(e));
 
 const label = (k: string) => reg.labels.get(k) ?? k;
-const rec = (k: string) => url(`/research/${k}/`);
+const DS = 'reza-2025-deltaic-bangladesh';
+const CBD = 'reza-nitu-2025-people-place-justice';
+const head = (n: string) => HOME.pages.find((p) => p.number === n)!;
+const philosophy = sectionByKey('philosophy');
+const methodologies = sectionByKey('methodologies');
+
+const steps = [
+  { title: 'Read the core proposition', text: 'What New Contextualism is, why it was proposed and what it covers.', href: url('/philosophy/definition-and-scope/') },
+  { title: 'Learn the ten layers', text: 'The ten contextual layers through which a place is read, each defined in the founder’s terms.', href: to.layers() },
+  { title: 'Follow the method', text: 'How a project reads its context, then plans and develops a response.', href: url('/methodologies/read-plan-process/') },
+  { title: 'See it applied', text: 'Theses, studio projects and proposals, documented from published sources.', href: url('/projects/') },
+  { title: 'Go to the sources', text: 'Every claim links to a published record that you can read and cite.', href: url('/research/') },
+];
+
+// Each idea quotes the founder’s published wording, checked against the source.
+const ideas = [
+  { title: 'More than the site', quote: 'transcends the immediate physical site', text: 'Context includes social, cultural, ecological and political conditions, not only the surrounding buildings.', source: DS },
+  { title: 'Ten overlapping layers', quote: 'a tenfold overlapping analysis', text: 'Places are read through ten layers at once, weighted differently in each project.', source: DS },
+  { title: 'Past and future', quote: 'intrinsically forward-looking, yet profoundly anchored in an understanding of the past', text: 'History is the basis for anticipating the needs a building will meet.', source: DS },
+  { title: 'The universal and the particular', quote: 'critical adaptation to the specificities of the local', text: 'Global knowledge is welcomed, but filtered through local climate, materials and culture.', source: DS },
+  { title: 'A method, not a style', quote: 'process-based rather than style-based', text: 'What is new lies in a way of reading and weighing context, not in a recognisable form.', source: CBD },
+  { title: 'Equity and justice', quote: 'must protect the “right to the city”', text: 'No project should strip away people’s access to space, belonging or shared resources.', source: CBD },
+];
+
+const phases = [
+  { name: 'Read', text: 'Investigating context through the ten layers: the phase given particular weight.' },
+  { name: 'Plan', text: 'Translating what is found into strategy.' },
+  { name: 'Process', text: 'Developing, testing and refining the response.' },
+];
 
 const community = [
+  { title: 'Community submissions', text: 'Propose research, case studies or critical responses for the archive.', href: url('/community/submissions/') },
   {
-    title: 'Research contributions',
-    text: 'Propose research, case studies or critical responses for the archive.',
-    href: url('/dialogue/#contributions'),
-  },
-  {
-    title: 'Academic collaborations',
-    text: 'Studios, theses and joint research that test the framework.',
-    href: url('/dialogue/#collaborations'),
-  },
-  {
-    title: 'Lectures and seminars',
-    text: 'Talks on New Contextualism, past and forthcoming.',
-    href: url('/dialogue/#lectures'),
-  },
-  {
-    title: 'Calls for papers',
-    text: 'There are no open calls at present.',
-    href: url('/dialogue/#calls'),
-  },
-  {
-    title: 'Workshops and events',
+    title: 'Events',
     text: upcoming.length
       ? `${upcoming.length} forthcoming event${upcoming.length === 1 ? '' : 's'}.`
       : lastEvent
         ? `No events are scheduled. The most recent was in ${lastEvent.data.start.getUTCFullYear()}.`
         : 'No events are scheduled.',
-    href: url('/dialogue/#events'),
+    href: url('/community/events/'),
   },
+  { title: 'Calls for papers', text: 'There are no open calls at present.', href: url('/community/calls/') },
+  { title: 'Students', text: 'Studios, theses and workshops in which the approach has been taught.', href: url('/community/students/') },
+  { title: 'Discussions and responses', text: 'Critical questions raised about the approach, and how to add to them.', href: url('/community/discussions/') },
 ];
 
 const jsonLd = {
@@ -76,13 +88,12 @@ const jsonLd = {
 ---
 
 <Base jsonLd={jsonLd}>
-  <!-- B. Hero -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
       <div class="hero__meta">
         <p class="label">Architecture · Urbanism · Philosophy</p>
         <p class="label hero__origin">
-          Originated by <a href={url('/about/#founder')}>Mohammad Habib Reza</a>
+          Originated by <a href={to.founder()}>Mohammad Habib Reza</a>
         </p>
       </div>
       <h1 class="hero__title" id="hero-title">
@@ -116,10 +127,40 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- C. The idea -->
+  <!-- 0.1 Start here -->
+  <section class="section start" aria-labelledby="start-title">
+    <div class="wrap">
+      <SectionHead index="0.1" label="Start Here" id="start-here" />
+      <div class="grid start__head">
+        <h2 class="col-title" id="start-title" data-reveal>How to use New Contextualism.</h2>
+        <p class="col-intro" data-reveal>
+          The platform is organised in six sections, from the philosophy to the people who develop it. Five ways in, for a first
+          visit:
+        </p>
+      </div>
+      <ol class="steps" role="list">
+        {
+          steps.map((s, i) => (
+            <li data-reveal>
+              <a href={s.href}>
+                <span class="label">{String(i + 1).padStart(2, '0')}</span>
+                <span class="steps__title">{s.title}</span>
+                <span class="steps__text">{s.text}</span>
+                <span class="steps__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 0.2 Introduction and core proposition -->
   <section class="section idea" aria-labelledby="idea-title">
     <div class="wrap">
-      <SectionHead index="01" label="The Idea" />
+      <SectionHead index="0.2" label={head('0.2').title} id="introduction" />
       <div class="grid">
         <h2 class="idea__title" id="idea-title" data-reveal>Context is more than what surrounds us.</h2>
         <div class="idea__text" data-reveal>
@@ -137,43 +178,138 @@ const jsonLd = {
             text="Context, in the New Contextualist framework, transcends the immediate physical site."
             author="Mohammad Habib Reza"
             source="The Daily Star"
-            label={label('reza-2025-deltaic-bangladesh')}
-            href={rec('reza-2025-deltaic-bangladesh')}
+            label={label(DS)}
+            href={to.record(DS)}
           />
-          <a class="arrow-link" href={url('/philosophy/')}>Read the philosophy <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="arrow-link" href={url('/philosophy/definition-and-scope/')}>Definition and scope <span class="arrow" aria-hidden="true">→</span></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- D. The framework -->
-  <section class="section framework" aria-labelledby="framework-title">
+  <!-- 0.3 Key ideas -->
+  <section class="section ideas" aria-labelledby="ideas-title">
     <div class="wrap">
-      <SectionHead index="02" label="The Framework" />
-      <div class="grid framework__head">
-        <h2 class="framework__title" id="framework-title" data-reveal>Ten dimensions. Interconnected realities.</h2>
-        <div class="framework__intro" data-reveal>
-          <p>
-            The founder’s writing describes context as a ‘tenfold matrix’ of overlapping dimensions. None is read alone: each is
-            entangled with the others, and every project weighs them differently.
-          </p>
-          <p class="small muted">
-            Dimensions and their terms from <a href={rec('reza-2025-deltaic-bangladesh')}>{label('reza-2025-deltaic-bangladesh')}</a>.
-            The relations traced here are an editorial interpretation.
-          </p>
+      <SectionHead index="0.3" label="Key Ideas" id="key-ideas" />
+      <div class="grid ideas__head">
+        <h2 class="col-title" id="ideas-title" data-reveal>The approach in six ideas.</h2>
+        <div class="col-intro" data-reveal>
+          <p>Each idea is summarised by the editors and quoted from the founder’s published writing.</p>
+          <Provenance kind="editorial-summary" approval="pending" />
         </div>
       </div>
-      <DimensionGrid dimensions={dims} />
-      <p class="framework__more">
-        <a class="arrow-link" href={url('/framework/')}>Explore the contextual diagram <span class="arrow" aria-hidden="true">→</span></a>
+      <ol class="ideas__list" role="list">
+        {
+          ideas.map((idea, i) => (
+            <li data-reveal>
+              <span class="label">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="ideas__title">{idea.title}</h3>
+              <p class="ideas__quote">‘{idea.quote}’</p>
+              <p class="ideas__text">{idea.text}</p>
+              <p class="ideas__cite small">
+                <a href={to.record(idea.source)}>{label(idea.source)}</a>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="more">
+        <a class="arrow-link" href={url('/philosophy/principles/')}>Propositions and principles <span class="arrow" aria-hidden="true">→</span></a>
       </p>
     </div>
   </section>
 
-  <!-- E. In practice -->
+  <!-- 0.4 The ten contextual layers -->
+  <section class="section framework" aria-labelledby="framework-title">
+    <div class="wrap">
+      <SectionHead index="0.4" label="The Ten Contextual Layers" id="layers" />
+      <div class="grid framework__head">
+        <h2 class="framework__title" id="framework-title" data-reveal>Ten layers. Interconnected realities.</h2>
+        <div class="framework__intro" data-reveal>
+          <p>
+            The founder’s writing describes context as a ‘tenfold matrix’ of overlapping layers. None is read alone: each is
+            entangled with the others, and every project weighs them differently.
+          </p>
+          <p class="small muted">
+            Layers and their terms from <a href={to.record(DS)}>{label(DS)}</a>, where they are called dimensions. The relations
+            traced here are an editorial interpretation.
+          </p>
+        </div>
+      </div>
+      <DimensionGrid dimensions={dims} />
+      <p class="more more--pair">
+        <a class="arrow-link" href={to.layers()}>The ten layers defined <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="arrow-link arrow-link--quiet" href={to.framework()}>Explore the contextual diagram <span class="arrow" aria-hidden="true">→</span></a>
+      </p>
+    </div>
+  </section>
+
+  <!-- 0.5 Explore the philosophy -->
+  <section class="section explore" aria-labelledby="philosophy-title">
+    <div class="wrap">
+      <SectionHead index="0.5" label="Explore the Philosophy" id="philosophy" />
+      <div class="grid explore__head">
+        <h2 class="col-title" id="philosophy-title" data-reveal>A philosophy in development.</h2>
+        <p class="col-intro" data-reveal>{philosophy.summary} Ten parts, each drawn from the published record.</p>
+      </div>
+      <ol class="toc-grid" role="list">
+        {
+          philosophy.pages.map((p) => (
+            <li data-reveal>
+              <a href={url(p.path)}>
+                <span class="toc-grid__num">{p.number}</span>
+                <span class="toc-grid__name">{p.title === 'Overview' ? 'Overview' : p.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 0.6 Explore the methodologies and frameworks -->
+  <section class="section explore" aria-labelledby="methodologies-title">
+    <div class="wrap">
+      <SectionHead index="0.6" label="Explore the Methodologies and Frameworks" id="methodologies" />
+      <div class="grid explore__head">
+        <h2 class="col-title" id="methodologies-title" data-reveal>From reading to design.</h2>
+        <div class="col-intro" data-reveal>
+          <p>
+            New Contextualism is presented as a process before it is a form. Every project is said to begin with three phases,
+            with particular weight on the first (<a href={to.record(CBD)}>{label(CBD)}</a>).
+          </p>
+        </div>
+      </div>
+      <ol class="phases" role="list">
+        {
+          phases.map((ph, i) => (
+            <li data-reveal>
+              <span class="label">Phase {i + 1}</span>
+              <h3 class="phases__name">{ph.name}</h3>
+              <p>{ph.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <ol class="toc-grid toc-grid--quiet" role="list">
+        {
+          methodologies.pages.map((p) => (
+            <li data-reveal>
+              <a href={url(p.path)}>
+                <span class="toc-grid__num">{p.number}</span>
+                <span class="toc-grid__name">{p.title === 'Overview' ? 'Overview' : p.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 0.7 Featured projects and case studies -->
   <section class="section practice" aria-labelledby="practice-title">
     <div class="wrap">
-      <SectionHead index="03" label="In Practice" />
+      <SectionHead index="0.7" label="Featured Projects and Case Studies" id="projects" />
       <div class="grid practice__head">
         <h2 class="practice__title" id="practice-title" data-reveal>Thinking through places.</h2>
         <div class="practice__intro" data-reveal>
@@ -208,76 +344,23 @@ const jsonLd = {
           ))
         }
       </div>
-      <p class="practice__more">
-        <a class="arrow-link" href={url('/projects/')}>All projects and research <span class="arrow" aria-hidden="true">→</span></a>
+      <p class="more more--pair">
+        <a class="arrow-link" href={url('/projects/featured/')}>Featured projects <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="arrow-link arrow-link--quiet" href={to.projects()}>All projects, as a list or on a map <span class="arrow" aria-hidden="true">→</span></a>
       </p>
     </div>
   </section>
 
-  <!-- F. The origin -->
-  <section class="section origin" aria-labelledby="origin-title">
-    <div class="wrap">
-      <SectionHead index="04" label="The Origin" />
-      <div class="grid">
-        <div class="origin__portrait" data-reveal>
-          <div class="portrait-slot" role="img" aria-label="Placeholder: an approved portrait of the founder has not yet been supplied">
-            <span class="label">Portrait</span>
-            <span class="portrait-slot__note">An approved photograph of the founder will appear here.</span>
-          </div>
-        </div>
-        <div class="origin__text">
-          <h2 class="origin__title" id="origin-title" data-reveal>An evolving architectural philosophy.</h2>
-          <div class="origin__body" data-reveal>
-            <p class="lede">
-              New Contextualism was originated by Mohammad Habib Reza, an architect, architectural historian and Associate Professor
-              at the School of Architecture and Design, BRAC University, Dhaka.
-            </p>
-            <p>
-              In his account, the approach grew from early work as an architect-planner for the Barisal City Corporation and from
-              doctoral research on the early Buddhist architecture of Bengal, and has been developed over more than a decade in
-              teaching at BRAC University (<a href={rec('reza-2023-new-contextualism-path')}>{label('reza-2023-new-contextualism-path')}</a>;
-              <a href={rec('reza-2025-deltaic-bangladesh')}>{label('reza-2025-deltaic-bangladesh')}</a>).
-            </p>
-            <Provenance kind={person?.data.provenance ?? 'editorial-summary'} approval="pending" note="Compiled from published sources" />
-            <div class="origin__works">
-              <p class="label">Selected writing and lectures</p>
-              <ul role="list">
-                {
-                  ['reza-nitu-2025-people-place-justice', 'reza-2025-deltaic-bangladesh', 'reza-2023-new-contextualism-path', 'reza-2023-introduction-lecture']
-                    .map((k) => reg.publication.get(k))
-                    .filter(Boolean)
-                    .map((p) => (
-                      <li>
-                        <a href={rec(p!.id)}>{p!.data.title}</a>
-                        <span class="muted small">
-                          {' '}
-                          {p!.data.type === 'lecture' ? 'Lecture, BRAC University' : p!.data.venue}, {pubYear(p!)}
-                        </span>
-                      </li>
-                    ))
-                }
-              </ul>
-            </div>
-            <p class="origin__links">
-              <a class="arrow-link" href={url('/movement/#origins')}>Explore the Movement’s Origins <span class="arrow" aria-hidden="true">↗</span></a>
-              <a class="arrow-link arrow-link--quiet" href={url('/about/#founder')}>Founder’s profile <span class="arrow" aria-hidden="true">→</span></a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- G. The archive -->
+  <!-- 0.8 Latest research and publications -->
   <section class="section archive" aria-labelledby="archive-title">
     <div class="wrap">
-      <SectionHead index="05" label="The Archive" />
+      <SectionHead index="0.8" label="Latest Research and Publications" id="research" />
       <div class="grid archive__head">
         <h2 class="archive__title" id="archive-title" data-reveal>An ongoing conversation.</h2>
         <div class="archive__intro" data-reveal>
           <p>
-            Essays, lectures and reports that make up the published record of New Contextualism, alongside the founder’s earlier
-            scholarship. Every record has a persistent address and a full citation.
+            Essays, articles, lectures and reports that make up the published record of New Contextualism, alongside the founder’s
+            research on the history of Bengal. Every record has a persistent address and a full citation.
           </p>
           <p class="archive__stats label">
             {allRecords.length} records · {types.size} types · {Math.min(...years)}–{Math.max(...years)}
@@ -285,18 +368,18 @@ const jsonLd = {
         </div>
       </div>
       <div data-reveal>
-        <RecordList reg={reg} records={selected} compact />
+        <RecordList reg={reg} records={latest} compact />
       </div>
-      <p class="archive__more">
-        <a class="arrow-link" href={url('/research/')}>Browse the full archive, with filters <span class="arrow" aria-hidden="true">→</span></a>
+      <p class="more">
+        <a class="arrow-link" href={to.archive()}>Browse the full archive, with filters <span class="arrow" aria-hidden="true">→</span></a>
       </p>
     </div>
   </section>
 
-  <!-- H. The community -->
+  <!-- 0.9 Join the community -->
   <section class="section community" aria-labelledby="community-title">
     <div class="wrap">
-      <SectionHead index="06" label="The Community" />
+      <SectionHead index="0.9" label="Join the Community" id="community" />
       <div class="grid">
         <h2 class="community__title" id="community-title" data-reveal>Context crosses disciplines.</h2>
         <div class="community__body" data-reveal>
@@ -412,7 +495,83 @@ const jsonLd = {
     }
   }
 
-  /* The idea */
+  /* Shared section heads */
+  .col-title {
+    grid-column: 1 / span 6;
+    font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3.75rem);
+    line-height: 1.02;
+  }
+
+  .col-intro {
+    grid-column: 8 / span 5;
+    display: grid;
+    gap: 1rem;
+    align-content: end;
+  }
+
+  .start__head,
+  .ideas__head,
+  .explore__head,
+  .framework__head,
+  .practice__head,
+  .archive__head {
+    row-gap: 1.5rem;
+    margin-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+    align-items: end;
+  }
+
+  .more {
+    margin-top: 2.5rem;
+  }
+
+  .more--pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+  }
+
+  /* 0.1 Start here */
+  .steps {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .steps a {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 5fr) minmax(0, 6fr) 2rem;
+    gap: 0.5rem var(--col-gap);
+    align-items: baseline;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .steps__title {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2.125rem);
+    line-height: 1.1;
+    transition: color 0.3s var(--ease);
+  }
+
+  .steps__text {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .steps__arrow {
+    justify-self: end;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .steps a:hover .steps__title {
+    color: var(--brick);
+  }
+
+  .steps a:hover .steps__arrow {
+    transform: translateX(4px);
+  }
+
+  /* 0.2 Introduction */
   .idea__title {
     grid-column: 1 / span 4;
     font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3.75rem);
@@ -432,20 +591,49 @@ const jsonLd = {
     border-left: 1px solid var(--brick);
   }
 
-  /* The framework */
-  .framework__head,
-  .practice__head,
-  .archive__head {
-    row-gap: 1.5rem;
-    margin-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);
-    align-items: end;
+  /* 0.3 Key ideas */
+  .ideas__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3rem var(--col-gap);
+    margin: 0;
   }
 
+  .ideas__list li {
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .ideas__title {
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.25rem);
+    line-height: 1.08;
+  }
+
+  .ideas__quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .ideas__text {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    max-width: 24rem;
+  }
+
+  .ideas__cite a {
+    text-decoration-color: var(--rule);
+  }
+
+  /* 0.4 The ten layers */
   .framework__title,
   .practice__title,
   .archive__title,
-  .community__title,
-  .origin__title {
+  .community__title {
     grid-column: 1 / span 7;
   }
 
@@ -457,13 +645,82 @@ const jsonLd = {
     gap: 1rem;
   }
 
-  .framework__more,
-  .practice__more,
-  .archive__more {
-    margin-top: 2.5rem;
+  /* 0.5 and 0.6 Indexes of the sections */
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    margin: 0;
+    border-top: 1px solid var(--ink);
   }
 
-  /* In practice */
+  .toc-grid a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .toc-grid__num {
+    flex: none;
+    min-width: 2.5rem;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .toc-grid__name {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.1rem + 0.7vw, 1.75rem);
+    line-height: 1.15;
+    transition: color 0.3s var(--ease);
+  }
+
+  .toc-grid a:hover .toc-grid__name {
+    color: var(--brick);
+  }
+
+  .toc-grid--quiet {
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .toc-grid--quiet .toc-grid__name {
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  }
+
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem var(--col-gap);
+    margin: 0;
+  }
+
+  .phases li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .phases li:first-child {
+    border-top-width: 2px;
+  }
+
+  .phases__name {
+    font-size: clamp(2.25rem, 1.6rem + 2vw, 3.5rem);
+    line-height: 1;
+  }
+
+  .phases p {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    max-width: 22rem;
+  }
+
+  /* 0.7 Projects */
   .practice__counts {
     display: grid;
     gap: 0.35rem;
@@ -500,74 +757,12 @@ const jsonLd = {
     margin-top: clamp(2rem, 6vw, 7rem);
   }
 
-  /* Origin */
-  .origin__portrait {
-    grid-column: 1 / span 4;
-  }
-
-  .portrait-slot {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    aspect-ratio: 4 / 5;
-    padding: 1rem;
-    border: 1px solid var(--rule);
-    background:
-      linear-gradient(to top right, transparent calc(50% - 0.5px), var(--rule) 50%, transparent calc(50% + 0.5px)),
-      var(--paper);
-  }
-
-  .portrait-slot__note {
-    max-width: 14rem;
-    font-size: 0.8125rem;
-    line-height: 1.45;
-    color: var(--ink-2);
-    background: var(--paper);
-  }
-
-  .origin__text {
-    grid-column: 6 / span 7;
-  }
-
-  .origin__title {
-    font-size: var(--fs-h2);
-  }
-
-  .origin__body {
-    display: grid;
-    gap: 1.4rem;
-    max-width: 40rem;
-    margin-top: clamp(1.75rem, 1rem + 2vw, 3rem);
-  }
-
-  .origin__works ul {
-    margin: 0.6rem 0 0;
-  }
-
-  .origin__works li {
-    padding: 0.6rem 0;
-    border-top: 1px solid var(--rule);
-    font-size: 0.9375rem;
-  }
-
-  .origin__works a {
-    font-family: var(--serif);
-    font-size: 1.15rem;
-    text-decoration-color: var(--rule);
-  }
-
-  .origin__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
-  }
-
-  /* Archive */
+  /* 0.8 Research */
   .archive__stats {
     color: var(--ink);
   }
 
-  /* Community */
+  /* 0.9 Community */
   .community__body {
     grid-column: 8 / span 5;
     display: grid;
@@ -618,18 +813,18 @@ const jsonLd = {
   @media (max-width: 900px) {
     .hero__tagline,
     .hero__text,
+    .col-title,
+    .col-intro,
     .idea__title,
     .idea__text,
     .framework__title,
     .practice__title,
     .archive__title,
     .community__title,
-    .origin__title,
     .framework__intro,
     .practice__intro,
     .archive__intro,
     .community__body,
-    .origin__text,
     .practice__item--0,
     .practice__item--1,
     .practice__item--2,
@@ -642,9 +837,27 @@ const jsonLd = {
       margin-top: 2rem;
     }
 
-    .origin__portrait {
-      grid-column: 1 / span 8;
-      margin-bottom: 2.5rem;
+    .ideas__list,
+    .phases {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .toc-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .steps a,
+    .community__links a {
+      grid-template-columns: 2.5rem minmax(0, 1fr) 2rem;
+    }
+
+    .steps__text {
+      grid-column: 2;
+    }
+
+    .steps__arrow {
+      grid-row: 1;
+      grid-column: 3;
     }
 
     .community__links a {
@@ -658,6 +871,13 @@ const jsonLd = {
     .community__arrow {
       grid-row: 1;
       grid-column: 2;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .ideas__list,
+    .phases {
+      grid-template-columns: 1fr;
     }
   }
 </style>

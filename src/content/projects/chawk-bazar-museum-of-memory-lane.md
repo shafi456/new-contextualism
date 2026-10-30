@@ -20,6 +20,13 @@ social: >-
 response: >-
   Applying New Contextualist principles led to strategies focused on phased interventions, integrating livelihoods, adaptive reuse of historic buildings and contextually sensitive materials and forms. The aim is to enhance functionality and safety while preserving ‘the unique, vibrant chaos that defines its identity’ [@reza-2025-deltaic-bangladesh].
 sources: [reza-2023-new-contextualism-path, reza-2025-deltaic-bangladesh]
+categories: [architectural, heritage-landscape, teaching]
+places:
+  - name: "Chawk Bazar, Old Dhaka"
+    lat: 23.717
+    lon: 90.397
+    precision: locality
+    area: Dhaka
 plate: fabric
 featured: true
 order: 3

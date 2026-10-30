@@ -25,6 +25,13 @@ process: >-
 response: >-
   The design proposes memory lanes, public spaces, green buffers and cultural nodes that transform the river edge into a civic landscape. Courts for culture and for ritual are interwoven rather than divided, open to all identities, and year-round cultural festivals, community hubs and local markets are proposed to activate the spiritual complex [@reza-nitu-2025-people-place-justice].
 sources: [reza-nitu-2025-people-place-justice]
+categories: [heritage-landscape, teaching]
+places:
+  - name: "Sunamganj district (approximate)"
+    lat: 25.066
+    lon: 91.395
+    precision: district
+    note: "The site is on the Jadukata riverfront at Panatirtha; the marker shows the district."
 plate: river
 featured: true
 order: 1

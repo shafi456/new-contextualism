@@ -1,6 +1,6 @@
 ---
-import { FOOTER_LINKS, NAV, settings } from '../lib/site';
-import { url } from '../lib/url';
+import { NAV, POLICY_LINKS, UTILITY_LINKS, settings } from '../lib/site';
+import { to } from '../lib/routes';
 
 const links = [...settings.institutionalLinks, ...settings.socialLinks];
 const year = new Date().getUTCFullYear();
@@ -15,24 +15,37 @@ const year = new Date().getUTCFullYear();
         <p class="site-footer__line">{settings.footerLine}</p>
       </div>
 
-      <nav class="site-footer__nav" aria-label="Footer">
+      <nav class="site-footer__nav" aria-label="Sections">
         <p class="label">Sections</p>
         <ul role="list">
           {
             NAV.map((item) => (
               <li>
-                <a href={item.href}>{item.label.replace('The ', '')}</a>
+                <a href={item.href}>{item.label}</a>
               </li>
             ))
           }
         </ul>
       </nav>
 
-      <nav class="site-footer__nav" aria-label="Additional">
+      <nav class="site-footer__nav" aria-label="Utilities">
+        <p class="label">Utilities</p>
+        <ul role="list">
+          {
+            UTILITY_LINKS.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="site-footer__nav" aria-label="Platform">
         <p class="label">Platform</p>
         <ul role="list">
           {
-            FOOTER_LINKS.map((item) => (
+            POLICY_LINKS.map((item) => (
               <li>
                 <a href={item.href}>{item.label}</a>
               </li>
@@ -64,7 +77,7 @@ const year = new Date().getUTCFullYear();
         {settings.prepublication ? `Pre-publication edition, ${year}.` : `© ${year}.`} Quoted texts and records remain the copyright
         of their authors and publishers.
       </p>
-      <p><a href={url('/editorial-standards/')}>How this platform verifies its content</a></p>
+      <p><a href={to.standards()}>How this platform verifies its content</a></p>
     </div>
   </div>
 </footer>

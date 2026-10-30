@@ -45,7 +45,7 @@ _provenance: &provenance
   label: Provenance
   name: provenance
   widget: select
-  hint: Where the text comes from. See /editorial-standards/.
+  hint: Where the text comes from. See /governance/editorial-standards/.
   options:
     - { label: 'Published source (verified, cited)', value: published-source }
     - { label: 'Editorial summary (written from cited sources)', value: editorial-summary }
@@ -77,7 +77,7 @@ _archived: &archived
   required: false
 
 _dimensions: &dimensions
-  label: Dimensions
+  label: Layers
   name: dimensions
   widget: relation
   collection: dimensions
@@ -111,6 +111,42 @@ _figure: &figure
   - { label: Alternative text, name: alt, widget: text, hint: Describe what the image shows for readers who cannot see it. }
   - { label: Credit, name: credit, widget: string, hint: 'Author or rights holder, e.g. “Drawing: A. Rahman”.' }
   - { label: Caption, name: caption, widget: text, required: false }
+
+# The pages of the site structure. Their titles and numbers come from
+# src/lib/ia.ts; the address must not be changed. The text is edited as plain
+# Markdown so that module markers and notes are kept exactly as written.
+_page_fields: &page_fields
+  - { label: Address (do not change), name: path, widget: string, hint: 'The page’s place in the site structure, e.g. /philosophy/principles/.' }
+  - { label: Introduction, name: intro, widget: text, required: false }
+  - { label: Last updated, name: updated, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+  - *provenance
+  - label: Founder’s approval
+    name: approval
+    widget: select
+    default: pending
+    options:
+      - { label: 'Awaiting approval', value: pending }
+      - { label: 'Approved', value: approved }
+      - { label: 'Not needed (e.g. the sitemap)', value: none }
+  - label: Text
+    name: body
+    widget: markdown
+    modes: [raw]
+    hint: >-
+      Each sub-item of the page is a second-level heading (## Heading), spelt as in the site structure; the build checks
+      them. Cite sources as [@record-file-name]. Mark missing material with a line beginning “> [!PENDING]”, and
+      editorial notes with “> [!NOTE]”. Diagrams and lists are inserted with markers such as <!-- module: chronology -->;
+      see README.md for the list of modules.
+
+_page_collection: &page_collection
+  create: false
+  delete: false
+  extension: md
+  format: frontmatter
+  identifier_field: path
+  summary: '{{path}}'
+  sortable_fields: [path]
+  fields: *page_fields
 
 collections:
   - name: settings
@@ -195,7 +231,7 @@ collections:
               - { label: Link (optional), name: href, widget: string, required: false }
 
       - name: relations
-        label: Framework relations
+        label: Relations between the layers
         file: src/content/framework/relations.json
         format: json
         fields:
@@ -205,14 +241,42 @@ collections:
             widget: list
             summary: '{{fields.a}} — {{fields.b}}'
             fields:
-              - { <<: *dimensions, label: Dimension A, name: a, multiple: false, required: true }
-              - { <<: *dimensions, label: Dimension B, name: b, multiple: false, required: true }
+              - { <<: *dimensions, label: Layer A, name: a, multiple: false, required: true }
+              - { <<: *dimensions, label: Layer B, name: b, multiple: false, required: true }
               - { label: Relation, name: note, widget: text }
               - { <<: *source, label: Example drawn from (optional), required: false }
 
+      - name: glossary
+        label: Glossary
+        file: src/content/site/glossary.json
+        format: json
+        fields:
+          - label: Terms
+            name: terms
+            widget: list
+            summary: '{{fields.term}}'
+            fields:
+              - { label: Term, name: term, widget: string }
+              - { label: Definition, name: definition, widget: markdown, modes: [raw], hint: 'Cite sources as [@record-file-name].' }
+              - *provenance
+              - { label: See also (site addresses), name: see, widget: list, required: false, hint: 'e.g. /philosophy/layers/' }
+
+      - name: faq
+        label: Frequently asked questions
+        file: src/content/site/faq.json
+        format: json
+        fields:
+          - label: Questions
+            name: items
+            widget: list
+            summary: '{{fields.question}}'
+            fields:
+              - { label: Question, name: question, widget: string }
+              - { label: Answer, name: answer, widget: markdown, modes: [raw], hint: 'Cite sources as [@record-file-name].' }
+
   - name: dimensions
-    label: Dimensions
-    label_singular: Dimension
+    label: The ten layers
+    label_singular: Layer
     folder: src/content/dimensions
     create: false
     delete: false
@@ -222,7 +286,7 @@ collections:
     sortable_fields: [number, name]
     summary: '{{number}} · {{name}}'
     fields:
-      - { label: Number, name: number, widget: number, value_type: int, min: 1, max: 10 }
+      - { label: Number (order on the platform), name: number, widget: number, value_type: int, min: 1, max: 10 }
       - { label: Name, name: name, widget: string }
       - { label: Short name (diagram labels), name: shortName, widget: string, required: false }
       - { label: Summary (one line), name: summary, widget: string }
@@ -233,37 +297,13 @@ collections:
       - *approval
       - { label: Definition, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name], e.g. [@reza-2025-deltaic-bangladesh].' }
 
-  - name: philosophy
-    label: Philosophy
-    label_singular: Section
-    folder: src/content/philosophy
-    create: true
-    extension: md
-    format: frontmatter
-    slug: '{{fields.order}}-{{slug}}'
-    sortable_fields: [order, title]
-    summary: '{{order}} · {{title}}'
-    fields:
-      - { label: Order, name: order, widget: number, value_type: int }
-      - { label: Title, name: title, widget: string }
-      - { label: Short title (contents), name: navTitle, widget: string, required: false }
-      - *provenance
-      - *approval
-      - label: Figure
-        name: figure
-        widget: select
-        default: none
-        options: [none, chronology, scales, dimensions, relations, process, bibliography]
-      - label: Pull quotation (optional)
-        name: quote
-        widget: object
-        required: false
-        hint: Only text checked word for word against the cited source.
-        fields:
-          - { label: Text, name: text, widget: text }
-          - { label: Author, name: author, widget: string }
-          - *source
-      - { label: Text, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name].' }
+  - { name: pages-philosophy, label: '1 · Philosophy', label_singular: Page, folder: src/content/pages/philosophy, <<: *page_collection }
+  - { name: pages-methodologies, label: '2 · Methodologies and Frameworks', label_singular: Page, folder: src/content/pages/methodologies, <<: *page_collection }
+  - { name: pages-projects, label: '3 · Projects (pages)', label_singular: Page, folder: src/content/pages/projects, <<: *page_collection }
+  - { name: pages-research, label: '4 · Research and Publications', label_singular: Page, folder: src/content/pages/research, <<: *page_collection }
+  - { name: pages-community, label: '5 · Movement and Community', label_singular: Page, folder: src/content/pages/community, <<: *page_collection }
+  - { name: pages-governance, label: '6 · Governance', label_singular: Page, folder: src/content/pages/governance, <<: *page_collection }
+  - { name: pages-utilities, label: Utilities, label_singular: Page, folder: src/content/pages/utilities, <<: *page_collection }
 
   - name: projects
     label: Projects
@@ -301,7 +341,40 @@ collections:
           - { label: Name, name: name, widget: string }
           - { label: Role, name: role, widget: string, required: false }
       - { label: Summary (cards), name: summary, widget: text }
-      - { <<: *dimensions, label: Dimensions emphasised, name: layers }
+      - label: Classification (editorial)
+        name: categories
+        widget: select
+        multiple: true
+        required: false
+        options:
+          - { label: Architectural design, value: architectural }
+          - { label: Urban design, value: urban }
+          - { label: Heritage and landscape, value: heritage-landscape }
+          - { label: Research and documentation, value: research }
+          - { label: Teaching and studio, value: teaching }
+          - { label: Comparative and experimental, value: comparative }
+      - label: Places on the project map
+        name: places
+        widget: list
+        required: false
+        summary: '{{fields.name}}'
+        hint: Give a place only as precisely as the sources allow.
+        fields:
+          - { label: Name, name: name, widget: string }
+          - { label: Latitude, name: lat, widget: number, value_type: float }
+          - { label: Longitude, name: lon, widget: number, value_type: float }
+          - label: Precision
+            name: precision
+            widget: select
+            options:
+              - { label: Site, value: site }
+              - { label: Neighbourhood, value: locality }
+              - { label: City, value: city }
+              - { label: District (approximate), value: district }
+              - { label: Region (approximate), value: region }
+          - { label: Shared marker (e.g. the city), name: area, widget: string, required: false }
+          - { label: Note, name: note, widget: string, required: false }
+      - { <<: *dimensions, label: Layers emphasised, name: layers }
       - label: Basis of the emphasis
         name: layersBasis
         widget: select
@@ -327,7 +400,7 @@ collections:
         options: [river, canal, fabric, megablock, waterfront, hilltop, village, strata, studio]
       - { label: Cover image (with permission), name: cover, widget: object, required: false, fields: *figure }
       - { label: Further images (with permission), name: gallery, widget: list, required: false, fields: *figure }
-      - { label: Featured on the home page, name: featured, widget: boolean, default: false, required: false }
+      - { label: Featured (home page and Featured Projects), name: featured, widget: boolean, default: false, required: false }
       - { label: Order, name: order, widget: number, value_type: int, default: 100 }
       - *provenance
       - *approval
@@ -544,20 +617,3 @@ collections:
       - *approval
       - { label: Biography, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name].' }
 
-  - name: pages
-    label: Pages
-    label_singular: Page
-    folder: src/content/pages
-    create: false
-    delete: false
-    extension: md
-    format: frontmatter
-    identifier_field: title
-    fields:
-      - { label: Title, name: title, widget: string }
-      - { label: Label, name: label, widget: string }
-      - { label: Introduction, name: intro, widget: text, required: false }
-      - { label: Last updated, name: updated, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
-      - *provenance
-      - *approval
-      - { label: Text, name: body, widget: markdown }

@@ -1,0 +1,510 @@
+---
+/**
+ * Where the documented projects are. The base map (Natural Earth, public
+ * domain) is drawn in the platform's graphic language and shows no borders;
+ * markers are HTML links positioned over it, so they stay legible and
+ * keyboard-accessible at every size. The list beside it is the map's text
+ * equivalent. Approximate places (a district or region) have dashed markers.
+ */
+import type { Project, Registry } from '../../lib/content';
+import { listed } from '../../lib/content';
+import { FRAMES, MAP_SOURCE, markers, project, unitsPerDegree, type Frame, type Marker } from '../../lib/drawing/map';
+import { PRECISION_LABELS, STATUS_LABELS } from '../../lib/provenance';
+import { to } from '../../lib/routes';
+
+interface Props {
+  reg: Registry;
+  /** Prefix for element ids, if the map appears with other maps. */
+  idPrefix?: string;
+  projects?: Project[];
+}
+
+const { reg, idPrefix = 'map' } = Astro.props;
+const projects = Astro.props.projects ?? listed(reg.projects);
+const all = markers(projects);
+const main = FRAMES['south-asia'];
+const inset = FRAMES.iberia;
+
+const pct = (frame: Frame, m: Marker) => {
+  const [x, y] = project(frame, m.lon, m.lat);
+  return { left: (x / frame.width) * 100, top: (y / frame.height) * 100 };
+};
+// Labels sit to the right unless another marker is close by on that side.
+const side = (m: Marker, list: Marker[], frame: Frame) => {
+  const [x, y] = project(frame, m.lon, m.lat);
+  const crowded = list.some((o) => {
+    if (o === m || o.frame !== m.frame) return false;
+    const [ox, oy] = project(frame, o.lon, o.lat);
+    return ox > x && ox - x < 150 && Math.abs(oy - y) < 36 && oy < y + 36;
+  });
+  return crowded || x > frame.width * 0.72 ? 'left' : 'right';
+};
+// Markers carry short names; the list beside the map gives them in full.
+const short = (label: string) => label.replace(/\s*\(.*?\)/g, '').replace(/ district$/, '');
+const mainMarkers = all.filter((m) => m.frame === 'south-asia');
+const insetMarkers = all.filter((m) => m.frame === 'iberia');
+const style = (p: { left: number; top: number }) => `left:${p.left.toFixed(2)}%;top:${p.top.toFixed(2)}%`;
+
+const graticule = (frame: Frame, step: number) => {
+  const [lon0, lat0, lon1, lat1] = frame.bbox;
+  let d = '';
+  for (let lon = Math.ceil(lon0 / step) * step; lon <= lon1; lon += step) {
+    const [x] = project(frame, lon, lat0);
+    d += `M${x.toFixed(1)} 0V${frame.height}`;
+  }
+  for (let lat = Math.ceil(lat0 / step) * step; lat <= lat1; lat += step) {
+    const [, y] = project(frame, lon0, lat);
+    d += `M0 ${y.toFixed(1)}H${frame.width}`;
+  }
+  return d;
+};
+const riverWidth = (rank: number) => (rank <= 2 ? 2.1 : rank <= 4 ? 1.4 : rank <= 6 ? 0.9 : 0.6);
+const KM = 500;
+const scaleUnits = (KM / 111.2) * unitsPerDegree(main);
+const sea = [
+  { name: 'Bay of Bengal', lon: 88.6, lat: 16.4 },
+  { name: 'Arabian Sea', lon: 69.4, lat: 16.8 },
+].map((s) => ({ ...s, pos: pct(main, { lon: s.lon, lat: s.lat } as Marker) }));
+const projectsLabel = (n: number) => `${n} project${n === 1 ? '' : 's'}`;
+---
+
+<figure class="pmap-module" data-project-map>
+  <div class="pmap-module__grid">
+    <div class="pmap" style={`aspect-ratio:${main.width}/${main.height}`}>
+      <svg viewBox={`0 0 ${main.width} ${main.height}`} aria-hidden="true" focusable="false">
+        <defs>
+          <pattern id={`${idPrefix}-sea`} width="7" height="7" patternUnits="userSpaceOnUse">
+            <path d="M0 3.5H7" stroke="var(--rule)" stroke-width="0.8"></path>
+          </pattern>
+          <clipPath id={`${idPrefix}-clip`}>
+            <rect width={main.width} height={main.height}></rect>
+          </clipPath>
+        </defs>
+        <g clip-path={`url(#${idPrefix}-clip)`}>
+          <rect width={main.width} height={main.height} fill={`url(#${idPrefix}-sea)`}></rect>
+          <path class="pmap__grat" d={graticule(main, 5)}></path>
+          <path class="pmap__land" d={main.land}></path>
+          <path class="pmap__lakes" d={main.lakes}></path>
+          {main.rivers.map((r) => <path class="pmap__river" d={r.d} stroke-width={riverWidth(r.rank)} />)}
+        </g>
+        <rect class="pmap__frame" x="0.5" y="0.5" width={main.width - 1} height={main.height - 1}></rect>
+        <g class="pmap__scale" transform={`translate(${(main.width - 32 - scaleUnits).toFixed(1)} ${main.height - 34})`}>
+          <path d={`M0 0H${scaleUnits.toFixed(1)}M0 -6V6M${(scaleUnits / 2).toFixed(1)} -4V4M${scaleUnits.toFixed(1)} -6V6`}></path>
+        </g>
+      </svg>
+
+      {
+        sea.map((s) => (
+          <span class="pmap__sea serif" style={style(s.pos)} aria-hidden="true">
+            {s.name}
+          </span>
+        ))
+      }
+      <span class="pmap__scale-label label" aria-hidden="true">{KM} km, approximate</span>
+
+      <ul class="pmap__markers" role="list" aria-label="Places on the map">
+        {
+          mainMarkers.map((m) => (
+            <li class="pmap__pin" style={style(pct(main, m))} data-side={side(m, mainMarkers, main)} data-marker={m.id} data-projects={m.projects.map((p) => p.id).join(' ')}>
+              <a class:list={['pmap__marker', `pmap__marker--${m.precision}`]} href={`#${idPrefix}-${m.id}`}>
+                <span class="pmap__dot" aria-hidden="true" />
+                <span class="pmap__name">{short(m.label)}</span>
+                <span class="pmap__n" aria-hidden="true">
+                  {m.projects.length}
+                </span>
+                <span class="visually-hidden">, {projectsLabel(m.projects.length)}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="pmap__statics" aria-hidden="true">
+        {
+          mainMarkers.map((m) => (
+            <span class="pmap__pin" style={style(pct(main, m))} data-marker={m.id} data-projects={m.projects.map((p) => p.id).join(' ')}>
+              <span class:list={['pmap__marker', 'pmap__marker--static', `pmap__marker--${m.precision}`]}>
+                <span class="pmap__dot" />
+                <span class="pmap__n">{m.projects.length}</span>
+              </span>
+            </span>
+          ))
+        }
+      </div>
+
+      <div class="pmap__inset" style={`width:26%;aspect-ratio:${inset.width}/${inset.height}`}>
+        <svg viewBox={`0 0 ${inset.width} ${inset.height}`} aria-hidden="true" focusable="false">
+          <defs>
+            <clipPath id={`${idPrefix}-clip-inset`}>
+              <rect width={inset.width} height={inset.height}></rect>
+            </clipPath>
+          </defs>
+          <g clip-path={`url(#${idPrefix}-clip-inset)`}>
+            <rect width={inset.width} height={inset.height} fill={`url(#${idPrefix}-sea)`}></rect>
+            <path class="pmap__grat" d={graticule(inset, 5)}></path>
+            <path class="pmap__land" d={inset.land}></path>
+            <path class="pmap__lakes" d={inset.lakes}></path>
+            {inset.rivers.map((r) => <path class="pmap__river" d={r.d} stroke-width={riverWidth(r.rank)} />)}
+          </g>
+          <rect class="pmap__frame pmap__frame--inset" x="0.5" y="0.5" width={inset.width - 1} height={inset.height - 1}></rect>
+        </svg>
+        <span class="pmap__inset-label label" aria-hidden="true">Inset · Iberia</span>
+        <ul class="pmap__markers" role="list" aria-label="Places on the inset map">
+          {
+            insetMarkers.map((m) => (
+              <li class="pmap__pin" style={style(pct(inset, m))} data-side="right" data-marker={m.id} data-projects={m.projects.map((p) => p.id).join(' ')}>
+                <a class:list={['pmap__marker', `pmap__marker--${m.precision}`]} href={`#${idPrefix}-${m.id}`}>
+                  <span class="pmap__dot" aria-hidden="true" />
+                  <span class="pmap__name">{short(m.label)}</span>
+                  <span class="pmap__n" aria-hidden="true">
+                    {m.projects.length}
+                  </span>
+                  <span class="visually-hidden">, {projectsLabel(m.projects.length)}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="pmap__statics" aria-hidden="true">
+          {
+            insetMarkers.map((m) => (
+              <span class="pmap__pin" style={style(pct(inset, m))} data-marker={m.id} data-projects={m.projects.map((p) => p.id).join(' ')}>
+                <span class:list={['pmap__marker', 'pmap__marker--static', `pmap__marker--${m.precision}`]}>
+                  <span class="pmap__dot" />
+                  <span class="pmap__n">{m.projects.length}</span>
+                </span>
+              </span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="pmap-list">
+      <p class="label">Places</p>
+      <ol class="pmap-list__places" role="list">
+        {
+          all.map((m) => (
+            <li id={`${idPrefix}-${m.id}`} data-marker={m.id} data-projects={m.projects.map((p) => p.id).join(' ')}>
+              <p class="pmap-list__head">
+                <span class="pmap-list__name">{m.label}</span>
+                <span class="pmap-list__precision label">{PRECISION_LABELS[m.precision]}</span>
+              </p>
+              <ul role="list">
+                {m.places.map((pl) => (
+                  <li data-project={pl.project.id}>
+                    <a href={to.project(pl.project.id)}>{pl.project.data.title}</a>
+                    <span class="pmap-list__meta small">
+                      <span class={`status status--${pl.project.data.status}`}>{STATUS_LABELS[pl.project.data.status]}</span>
+                      {m.places.length > 1 || pl.name !== m.label ? <span class="muted"> · {pl.name}</span> : null}
+                    </span>
+                    {pl.note && <span class="pmap-list__note small muted">{pl.note}</span>}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+      <dl class="pmap-legend small">
+        <div><dt><span class="pmap__dot pmap__dot--key" aria-hidden="true"></span>Site or neighbourhood</dt></div>
+        <div><dt><span class="pmap__dot pmap__dot--key pmap__dot--city" aria-hidden="true"></span>City</dt></div>
+        <div><dt><span class="pmap__dot pmap__dot--key pmap__dot--approx" aria-hidden="true"></span>District or region, approximate</dt></div>
+      </dl>
+    </div>
+  </div>
+  <figcaption class="diagram__caption">
+    <span class="label label--ink">Map</span>
+    <span>
+      Places of the documented projects, grouped where they share a city. Numbers show how many projects each marker
+      represents. Locations are given only as precisely as the sources allow, and the map shows no borders. {MAP_SOURCE}
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  .pmap-module__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: 2rem var(--col-gap);
+    align-items: start;
+  }
+
+  .pmap {
+    position: relative;
+    width: 100%;
+  }
+
+  .pmap > svg,
+  .pmap__inset > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pmap__grat {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 0.6;
+  }
+
+  .pmap__land {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+  }
+
+  .pmap__lakes {
+    fill: var(--paper-2);
+    stroke: var(--sage);
+    stroke-width: 0.6;
+  }
+
+  .pmap__river {
+    fill: none;
+    stroke: var(--sage);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pmap__frame {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1;
+  }
+
+  .pmap__scale path {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.2;
+  }
+
+  .pmap__scale-label {
+    position: absolute;
+    right: 3.2%;
+    bottom: 5.4%;
+    font-size: 0.625rem;
+  }
+
+  .pmap__sea {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-style: italic;
+    font-size: clamp(0.8rem, 0.6rem + 0.6vw, 1.125rem);
+    color: var(--ink-2);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .pmap__markers {
+    margin: 0;
+  }
+
+  .pmap__pin {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  .pmap__marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transform: translate(-0.4rem, -50%);
+    min-height: 1.5rem;
+    padding: 0.15rem 0.35rem 0.15rem 0;
+    white-space: nowrap;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .pmap__pin[data-side='left'] .pmap__marker {
+    left: auto;
+    right: 0;
+    flex-direction: row-reverse;
+    transform: translate(0.4rem, -50%);
+    padding: 0.15rem 0 0.15rem 0.35rem;
+  }
+
+  .pmap__name {
+    padding: 0 0.15rem;
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+  }
+
+  .pmap__n {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .pmap__dot {
+    flex: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: 0 0 0 2px var(--paper);
+  }
+
+  .pmap__marker--city .pmap__dot,
+  .pmap__dot--city {
+    background: radial-gradient(circle, var(--ink) 0 28%, var(--paper) 32%);
+  }
+
+  .pmap__marker--district .pmap__dot,
+  .pmap__marker--region .pmap__dot,
+  .pmap__dot--approx {
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-inline: -0.275rem;
+    border-style: dashed;
+    background: radial-gradient(circle, var(--ink) 0 14%, transparent 18%);
+    box-shadow: none;
+  }
+
+  .pmap__marker:hover .pmap__name,
+  .pmap__marker:focus-visible .pmap__name {
+    color: var(--brick);
+  }
+
+  .pmap__marker:hover .pmap__dot {
+    border-color: var(--brick);
+  }
+
+  .pmap__pin[hidden] {
+    display: none;
+  }
+
+  .pmap__inset {
+    position: absolute;
+    left: 1.6%;
+    bottom: 2%;
+  }
+
+  .pmap__inset-label {
+    position: absolute;
+    left: 0.4rem;
+    top: 0.3rem;
+    font-size: 0.625rem;
+    background: var(--paper);
+    padding: 0 0.2rem;
+  }
+
+  /* Place list */
+  .pmap-list__places {
+    margin: 0.75rem 0 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .pmap-list__places > li {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--rule);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .pmap-list__places > li:target {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--sage) 35%, transparent), transparent 80%);
+  }
+
+  .pmap-list__places > li[hidden],
+  .pmap-list__places li li[hidden] {
+    display: none;
+  }
+
+  .pmap-list__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .pmap-list__name {
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.15;
+  }
+
+  .pmap-list__places ul {
+    margin: 0.4rem 0 0;
+  }
+
+  .pmap-list__places ul li {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.35rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .pmap-list__places ul a {
+    text-decoration-color: var(--rule);
+  }
+
+  .pmap-list__meta .status {
+    font-size: 0.8125rem;
+  }
+
+  .pmap-legend {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 1.25rem;
+    color: var(--ink-2);
+  }
+
+  .pmap-legend dt {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .pmap__dot--key {
+    display: inline-block;
+    box-shadow: none;
+  }
+
+  .pmap__dot--key.pmap__dot--approx {
+    margin-inline: -0.275rem;
+  }
+
+  @media (max-width: 1080px) {
+    .pmap-module__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* On small screens markers are too close to tap reliably: the map becomes a
+     drawing of dots and counts, and the list below carries the links. */
+  .pmap__statics {
+    display: none;
+  }
+
+  .pmap__marker--static {
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .pmap__markers {
+      display: none;
+    }
+
+    .pmap__statics {
+      display: block;
+    }
+
+    .pmap__sea {
+      display: none;
+    }
+
+    .pmap__inset {
+      width: 34% !important;
+    }
+  }
+</style>

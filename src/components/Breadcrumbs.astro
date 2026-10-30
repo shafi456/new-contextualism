@@ -1,0 +1,46 @@
+---
+/** The path from the home page to the current page. */
+interface Props {
+  trail: { href?: string; label: string }[];
+}
+const { trail } = Astro.props;
+---
+
+<nav class="wrap crumbs label" aria-label="Breadcrumb">
+  <ol role="list">
+    {
+      trail.map((c, i) => (
+        <li>
+          {c.href && i < trail.length - 1 ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs {
+    padding-top: 1.5rem;
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.6rem;
+    margin: 0;
+  }
+
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 0.6rem;
+    color: var(--grey);
+  }
+
+  .crumbs a {
+    text-decoration-color: var(--rule);
+  }
+
+  .crumbs [aria-current] {
+    color: var(--ink);
+  }
+</style>

@@ -1,0 +1,118 @@
+{
+  "terms": [
+    {
+      "term": "New Contextualism",
+      "definition": "An approach to architecture and urban design originated by Mohammad Habib Reza, described as ‘a forward-thinking philosophy that advocates for creating built environments informed by accurate predictions of the future, deeply rooted in the past and encompassing a holistic understanding of the context’ [@reza-2023-new-contextualism-path].",
+      "provenance": "published-source",
+      "see": ["/philosophy/definition-and-scope/"]
+    },
+    {
+      "term": "Context",
+      "definition": "In New Contextualism, context ‘transcends the immediate physical site’ and ‘encompasses a complex, interwoven matrix of factors’ [@reza-2025-deltaic-bangladesh]. The approach ‘does not treat context as a backdrop or a single reference point, but as a living, layered, and evolving fabric’ [@reza-nitu-2025-people-place-justice].",
+      "provenance": "published-source",
+      "see": ["/philosophy/relational-ontology/"]
+    },
+    {
+      "term": "Contextual layer",
+      "definition": "One of the ten overlapping conditions through which New Contextualism reads a place: social, cultural, historical, political, economic, ecological, geographical, scientific, urban and architectural. The April 2025 essay calls them dimensions [@reza-2025-deltaic-bangladesh]; the September 2025 essay, layers [@reza-nitu-2025-people-place-justice].",
+      "provenance": "editorial-summary",
+      "see": ["/philosophy/layers/"]
+    },
+    {
+      "term": "Tenfold matrix",
+      "definition": "The reading of a place through all ten layers at once: ‘a tenfold overlapping analysis’, set out under the heading ‘Holistic Context Understanding – The Tenfold Matrix’ [@reza-2025-deltaic-bangladesh]. The 2023 essay calls it ‘a tenfold overlapping study of the broader context’ [@reza-2023-new-contextualism-path].",
+      "provenance": "published-source",
+      "see": ["/methodologies/foundational-framework/"]
+    },
+    {
+      "term": "Ten-layer lens",
+      "definition": "The version of the ten layers given in the September 2025 essay, which ‘offers a framework’ for reading the site. It lists a spiritual layer in place of the political, and calls the scientific layer ‘Scientific/Technological’ [@reza-nitu-2025-people-place-justice].",
+      "provenance": "published-source",
+      "see": ["/philosophy/layers/"]
+    },
+    {
+      "term": "Read, Plan, Process",
+      "definition": "The three phases with which ‘every project begins’; New Contextualism ‘gives particular weight to the first, reading the site’ [@reza-nitu-2025-people-place-justice]. The published texts do not yet define the second and third phases.",
+      "provenance": "published-source",
+      "see": ["/methodologies/read-plan-process/"]
+    },
+    {
+      "term": "New Contextualism 2.0",
+      "definition": "A further stage of the approach, the outcome of ongoing work at BRAC University, reflecting ‘a heightened urgency regarding global environmental challenges and a more explicit integration of contemporary sustainability frameworks’ [@reza-2025-deltaic-bangladesh]. It was the subject of a workshop in February 2024 [@contextbd-2024-workshop-listing].",
+      "provenance": "published-source",
+      "see": ["/philosophy/origins-and-evolution/"]
+    },
+    {
+      "term": "Hybridisation",
+      "definition": "The critical adaptation of global knowledge to the specificities of the local: ‘a productive hybridization, analogous to the process that shaped Baņgālee culture itself through encounters with Vedic, Buddhist, Jain, Islamic, and European influences’ [@reza-2025-deltaic-bangladesh].",
+      "provenance": "published-source",
+      "see": ["/philosophy/global-south/"]
+    },
+    {
+      "term": "Classic contextualism",
+      "definition": "The contextualism of the 1960s and 1970s, which ‘arose as a corrective to modernist universalism’ by asking new buildings to fit their surroundings, but which, in the view of New Contextualist writing, ‘often stopped at the surface’ [@reza-nitu-2025-people-place-justice]. See also Rowe and Koetter [@rowe-koetter-1978-collage-city].",
+      "provenance": "editorial-summary",
+      "see": ["/philosophy/related-theories/"]
+    },
+    {
+      "term": "Critical regionalism",
+      "definition": "Kenneth Frampton’s proposal for an architecture that mediates between universal civilisation and the particularities of place [@frampton-1983-critical-regionalism]. New Contextualism ‘aligns with the discourse on contextualism and critical regionalism’, with ‘greater emphasis on sustainability and community-oriented design’ [@reza-2023-new-contextualism-path].",
+      "provenance": "editorial-summary",
+      "see": ["/philosophy/related-theories/"]
+    },
+    {
+      "term": "Placemaking",
+      "definition": "An approach to the design of public space centred on its users. New Contextualist writing credits it with having ‘brought people back into the conversation’, while noting that ‘it remained limited to small-scale interventions’ [@reza-nitu-2025-people-place-justice].",
+      "provenance": "editorial-summary",
+      "see": ["/philosophy/related-theories/"]
+    },
+    {
+      "term": "Right to the city",
+      "definition": "A phrase introduced by Henri Lefebvre [@lefebvre-1968-droit-a-la-ville]. In New Contextualism’s principle of equity and justice, ‘design must protect the “right to the city,” ensuring that no project strips away people’s access to space, belonging, or shared resources’ [@reza-nitu-2025-people-place-justice].",
+      "provenance": "published-source",
+      "see": ["/methodologies/urbanism/"]
+    },
+    {
+      "term": "Al",
+      "definition": "‘The raised earthen embankment crucial for agriculture and movement in the delta’, which the founder cites as a lesson for infrastructure and settlement design in flood-prone areas [@reza-2025-deltaic-bangladesh].",
+      "provenance": "published-source",
+      "see": ["/philosophy/global-south/"]
+    },
+    {
+      "term": "Syncretic cultural history",
+      "definition": "A method proposed in the founder’s historical writing: not syncretism ‘in the simplistic sense of religious mixing, but as a method of reading layered civilisational formation’ [@reza-2026-reading-bengal]. The essay does not connect it to New Contextualism. The name Syncretic Cultural History Theory used in this platform’s structure has not been found in a published source.",
+      "provenance": "published-source",
+      "see": ["/research/civilizational-history/"]
+    },
+    {
+      "term": "Delta civilisation",
+      "definition": "The founder’s term, in his historical writing, for the civilisation of the Bengal delta: ‘a civilisational logic of its own: rooted in the Ganges-Brahmaputra delta’ [@reza-2026-reading-bengal], of which the Bengali calendar is ‘a long-term expression’ [@reza-2026-bongabdo]. The name Ganga-Brahmaputra Civilization used in this platform’s structure has not been found in a published source.",
+      "provenance": "published-source",
+      "see": ["/research/civilizational-history/"]
+    },
+    {
+      "term": "SDG+",
+      "definition": "A name for the approach suggested by Md Samiur Rahman Bhuiyan at the 2024 workshop, for its alignment with the United Nations Sustainable Development Goals: ‘the new contextual approach could be termed SDG+ (Sustainable Development Goal Plus)’ [@arch-bangla-2024-workshop-report].",
+      "provenance": "published-source",
+      "see": ["/community/discussions/"]
+    },
+    {
+      "term": "Neo-contextual resilient urbanism",
+      "definition": "A concept attributed, in the report of the 2023 workshop, to S M Kaikobad, one of its speakers, rather than to the founder; it ‘considers human behaviour and adapts to changing environments’ [@bracu-2023-workshop-report].",
+      "provenance": "published-source",
+      "see": ["/methodologies/urbanism/"]
+    },
+    {
+      "term": "New Contextual Group",
+      "definition": "The name under which the online symposium of August 2025 was organised [@contextbd-2025-symposium-listing].",
+      "provenance": "published-source",
+      "see": ["/community/events/"]
+    },
+    {
+      "term": "Provenance label",
+      "definition": "The platform’s own term. Every substantial text on this platform carries a label saying where it comes from: published source, editorial summary, proposed statement, approved by the founder, or interpretation.",
+      "provenance": "proposed",
+      "see": ["/governance/editorial-standards/"]
+    }
+  ]
+}

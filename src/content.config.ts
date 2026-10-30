@@ -8,8 +8,10 @@
  * Integrity rules enforced here and in src/lib/content.ts:
  *  - every claim-bearing entry records its provenance (see PROVENANCE);
  *  - images require alternative text and a credit;
- *  - cross-references (dimensions, citation keys, events) must resolve, or the
- *    build fails.
+ *  - cross-references (layers, citation keys, events) must resolve, or the
+ *    build fails;
+ *  - every page in src/content/pages belongs to the site structure defined in
+ *    src/lib/ia.ts and covers the sub-items listed there.
  */
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
@@ -31,41 +33,24 @@ const figure = (image: () => any) =>
     caption: z.string().optional(),
   });
 
+/**
+ * The ten contextual layers. The collection keeps its original name,
+ * "dimensions", the founder's term in his April 2025 essay.
+ */
 const dimensions = defineCollection({
   loader: md('dimensions'),
   schema: z.object({
+    /** Position in the order used on this platform. */
     number: z.number().int().min(1).max(10),
     name: z.string(),
     shortName: z.string().optional(),
     summary: z.string(),
-    /** The founder's own characterisation of the dimension. */
+    /** The founder's own characterisation of the layer. */
     keywords: z.array(z.string()).min(1),
     keywordsSource: z.string(),
     questions: z.array(z.string()).default([]),
     provenance: provenance.default('editorial-summary'),
     approval,
-  }),
-});
-
-const philosophy = defineCollection({
-  loader: md('philosophy'),
-  schema: z.object({
-    order: z.number().int(),
-    title: z.string(),
-    navTitle: z.string().optional(),
-    provenance,
-    approval,
-    figure: z
-      .enum(['none', 'dimensions', 'scales', 'relations', 'process', 'chronology', 'bibliography'])
-      .default('none'),
-    /** A pull quotation, verified word for word against its source. */
-    quote: z
-      .object({
-        text: z.string(),
-        author: z.string(),
-        source: z.string(),
-      })
-      .optional(),
   }),
 });
 
@@ -97,6 +82,29 @@ const projects = defineCollection({
       response: z.string().optional(),
       outcomes: z.string().optional(),
       sources: z.array(z.string()).min(1, 'A project must cite at least one source.'),
+      /**
+       * Editorial classification used by the Projects section: design
+       * proposals (architectural, urban, heritage and landscape), research and
+       * documentation, teaching and studio work, and comparative and
+       * experimental studies. A project may belong to several.
+       */
+      categories: z
+        .array(z.enum(['architectural', 'urban', 'heritage-landscape', 'research', 'teaching', 'comparative']))
+        .default([]),
+      /** Points for the project map, with the precision each can claim. */
+      places: z
+        .array(
+          z.object({
+            name: z.string(),
+            lat: z.number().min(-90).max(90),
+            lon: z.number().min(-180).max(180),
+            precision: z.enum(['site', 'locality', 'city', 'district', 'region']),
+            /** Places with the same area share one marker on the map. */
+            area: z.string().optional(),
+            note: z.string().optional(),
+          }),
+        )
+        .default([]),
       plate: z
         .enum(['river', 'canal', 'fabric', 'megablock', 'waterfront', 'hilltop', 'village', 'strata', 'studio'])
         .default('fabric'),
@@ -260,21 +268,26 @@ const people = defineCollection({
     }),
 });
 
+/**
+ * The pages of the site structure: one Markdown file per page, in a folder
+ * per section. Numbers and titles come from src/lib/ia.ts. A body may embed
+ * modules (diagrams, lists, maps) with <!-- module: name key="value" -->.
+ */
 const pages = defineCollection({
   loader: md('pages'),
   schema: z.object({
-    title: z.string(),
-    label: z.string(),
+    /** The page's address, as listed in src/lib/ia.ts. */
+    path: z.string().regex(/^\/([a-z0-9-]+\/)*$/, 'A path starts and ends with a slash, e.g. /philosophy/principles/'),
     intro: z.string().optional(),
     updated: z.coerce.date(),
     provenance: provenance.default('editorial-summary'),
-    approval,
+    /** "none" for pages that make no claims needing the founder's approval, such as the sitemap. */
+    approval: z.enum(['pending', 'approved', 'none']).default('pending'),
   }),
 });
 
 export const collections = {
   dimensions,
-  philosophy,
   projects,
   publications,
   events,

@@ -212,6 +212,60 @@ export function apa(p: Publication): string {
   return `${who ? `${who} ` : ''}(${date}). ${body} ${tail}`.replace(/\s+/g, ' ').replace(/\.\./g, '.').trim();
 }
 
+/* -------------------------------------------------------------------- RIS */
+
+const RIS_TYPE: Record<string, string> = {
+  book: 'BOOK',
+  'edited-book': 'EDBOOK',
+  chapter: 'CHAP',
+  article: 'JOUR',
+  essay: 'NEWS',
+  interview: 'NEWS',
+  'conference-paper': 'CPAPER',
+  lecture: 'SLIDE',
+  report: 'RPRT',
+  'event-listing': 'ELEC',
+  'web-page': 'ELEC',
+  thesis: 'THES',
+};
+
+const risDate = (d: Date) =>
+  `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}/`;
+
+/** RIS record, the exchange format read by Zotero, EndNote and Mendeley. */
+export function ris(p: Publication): string {
+  const d = p.data;
+  const lines: [string, string | undefined][] = [['TY', RIS_TYPE[d.type] ?? 'GEN']];
+  const names = (list: string[], tag: string) =>
+    list.forEach((v) => {
+      const n = parseName(v);
+      lines.push([tag, n.literal ?? `${n.family}, ${n.given}`]);
+    });
+  names(d.authors, 'AU');
+  names(d.editors, 'ED');
+  lines.push(['TI', d.title]);
+  const container = d.type === 'chapter' ? d.container : (d.venue ?? d.container);
+  lines.push([d.type === 'article' ? 'JO' : 'T2', container]);
+  if (d.section) lines.push(['SE', d.section]);
+  lines.push(['PY', String(pubYear(p) ?? '')]);
+  if (d.date) lines.push(['DA', risDate(d.date)]);
+  lines.push(['PB', d.publisher], ['CY', d.place], ['VL', d.volume], ['IS', d.issue]);
+  if (d.pages) {
+    const [sp, ep] = d.pages.split(/[–-]/);
+    lines.push(['SP', sp], ['EP', ep]);
+  }
+  lines.push(['DO', d.doi], ['UR', d.url]);
+  if (d.accessed) lines.push(['Y2', risDate(d.accessed)]);
+  d.topics.forEach((t) => lines.push(['KW', t]));
+  lines.push(['ID', p.id], ['ER', '']);
+  // Every tag takes the form "TY  - value"; empty fields are left out, except
+  // the closing "ER  - ".
+  return lines
+    .filter(([k, v]) => k === 'ER' || (v ?? '').trim() !== '')
+    .map(([k, v]) => `${k}  - ${v ?? ''}`)
+    .join('\r\n');
+}
+
 /* ----------------------------------------------------------------- BibTeX */
 
 const BIBTEX_TYPE: Record<string, string> = {

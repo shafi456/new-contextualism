@@ -18,9 +18,31 @@ const site = process.env.SITE_URL || undefined;
  */
 const base = process.env.BASE_PATH || '/';
 
+/**
+ * Addresses from the first edition of the site, redirected to the pages that
+ * now hold their content, so that links already shared keep working. Astro
+ * does not add the base path to redirect destinations, so it is added here.
+ */
+const LAYERS = ['social', 'cultural', 'historical', 'political', 'economic', 'ecological', 'geographical', 'urban', 'architectural'];
+const to = (path) => `${base.replace(/\/+$/, '')}${path}`;
+const redirects = Object.fromEntries(
+  Object.entries({
+    '/movement': '/community/',
+    '/framework': '/methodologies/foundational-framework/',
+    '/about': '/governance/',
+    '/dialogue': '/community/events/',
+    '/contact': '/governance/contact/',
+    '/privacy': '/governance/privacy-and-terms/',
+    '/editorial-standards': '/governance/editorial-standards/',
+    '/framework/scientific-technological': '/philosophy/layers/scientific/',
+    ...Object.fromEntries(LAYERS.map((id) => [`/framework/${id}`, `/philosophy/layers/${id}/`])),
+  }).map(([from, dest]) => [from, to(dest)]),
+);
+
 export default defineConfig({
   site,
   base,
+  redirects,
   // Explicit, so behaviour is unchanged if the project is upgraded to Astro 7,
   // where the default changes to 'jsx'.
   compressHTML: true,

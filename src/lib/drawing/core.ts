@@ -535,4 +535,6 @@ export const PALETTE = {
   rule: '#D4D1C8',
   brick: '#A54B37',
   sage: '#B7B9A6',
+  /** The soft grey darkened for legible small text, as --ink-2 in the stylesheet. */
+  ink2: '#65645D',
 };

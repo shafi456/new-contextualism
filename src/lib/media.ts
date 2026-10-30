@@ -1,5 +1,5 @@
 /**
- * Images for projects and dimensions. When permitted documentation exists it
+ * Images for projects and layers. When permitted documentation exists it
  * is used; otherwise an abstract editorial plate is shown, always labelled so
  * that it cannot be mistaken for a drawing of the project.
  */
@@ -58,7 +58,7 @@ export function dimensionMedia(d: Dimension): Media {
   const note = DIMENSION_PLATE_NOTES[d.id] ?? '';
   return {
     src: url(`/plates/dimension-${d.id}.svg`),
-    alt: `Analytical diagram for the ${d.data.name.toLowerCase()} dimension. ${note}`,
+    alt: `Analytical diagram for the ${d.data.name.toLowerCase()} layer. ${note}`,
     width: 1200,
     height: 900,
     caption: `${note} Original editorial drawing; an abstract diagram, not a documented site.`,

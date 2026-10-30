@@ -21,6 +21,12 @@ context: >-
 response: >-
   The design reimagines the precinct as a civic sanctuary. Anchored by a sunken memorial cube and two symbolic axes, it blends heritage, resilience and aspiration through monuments, pedestrian zones and green buffers [@reza-nitu-2025-people-place-justice].
 sources: [reza-nitu-2025-people-place-justice]
+categories: [urban, heritage-landscape]
+places:
+  - name: "Gateway of India, Mumbai"
+    lat: 18.922
+    lon: 72.835
+    precision: site
 plate: waterfront
 featured: true
 order: 4

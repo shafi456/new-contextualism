@@ -1,0 +1,42 @@
+---
+/** Renders one module of a page body by name (see src/lib/modules.ts). */
+import type { Cite, Registry } from '../../lib/content';
+import type { ModuleName } from '../../lib/modules';
+import SectionIndex from './SectionIndex.astro';
+import Diagrams from './Diagrams.astro';
+import Principles from './Principles.astro';
+import Projects from './Projects.astro';
+import ProjectBrowser from './ProjectBrowser.astro';
+import ProjectMap from './ProjectMap.astro';
+import Records from './Records.astro';
+import Events from './Events.astro';
+import People from './People.astro';
+import Platform from './Platform.astro';
+
+interface Props {
+  name: ModuleName;
+  attrs: Record<string, string>;
+  reg: Registry;
+  cite: Cite;
+  path: string;
+}
+
+const { name, attrs, reg, cite, path } = Astro.props;
+const DIAGRAMS = ['chronology', 'layer-grid', 'layer-table', 'layer-index', 'context-diagram', 'context-network', 'relation-matrix', 'scales', 'process'];
+const PRINCIPLES = ['formulations', 'pillars', 'focus-areas', 'statements'];
+const RECORDS = ['records', 'archive', 'bibliography', 'lectures'];
+const PLATFORM = ['citation', 'downloads', 'glossary', 'faq', 'sitemap', 'feed', 'contact', 'provenance-legend', 'provenance'];
+---
+
+<div class:list={['module', `module--${name}`]}>
+  {name === 'section-index' && <SectionIndex path={path} attrs={attrs} />}
+  {DIAGRAMS.includes(name) && <Diagrams name={name} reg={reg} cite={cite} />}
+  {PRINCIPLES.includes(name) && <Principles name={name as 'formulations'} cite={cite} />}
+  {(name === 'projects' || name === 'project-legend') && <Projects name={name} reg={reg} attrs={attrs} />}
+  {name === 'project-browser' && <ProjectBrowser reg={reg} />}
+  {name === 'project-map' && <ProjectMap reg={reg} />}
+  {RECORDS.includes(name) && <Records name={name as 'records'} reg={reg} cite={cite} attrs={attrs} />}
+  {name === 'events' && <Events reg={reg} cite={cite} attrs={attrs} />}
+  {(name === 'contributors' || name === 'founder') && <People name={name} reg={reg} cite={cite} />}
+  {PLATFORM.includes(name) && <Platform name={name as 'citation'} reg={reg} cite={cite} path={path} attrs={attrs} />}
+</div>

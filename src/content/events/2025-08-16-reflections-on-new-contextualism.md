@@ -23,7 +23,7 @@ participants:
   - name: Upama Das
     role: Lecturer, BRAC University
 summary: An online symposium bringing together architects, educators and researchers to reflect on the approach in practice and pedagogy.
-sources: [contextbd-2025-symposium-listing]
+sources: [contextbd-2025-symposium-listing, arch-bangla-2025-symposium-announcement]
 provenance: editorial-summary
 ---
 The published announcement describes an online symposium bringing together architects, educators and researchers to engage with New Contextualism, ‘a thoughtful architectural philosophy crafted by Dr. Mohammad Habib Reza’ [@contextbd-2025-symposium-listing].

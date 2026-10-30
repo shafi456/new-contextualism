@@ -1,0 +1,320 @@
+---
+/**
+ * All projects, as a list or on a map, with search and filters by type,
+ * location, contextual layer and status. Filters and the chosen view are kept
+ * in the address bar, so a filtered view can be shared. Without JavaScript the
+ * full list and the map are both shown.
+ */
+import type { Project, Registry } from '../../lib/content';
+import { listed } from '../../lib/content';
+import { CATEGORY_LABELS, STATUS_LABELS } from '../../lib/provenance';
+import { to } from '../../lib/routes';
+import LayerSignature from '../LayerSignature.astro';
+import ProjectMap from './ProjectMap.astro';
+
+interface Props {
+  reg: Registry;
+}
+
+const { reg } = Astro.props;
+const projects = listed(reg.projects);
+const country = (p: Project) => p.data.location.split(',').pop()!.trim();
+const count = <T extends string>(values: T[]) => {
+  const m = new Map<T, number>();
+  values.forEach((v) => m.set(v, (m.get(v) ?? 0) + 1));
+  return m;
+};
+const categories = Object.entries(CATEGORY_LABELS)
+  .map(([key, label]) => ({ key, label, n: projects.filter((p) => (p.data.categories as string[]).includes(key)).length }))
+  .filter((c) => c.n > 0);
+const countries = [...count(projects.map(country))].sort((a, b) => a[0].localeCompare(b[0]));
+const layers = reg.dimensions
+  .map((d) => ({ d, n: projects.filter((p) => p.data.layers.includes(d.id)).length }))
+  .filter((x) => x.n > 0);
+const statuses = (['completed', 'ongoing', 'conceptual'] as const)
+  .map((s) => ({ s, n: projects.filter((p) => p.data.status === s).length }))
+  .filter((x) => x.n > 0);
+const attr = (list: string[]) => list.map((s) => s.toLowerCase()).join('|');
+const when = (p: Project) => (p.data.year ? String(p.data.year) : `Documented ${p.data.documented}`);
+---
+
+<div class="pbrowser" data-pbrowser>
+  <form class="filters pbrowser__filters" data-pfilters hidden aria-label="Filter the projects">
+    <div class="filters__grid">
+      <label class="filter filter--search">
+        <span class="label">Search the projects</span>
+        <input type="search" name="q" autocomplete="off" placeholder="Title, place, team or theme" />
+      </label>
+      <label class="filter">
+        <span class="label">Project type</span>
+        <select name="category">
+          <option value="">All types</option>
+          {categories.map((c) => <option value={c.key}>{`${c.label} (${c.n})`}</option>)}
+        </select>
+      </label>
+      <label class="filter">
+        <span class="label">Location</span>
+        <select name="country">
+          <option value="">All locations</option>
+          {countries.map(([c, n]) => <option value={c.toLowerCase()}>{`${c} (${n})`}</option>)}
+        </select>
+      </label>
+      <label class="filter">
+        <span class="label">Contextual layer</span>
+        <select name="layer">
+          <option value="">All layers</option>
+          {layers.map(({ d, n }) => <option value={d.id}>{`${d.data.name} (${n})`}</option>)}
+        </select>
+      </label>
+      <label class="filter">
+        <span class="label">Status</span>
+        <select name="status">
+          <option value="">All statuses</option>
+          {statuses.map(({ s, n }) => <option value={s}>{`${STATUS_LABELS[s]} (${n})`}</option>)}
+        </select>
+      </label>
+    </div>
+    <div class="filters__foot">
+      <div class="pbrowser__views" role="group" aria-label="View">
+        <button type="button" class="pbrowser__view" data-view="list" aria-pressed="true">List</button>
+        <button type="button" class="pbrowser__view" data-view="map" aria-pressed="false">Map</button>
+      </div>
+      <p class="filters__count" role="status" aria-live="polite" data-pcount></p>
+      <button type="reset" class="filters__reset">Clear filters</button>
+    </div>
+  </form>
+
+  <section class="pbrowser__panel" data-panel="list" aria-label="List of projects">
+    <ol class="plist" role="list">
+      {
+        projects.map((p) => (
+          <li
+            class="plist__item"
+            data-project={p.id}
+            data-category={attr(p.data.categories)}
+            data-country={country(p).toLowerCase()}
+            data-layers={attr(p.data.layers)}
+            data-status={p.data.status}
+            data-text={`${p.data.title} ${p.data.kind} ${p.data.location} ${p.data.summary} ${p.data.team.map((t) => t.name).join(' ')}`.toLowerCase()}
+          >
+            <div class="plist__main">
+              <a class="plist__title" href={to.project(p.id)}>
+                {p.data.title}
+              </a>
+              <p class="plist__meta">
+                {p.data.kind} · {p.data.location} · {when(p)}
+              </p>
+              <p class="plist__summary">{p.data.summary}</p>
+            </div>
+            <div class="plist__side">
+              <span class={`status status--${p.data.status}`}>{STATUS_LABELS[p.data.status]}</span>
+              <span class="plist__cats label">{p.data.categories.map((c) => CATEGORY_LABELS[c]).join(' · ')}</span>
+              <LayerSignature dimensions={reg.dimensions} active={p.data.layers} basis={p.data.layersBasis} />
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="pending pbrowser__empty" data-pempty hidden>
+      <span class="label">No matching projects</span>
+      No projects match these filters. <button type="button" class="link-button" data-pclear>Clear the filters</button> to see them all.
+    </p>
+  </section>
+
+  <section class="pbrowser__panel pbrowser__panel--map" data-panel="map" aria-label="Map of projects">
+    <ProjectMap reg={reg} idPrefix="browse" projects={projects} />
+  </section>
+</div>
+
+<style>
+  .pbrowser__filters {
+    margin-bottom: 2.5rem;
+  }
+
+  .pbrowser__views {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+
+  .pbrowser__view {
+    padding: 0.35rem 1rem;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    transition:
+      background-color 0.25s var(--ease),
+      color 0.25s var(--ease);
+  }
+
+  .pbrowser__view + .pbrowser__view {
+    border-left: 1px solid var(--ink);
+  }
+
+  .pbrowser__view[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .pbrowser__panel--map {
+    margin-top: var(--section);
+  }
+
+  :global(.js) .pbrowser__panel--map {
+    margin-top: 0;
+  }
+
+  .pbrowser__panel[hidden] {
+    display: none;
+  }
+
+  .plist {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .plist__item {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: 1rem var(--col-gap);
+    padding: 1.35rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .plist__item[hidden] {
+    display: none;
+  }
+
+  .plist__main {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+  }
+
+  .plist__title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 1.15rem + 0.9vw, 2rem);
+    line-height: 1.1;
+    text-decoration: none;
+    transition: color 0.3s var(--ease);
+  }
+
+  .plist__title:hover {
+    color: var(--brick);
+  }
+
+  .plist__meta {
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+
+  .plist__summary {
+    max-width: 42rem;
+    font-size: 0.9375rem;
+  }
+
+  .plist__side {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    font-size: 0.875rem;
+  }
+
+  .pbrowser__empty {
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .plist__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-pbrowser]');
+  const form = root?.querySelector<HTMLFormElement>('[data-pfilters]');
+  if (root && form) {
+    const items = [...root.querySelectorAll<HTMLElement>('.plist__item')];
+    const count = root.querySelector<HTMLElement>('[data-pcount]');
+    const empty = root.querySelector<HTMLElement>('[data-pempty]');
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const views = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
+    const FIELDS = ['q', 'category', 'country', 'layer', 'status'] as const;
+    let view = 'list';
+    form.hidden = false;
+
+    const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null)?.value ?? '';
+    const has = (attr: string | undefined, v: string) => !v || (attr ?? '').split('|').includes(v);
+
+    const setView = (v: string) => {
+      view = v === 'map' ? 'map' : 'list';
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== view));
+      views.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    };
+
+    const apply = (updateUrl = true) => {
+      const q = value('q').trim().toLowerCase();
+      const shown = new Set<string>();
+      for (const item of items) {
+        const d = item.dataset;
+        const match =
+          (!q || q.split(/\s+/).every((t) => (d.text ?? '').includes(t))) &&
+          has(d.category, value('category')) &&
+          (!value('country') || d.country === value('country')) &&
+          has(d.layers, value('layer')) &&
+          (!value('status') || d.status === value('status'));
+        item.hidden = !match;
+        if (match) shown.add(d.project ?? '');
+      }
+      // The map shows only the places of the projects that remain.
+      root.querySelectorAll<HTMLElement>('[data-marker]').forEach((el) => {
+        const ids = (el.dataset.projects ?? '').split(' ');
+        el.hidden = !ids.some((id) => shown.has(id));
+      });
+      root.querySelectorAll<HTMLElement>('.pmap-list [data-project]').forEach((el) => {
+        el.hidden = !shown.has(el.dataset.project ?? '');
+      });
+      if (count) {
+        count.textContent =
+          shown.size === items.length ? `Showing all ${items.length} projects` : `Showing ${shown.size} of ${items.length} projects`;
+      }
+      if (empty) empty.hidden = shown.size > 0 || view !== 'list';
+      if (updateUrl) {
+        const params = new URLSearchParams();
+        FIELDS.forEach((f) => value(f) && params.set(f, value(f)));
+        if (view === 'map') params.set('view', 'map');
+        const qs = params.toString();
+        history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+      }
+    };
+
+    const params = new URLSearchParams(location.search);
+    FIELDS.forEach((f) => {
+      const el = form.elements.namedItem(f) as HTMLInputElement | HTMLSelectElement | null;
+      const v = params.get(f);
+      if (el && v !== null) el.value = v;
+    });
+    setView(params.get('view') ?? 'list');
+    apply(false);
+
+    let t = 0;
+    form.addEventListener('input', () => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => apply(), 80);
+    });
+    form.addEventListener('submit', (e) => e.preventDefault());
+    form.addEventListener('reset', () => window.setTimeout(() => apply(), 0));
+    views.forEach((b) =>
+      b.addEventListener('click', () => {
+        setView(b.dataset.view ?? 'list');
+        apply();
+      }),
+    );
+    root.querySelector('[data-pclear]')?.addEventListener('click', () => form.reset());
+  }
+</script>

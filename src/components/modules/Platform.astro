@@ -1,0 +1,685 @@
+---
+/**
+ * Platform modules: citation tools, downloads, glossary, frequently asked
+ * questions, sitemap, feed, contact, and the provenance labels.
+ */
+import type { Cite, Registry } from '../../lib/content';
+import { archiveRecords, listed } from '../../lib/content';
+import { downloadsIn, type DownloadGroup } from '../../lib/downloads';
+import { SECTIONS, UTILITIES, isOverview, itemId, pageByPath } from '../../lib/ia';
+import { PROVENANCE, PROVENANCE_META, TYPE_LABELS, type Provenance as ProvenanceKind } from '../../lib/provenance';
+import { faq, glossary, settings } from '../../lib/site';
+import { pubYear } from '../../lib/cite';
+import { formatDate, slugify } from '../../lib/format';
+import { to } from '../../lib/routes';
+import { url } from '../../lib/url';
+import Provenance from '../Provenance.astro';
+
+interface Props {
+  name: 'citation' | 'downloads' | 'glossary' | 'faq' | 'sitemap' | 'feed' | 'contact' | 'provenance-legend' | 'provenance';
+  reg: Registry;
+  cite: Cite;
+  path: string;
+  attrs: { group?: string; kind?: string; note?: string; approval?: string };
+}
+
+const { name, reg, cite, path, attrs } = Astro.props;
+
+// Citation tools
+const withDoi = name === 'citation' ? listed(reg.publications).filter((p) => p.data.doi) : [];
+const thisPage = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const platformRef = `New Contextualism (platform, pre-publication edition). ${new Date().getUTCFullYear()}. “${pageByPath(path).title}.” ${thisPage}. Accessed [day month year].`;
+
+// Downloads
+const groups: DownloadGroup[] = (attrs.group?.split(',').map((g) => g.trim()) as DownloadGroup[]) ?? [];
+const files = name === 'downloads' ? groups.flatMap((g) => downloadsIn(g)) : [];
+
+// Glossary
+const letters = [...new Set(glossary.map((g) => g.term[0].toUpperCase()))];
+
+// Feed: the latest records and events
+const latest =
+  name === 'feed'
+    ? [
+        ...archiveRecords(reg).map((p) => ({
+          href: to.record(p.id),
+          title: p.data.title,
+          date: p.data.date,
+          year: pubYear(p),
+          kind: TYPE_LABELS[p.data.type],
+        })),
+        ...reg.events.map((e) => ({ href: to.event(e.id), title: e.data.title, date: e.data.start, year: e.data.start.getUTCFullYear(), kind: 'Event' })),
+      ]
+        .sort((a, b) => (b.date?.getTime() ?? Date.UTC(b.year ?? 0, 0)) - (a.date?.getTime() ?? Date.UTC(a.year ?? 0, 0)))
+        .slice(0, 6)
+    : [];
+
+// Contact
+const email = settings.contactEmail;
+const enquiries = [
+  { title: 'Research contributions', text: 'Proposals for research, case studies, critical responses or project documentation.' },
+  { title: 'Academic collaborations', text: 'Studios, theses and joint research testing the framework.' },
+  { title: 'Lectures and events', text: 'Invitations, and proposals for lectures, seminars and workshops.' },
+  { title: 'Corrections to the record', text: 'Errors of fact, citation or attribution anywhere on the platform.' },
+  { title: 'Permissions and images', text: 'Photographs and drawings of projects, and permission to reproduce material.' },
+  { title: 'General correspondence', text: 'Anything else about New Contextualism or this platform.' },
+];
+const mailto = (subject: string) => `mailto:${email}?subject=${encodeURIComponent(`New Contextualism: ${subject}`)}`;
+---
+
+{
+  name === 'citation' && (
+    <div class="citation-tools">
+      <div class="tool">
+        <p class="label">Citing this platform</p>
+        <p class="tool__ref">{platformRef}</p>
+        <p class="small muted">
+          A template for citing a page of the platform, shown for this page. Cite the founder’s published texts for the ideas
+          themselves, and the platform only for its editorial material.
+        </p>
+      </div>
+      <div class="tool">
+        <p class="label">Records with a DOI</p>
+        {withDoi.length ? (
+          <ul class="tool__list" role="list">
+            {withDoi.map((p) => (
+              <li>
+                <a href={to.record(p.id)}>{p.data.title}</a>
+                <span class="small">
+                  {' '}
+                  <a class="ext" href={`https://doi.org/${p.data.doi}`}>
+                    doi.org/{p.data.doi}
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="pending">No record in the archive yet has a DOI.</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+{
+  name === 'downloads' && (
+    <ul class="downloads" role="list">
+      {files.map((d) => (
+        <li>
+          <a class="downloads__link" href={url(`/downloads/${d.file}`)} download>
+            <span class="downloads__title">{d.title}</span>
+            <span class="downloads__format label">{d.format}</span>
+          </a>
+          <p class="downloads__desc small">{d.description}</p>
+          <Provenance kind={d.provenance} approval={d.provenance === 'published-source' ? undefined : 'pending'} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+{
+  name === 'glossary' && (
+    <div class="glossary">
+      <nav class="glossary__letters label" aria-label="Glossary by letter">
+        {letters.map((l) => (
+          <a href={`#letter-${l.toLowerCase()}`}>{l}</a>
+        ))}
+      </nav>
+      <dl class="glossary__list">
+        {glossary.map((g, i) => (
+          <div class="glossary__entry" id={slugify(g.term)}>
+            {(i === 0 || glossary[i - 1].term[0].toUpperCase() !== g.term[0].toUpperCase()) && (
+              <span class="glossary__letter" id={`letter-${g.term[0].toLowerCase()}`} aria-hidden="true">
+                {g.term[0].toUpperCase()}
+              </span>
+            )}
+            <dt class="glossary__term">{g.term}</dt>
+            <dd class="glossary__def">
+              <div class="prose" set:html={cite.md(g.definition)} />
+              <div class="glossary__meta">
+                <Provenance kind={g.provenance} />
+                {g.see.length > 0 && (
+                  <span class="small">
+                    See{' '}
+                    {g.see.map((s, j) => (
+                      <>
+                        {j > 0 && ', '}
+                        <a href={url(s)}>{pageByPath(s).short ?? pageByPath(s).title}</a>
+                      </>
+                    ))}
+                  </span>
+                )}
+              </div>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+{
+  name === 'faq' && (
+    <div class="faq">
+      <ol class="faq__index" role="list">
+        {faq.map((f) => (
+          <li>
+            <a href={`#${slugify(f.question)}`}>{f.question}</a>
+          </li>
+        ))}
+      </ol>
+      {faq.map((f) => (
+        <section class="faq__item" aria-labelledby={slugify(f.question)}>
+          <h2 class="faq__q" id={slugify(f.question)}>
+            {f.question}
+          </h2>
+          <div class="prose faq__a" set:html={cite.md(f.answer)} />
+        </section>
+      ))}
+    </div>
+  )
+}
+
+{
+  name === 'sitemap' && (
+    <div class="sitemap">
+      <section class="sitemap__section">
+        <h2 class="sitemap__title">
+          <a href={url('/')}>
+            <span class="label">0</span> Home
+          </a>
+        </h2>
+      </section>
+      {SECTIONS.map((s) => (
+        <section class="sitemap__section">
+          <h2 class="sitemap__title">
+            <a href={url(s.path)}>
+              <span class="label">{s.number}</span>{' '}{s.title}
+            </a>
+          </h2>
+          <ol class="sitemap__pages" role="list">
+            {s.pages.map((p) => (
+              <li>
+                <a href={url(p.path)}>
+                  <span class="sitemap__num">{p.number}</span>{' '}{isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title}
+                </a>
+                {p.path === '/philosophy/layers/' && (
+                  <ul class="sitemap__items" role="list">
+                    {reg.dimensions.map((d) => (
+                      <li>
+                        <a href={to.layer(d.id)}>{d.data.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {p.items && p.path !== '/philosophy/layers/' && (
+                  <ul class="sitemap__items" role="list">
+                    {p.items.map((item) => (
+                      <li>
+                        <a href={`${url(p.path)}#${itemId(item)}`}>{item}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+      <section class="sitemap__section">
+        <h2 class="sitemap__title">Utilities</h2>
+        <ul class="sitemap__pages" role="list">
+          {UTILITIES.map((p) => (
+            <li>
+              <a href={url(p.path)}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section class="sitemap__section">
+        <h2 class="sitemap__title">Records</h2>
+        <ul class="sitemap__pages" role="list">
+          <li>
+            <a href={to.projects()}>{listed(reg.projects).length} projects</a>, each at /projects/…/
+          </li>
+          <li>
+            <a href={to.archive()}>{archiveRecords(reg).length} archive records</a>, each at /research/…/
+          </li>
+        </ul>
+      </section>
+    </div>
+  )
+}
+
+{
+  name === 'feed' && (
+    <div class="feed-module">
+      <p class="feed-module__action">
+        <a class="arrow-link" href={url('/feed.xml')}>
+          Subscribe to the feed <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <span class="small muted">
+          Atom feed · <code>{url('/feed.xml')}</code>
+        </span>
+      </p>
+      <p class="label">Latest in the feed</p>
+      <ol class="feed-module__list" role="list">
+        {latest.map((e) => (
+          <li>
+            <a href={e.href}>{e.title}</a>
+            <span class="small muted">
+              {' '}
+              {e.kind}, {e.date ? formatDate(e.date) : e.year}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+{
+  name === 'contact' &&
+    (email ? (
+      <div class="contact-module">
+        <p class="label">Write to the editors</p>
+        <ul class="enquiries" role="list">
+          {enquiries.map((e) => (
+            <li id={slugify(e.title)}>
+              <a href={mailto(e.title)}>
+                <span class="enquiries__title">{e.title}</span>
+                <span class="enquiries__text">{e.text}</span>
+                <span class="enquiries__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="small muted">
+          Each link opens a message to <a href={`mailto:${email}`}>{email}</a> in your email application.
+        </p>
+      </div>
+    ) : (
+      <div class="contact-module">
+        <div class="pending">
+          <span class="label">Address not yet published</span>
+          The correspondence address for this platform has not yet been confirmed. It will appear here, with links for each kind
+          of enquiry, once it has been set in the site settings.
+        </div>
+        <p class="label contact-module__while">In the meantime</p>
+        <p>
+          The founder’s institutional profile, with his published contact details, is available from{' '}
+          <a class="ext" href="https://www.bracu.ac.bd/node/1077">
+            BRAC University
+          </a>
+          .
+        </p>
+        <ul class="enquiries enquiries--static" role="list">
+          {enquiries.map((e) => (
+            <li id={slugify(e.title)}>
+              <span class="enquiries__title">{e.title}</span>
+              <span class="enquiries__text">{e.text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+}
+
+{
+  name === 'provenance-legend' && (
+    <ul class="labels-legend" role="list">
+      {PROVENANCE.map((k) => (
+        <li>
+          <Provenance kind={k} />
+          <span class="small muted">{PROVENANCE_META[k].description}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+{
+  name === 'provenance' && (
+    <Provenance
+      kind={(attrs.kind ?? 'editorial-summary') as ProvenanceKind}
+      approval={attrs.approval === 'approved' ? 'approved' : attrs.approval === 'pending' ? 'pending' : undefined}
+      note={attrs.note}
+    />
+  )
+}
+
+<style>
+  /* Citation tools */
+  .citation-tools {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .tool {
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .tool__ref {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .tool__list {
+    margin: 0;
+  }
+
+  .tool__list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+  }
+
+  /* Downloads */
+  .downloads {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .downloads li {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .downloads__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    text-decoration: none;
+  }
+
+  .downloads__title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.15;
+    transition: color 0.3s var(--ease);
+  }
+
+  .downloads__link:hover .downloads__title {
+    color: var(--brick);
+  }
+
+  .downloads__format {
+    white-space: nowrap;
+  }
+
+  .downloads__desc {
+    max-width: 40rem;
+    color: var(--ink-2);
+  }
+
+  /* Glossary */
+  .glossary__letters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .glossary__letters a {
+    color: var(--ink);
+    text-decoration-color: var(--rule);
+  }
+
+  .glossary__list {
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .glossary__entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 5fr);
+    gap: 0.5rem var(--col-gap);
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--rule);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .glossary__entry:target {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--sage) 35%, transparent), transparent 80%);
+  }
+
+  .glossary__letter {
+    position: absolute;
+    top: -0.65rem;
+    right: 0;
+    padding-left: 0.5rem;
+    background: var(--paper);
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--ink-2);
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .glossary__term {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .glossary__def {
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.9375rem;
+  }
+
+  .glossary__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    align-items: baseline;
+  }
+
+  /* Frequently asked questions */
+  .faq__index {
+    margin: 0 0 3rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .faq__index li {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+  }
+
+  .faq__index a {
+    text-decoration-color: var(--rule);
+  }
+
+  .faq__item {
+    padding: 1.25rem 0 2rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .faq__q {
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.25rem);
+    line-height: 1.1;
+    max-width: 30ch;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .faq__a {
+    margin-top: 1rem;
+  }
+
+  /* Sitemap */
+  .sitemap {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .sitemap__title {
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.25rem);
+    line-height: 1.1;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .sitemap__title a {
+    text-decoration: none;
+  }
+
+  .sitemap__title a:hover {
+    color: var(--brick);
+  }
+
+  .sitemap__pages {
+    margin: 0.75rem 0 0;
+    columns: 2;
+    column-gap: var(--col-gap);
+  }
+
+  .sitemap__pages > li {
+    break-inside: avoid;
+    padding: 0.35rem 0;
+    font-size: 0.9375rem;
+  }
+
+  .sitemap__pages a {
+    text-decoration-color: var(--rule);
+  }
+
+  .sitemap__num {
+    display: inline-block;
+    min-width: 2.4rem;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sitemap__items {
+    margin: 0.25rem 0 0.25rem 2.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .sitemap__items a {
+    display: inline-block;
+    padding-block: 0.2rem;
+  }
+
+  /* Feed */
+  .feed-module__action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .feed-module__list {
+    margin: 0.6rem 0 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .feed-module__list li {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+  }
+
+  /* Contact */
+  .contact-module {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact-module__while {
+    margin-top: 1rem;
+  }
+
+  .enquiries {
+    margin: 0.5rem 0 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .enquiries li {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .enquiries a,
+  .enquiries--static li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    gap: 0.25rem 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .enquiries__title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .enquiries__text {
+    grid-column: 1;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .enquiries__arrow {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .enquiries a:hover .enquiries__title {
+    color: var(--brick);
+  }
+
+  .enquiries li:target {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--sage) 35%, transparent), transparent 80%);
+  }
+
+  /* Provenance labels */
+  .labels-legend {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .labels-legend li {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  @media (max-width: 720px) {
+    .glossary__entry {
+      grid-template-columns: 1fr;
+    }
+
+    .sitemap__pages {
+      columns: 1;
+    }
+
+    .labels-legend li {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+</style>

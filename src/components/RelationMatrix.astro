@@ -1,6 +1,6 @@
 ---
 /**
- * The relations between dimensions as a matrix: an accessible table in which
+ * The relations between layers as a matrix: an accessible table in which
  * each marked cell is one proposed relation.
  */
 import type { Dimension, Registry } from '../lib/content';
@@ -19,7 +19,7 @@ const find = (a: string, b: string) => relations.find((r) => (r.a === a && r.b =
   <div class="matrix__scroll">
     <table>
       <caption class="visually-hidden">
-        Relations proposed between the ten dimensions. A marked cell indicates a direct relation; its description is given in the
+        Relations proposed between the ten layers. A marked cell indicates a direct relation; its description is given in the
         cell.
       </caption>
       <thead>
@@ -40,7 +40,7 @@ const find = (a: string, b: string) => relations.find((r) => (r.a === a && r.b =
           dims.map((row, i) => (
             <tr>
               <th scope="row">
-                <span class="matrix__num">{pad(row.data.number)}</span> {row.data.shortName ?? row.data.name}
+                <span class="matrix__num">{pad(row.data.number)}</span>{' '}{row.data.shortName ?? row.data.name}
               </th>
               {dims.map((col, j) => {
                 if (j === i) return <td class="matrix__self" aria-hidden="true" />;

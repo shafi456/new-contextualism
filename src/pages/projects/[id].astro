@@ -6,10 +6,12 @@ import Provenance from '../../components/Provenance.astro';
 import LayerSignature from '../../components/LayerSignature.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import Bibliography from '../../components/Bibliography.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { citations, listed, registry } from '../../lib/content';
 import { projectMedia } from '../../lib/media';
-import { STATUS_DESCRIPTIONS, STATUS_LABELS } from '../../lib/provenance';
+import { CATEGORY_LABELS, PRECISION_LABELS, STATUS_DESCRIPTIONS, STATUS_LABELS } from '../../lib/provenance';
 import { joinList, pad } from '../../lib/format';
+import { to } from '../../lib/routes';
 import { url } from '../../lib/url';
 
 export const getStaticPaths = (async () => {
@@ -68,12 +70,16 @@ const jsonLd = {
 ---
 
 <Base title={d.title} description={d.summary} type="article" jsonLd={jsonLd}>
+  <Breadcrumbs
+    trail={[
+      { href: url('/'), label: 'Home' },
+      { href: url('/projects/'), label: 'Projects' },
+      { href: to.projects(), label: 'All Projects' },
+      { label: d.title },
+    ]}
+  />
   <article class="project">
     <header class="wrap project__header">
-      <nav class="crumbs label" aria-label="Breadcrumb">
-        <a href={url('/projects/')}>Projects</a> <span aria-hidden="true">/</span>
-        <a href={url(`/projects/#${d.status}`)}>{STATUS_LABELS[d.status]}</a>
-      </nav>
       {d.archived && <p class="pending archived">This record is archived. It is kept at this address for reference.</p>}
       <p class="label project__status">
         <span class={`status status--${d.status}`}>{STATUS_LABELS[d.status]}</span>
@@ -114,6 +120,22 @@ const jsonLd = {
           <dt class="label">Type</dt>
           <dd>{d.kind}</dd>
           {
+            d.categories.length > 0 && (
+              <>
+                <dt class="label">Classification</dt>
+                <dd>
+                  {d.categories.map((c, i) => (
+                    <>
+                      {i > 0 && ' · '}
+                      <a href={to.projects({ category: c })}>{CATEGORY_LABELS[c]}</a>
+                    </>
+                  ))}
+                  <span class="muted"> (editorial)</span>
+                </dd>
+              </>
+            )
+          }
+          {
             d.year && (
               <>
                 <dt class="label">Year</dt>
@@ -124,7 +146,25 @@ const jsonLd = {
           <dt class="label">Documented</dt>
           <dd>First published account, {d.documented}</dd>
           <dt class="label">Location</dt>
-          <dd>{d.location}</dd>
+          <dd>
+            {d.location}
+            {
+              d.places.length > 0 && (
+                <>
+                  {' '}
+                  <a class="small" href={to.projects({ view: 'map' })}>
+                    On the map
+                  </a>
+                  {d.places.some((pl) => pl.precision === 'district' || pl.precision === 'region' || pl.note) && (
+                    <span class="small muted">
+                      {' '}
+                      ({d.places.map((pl) => pl.note ?? PRECISION_LABELS[pl.precision]).join(' ')})
+                    </span>
+                  )}
+                </>
+              )
+            }
+          </dd>
           {
             d.team.length > 0 && (
               <>
@@ -237,7 +277,7 @@ const jsonLd = {
     <nav class="wrap pager" aria-label="Other projects">
       {
         prev ? (
-          <a href={url(`/projects/${prev.id}/`)} rel="prev">
+          <a href={to.project(prev.id)} rel="prev">
             <span class="label">Previous</span>
             <span class="pager__name">{prev.data.title}</span>
           </a>
@@ -247,7 +287,7 @@ const jsonLd = {
       }
       {
         next && (
-          <a href={url(`/projects/${next.id}/`)} rel="next" class="pager__next">
+          <a href={to.project(next.id)} rel="next" class="pager__next">
             <span class="label">Next</span>
             <span class="pager__name">{next.data.title}</span>
           </a>
@@ -258,16 +298,6 @@ const jsonLd = {
 </Base>
 
 <style>
-  .crumbs {
-    display: flex;
-    gap: 0.6rem;
-    padding-top: 1.5rem;
-  }
-
-  .crumbs a {
-    text-decoration-color: var(--rule);
-  }
-
   .project__header {
     padding-top: 0;
     padding-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);

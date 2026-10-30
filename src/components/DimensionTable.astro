@@ -1,8 +1,8 @@
 ---
-/** The ten dimensions with the terms the founder uses for each. */
+/** The ten layers with the terms the founder uses for each. */
 import type { Dimension } from '../lib/content';
 import { pad } from '../lib/format';
-import { url } from '../lib/url';
+import { to } from '../lib/routes';
 
 interface Props {
   dimensions: Dimension[];
@@ -13,11 +13,11 @@ const { dimensions, citation } = Astro.props;
 
 <figure class="diagram dim-table" data-reveal>
   <table>
-    <caption class="visually-hidden">The ten contextual dimensions and the terms used to characterise them</caption>
+    <caption class="visually-hidden">The ten contextual layers and the terms used to characterise them</caption>
     <thead>
       <tr>
         <th scope="col" class="label">No.</th>
-        <th scope="col" class="label">Dimension</th>
+        <th scope="col" class="label">Layer</th>
         <th scope="col" class="label">In the founder’s terms</th>
       </tr>
     </thead>
@@ -27,7 +27,7 @@ const { dimensions, citation } = Astro.props;
           <tr>
             <td class="dim-table__num">{pad(d.data.number)}</td>
             <th scope="row" class="dim-table__name">
-              <a href={url(`/framework/${d.id}/`)}>{d.data.name}</a>
+              <a href={to.layer(d.id)}>{d.data.name}</a>
             </th>
             <td class="dim-table__keys">{d.data.keywords.join(', ')}</td>
           </tr>
@@ -37,8 +37,8 @@ const { dimensions, citation } = Astro.props;
   </table>
   <figcaption class="diagram__caption">
     <span class="label label--ink">Table</span>
-    <span>Terms as published in <a href={citation[1]}>{citation[0]}</a>. The name ‘Scientific and Technological’ follows this
-      platform’s usage; the essay uses ‘Scientific’.</span>
+    <span>Terms as published in <a href={citation[1]}>{citation[0]}</a>, where the layers are called dimensions. Layers are
+      listed in the order used on this platform.</span>
   </figcaption>
 </figure>
 
