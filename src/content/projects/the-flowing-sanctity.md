@@ -11,7 +11,7 @@ team:
 summary: Reimagines a riverside pilgrimage site, traditionally visited once a year for ritual bathing, as a civic landscape alive in daily life as well as in ritual moments.
 layers: [historical, cultural, social]
 layersBasis: reported
-layersNote: The published account highlights spiritual, historical, cultural and social layers. ‘Spiritual’ belongs to the September 2025 ten-layer lens rather than to the ten dimensions used on this platform. Economic, urban and other layers were accounted for but given less weight.
+layersNote: The published account highlights spiritual, historical, cultural and social layers. ‘Spiritual’ belongs to the September 2025 ten-layer lens rather than to the ten layers used on this platform. Economic, urban and other layers were accounted for but given less weight.
 context: >-
   Panatirtha is a spiritual pilgrimage site in Sunamganj, Bangladesh, where Advaita Acharya’s temple stands. Traditionally visited only once a year for ritual bathing, the site risked slipping into obscurity [@reza-nitu-2025-people-place-justice].
 historical: >-

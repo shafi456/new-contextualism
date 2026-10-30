@@ -8,7 +8,7 @@ collection: new-contextualism
 venue: Context BD
 url: https://contextbd.com/new-contextualism-architecture-and-urbanism-for-people-place-and-justice/
 dimensions: [social, economic, political, historical, ecological, scientific, geographical, cultural, urban, architectural]
-topics: [principles, ten dimensions, case studies, equity, right to the city, critical regionalism, pedagogy]
+topics: [principles, ten layers, case studies, equity, right to the city, critical regionalism, pedagogy]
 summary: Presents five guiding principles, the ‘ten-layer lens’ and the Read–Plan–Process sequence, with case studies from undergraduate theses and a competition entry.
 provenance: published-source
 ---

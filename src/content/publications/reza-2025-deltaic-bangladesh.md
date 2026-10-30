@@ -9,7 +9,7 @@ venue: The Daily Star
 section: In Focus
 url: https://www.thedailystar.net/opinion/focus/news/new-contextualism-architectural-philosophy-deltaic-bangladesh-3878456
 dimensions: [social, economic, political, historical, ecological, scientific, geographical, cultural, urban, architectural]
-topics: [principles, ten dimensions, New Contextualism 2.0, heritage, Bengal delta, resilience, hybridisation]
+topics: [principles, ten layers, New Contextualism 2.0, heritage, Bengal delta, resilience, hybridisation]
 summary: Sets out five core tenets, including the ‘tenfold matrix’ of contextual dimensions, and describes the further development of the approach as New Contextualism 2.0.
 provenance: published-source
 ---

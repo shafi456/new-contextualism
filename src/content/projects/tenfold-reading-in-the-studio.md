@@ -7,7 +7,7 @@ location: BRAC University, Dhaka, Bangladesh
 team:
   - name: Mohammad Habib Reza
     role: Studio teacher
-summary: The use of a ten-dimension reading of context in design and thesis studios at BRAC University, from which most documented applications of the approach have emerged.
+summary: The use of a ten-layer reading of context in design and thesis studios at BRAC University, from which most documented applications of the approach have emerged.
 layers: [social, economic, political, historical, ecological, scientific, geographical, cultural, urban, architectural]
 layersBasis: reported
 context: >-
