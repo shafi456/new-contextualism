@@ -24,4 +24,6 @@ Student entries framed by the approach have been placed in international competi
 > [!PENDING] None open at present
 > No scholarships, internships, studios or calls for students are currently offered through this platform. Opportunities will be published here, with their terms and deadlines, when they are announced.
 
+The [proposed governance structure](/governance/#proposed-governance-structure) includes an NC Student Nexus: an independent, student-led space for research, peer critique and reading groups, organised in regional chapters and hosting annual challenges. It has not yet been formed.
+
 A guide to New Contextualism for students, co-edited by Upama Das Nitu in collaboration with the founder, is listed as in progress [@bracu-nitu-profile].

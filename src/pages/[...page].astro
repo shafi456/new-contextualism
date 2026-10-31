@@ -36,7 +36,7 @@ const rendered = segments.map((s, i) => (s.kind === 'md' ? { ...s, html: cite.md
 
 // Modules whose items are third-level headings need a second-level heading
 // before them; where the text supplies none, a hidden one keeps the outline.
-const H3_MODULES = ['projects', 'chronology', 'events', 'pillars', 'focus-areas'];
+const H3_MODULES = ['projects', 'chronology', 'events', 'pillars', 'focus-areas', 'governance'];
 const outlineGap = segments.findIndex(
   (s, i) =>
     s.kind === 'module' &&

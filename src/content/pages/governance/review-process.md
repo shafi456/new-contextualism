@@ -9,7 +9,7 @@ These arrangements are proposed, pending the founder’s approval. What can be s
 
 ## Review
 
-Every proposal is read by the editors. They check that the work can be documented from a source that readers can consult, and that its account of New Contextualism is accurate. They check that its authors agree to its publication, and that images come with permission and a credit. Proposals that concern the statement of the philosophy are referred to the founder.
+Every proposal is read by the editors. They check that the work can be documented from a source that readers can consult, and that its account of New Contextualism is accurate. They check that its authors agree to its publication, and that images come with permission and a credit. Proposals that concern the statement of the philosophy are referred to the founder. Under the [proposed governance structure](/governance/#proposed-governance-structure), proposed extensions of the theory would also be evaluated by a Curatorial Core, once it is constituted.
 
 ## Decisions
 

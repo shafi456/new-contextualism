@@ -274,6 +274,21 @@ collections:
               - { label: Question, name: question, widget: string }
               - { label: Answer, name: answer, widget: markdown, modes: [raw], hint: 'Cite sources as [@record-file-name].' }
 
+      - name: governance
+        label: Governance structure (proposed)
+        file: src/content/site/governance.json
+        format: json
+        fields:
+          - label: Bodies
+            name: bodies
+            widget: list
+            summary: '{{fields.name}}'
+            hint: Shown on the Governance page as a proposal. Its status is stated in the page text.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Role (a few words), name: role, widget: string }
+              - { label: Description, name: text, widget: text }
+
   - name: dimensions
     label: The ten layers
     label_singular: Layer

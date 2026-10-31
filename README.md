@@ -63,7 +63,7 @@ Where sources disagree (dates, the Al-Cazaba's location, the spiritual/political
 - **Layer definitions and research questions.** Editorial summaries built on the founder's own terms for each layer.
 - **The 26 relations between layers.** An editorial interpretation; 20 are illustrated with examples from the published record. Stored in `src/content/framework/relations.json`.
 - **Descriptions of the Plan and Process phases**, drawn from the published case studies, and the classification of projects into types.
-- **Proposed statements:** mission and vision, how contributions are reviewed, copyright, privacy and terms, and the accessibility statement.
+- **Proposed statements:** mission and vision, the governance structure of five bodies (none yet constituted), how contributions are reviewed, copyright, privacy and terms, and the accessibility statement.
 - **The ten-layer reading sheet**, an editorial template offered for download.
 
 ### Images and maps
@@ -92,6 +92,7 @@ Open <http://localhost:4321/admin/index.html>. Changes are written directly to t
 | The pages of each section | `src/content/pages/{section}/*.md` (one file per page; the `path` field ties it to the structure) |
 | Site settings: tagline, pre-publication flag, contact email, links, mission and vision | `src/content/site/settings.json` |
 | Chronology, glossary, frequently asked questions | `src/content/site/chronology.json`, `glossary.json`, `faq.json` |
+| The proposed governance structure (shown on the Governance page) | `src/content/site/governance.json` |
 | Relations between layers | `src/content/framework/relations.json` |
 | The ten layers | `src/content/dimensions/*.md` (the files keep the founder's earlier term, *dimensions*) |
 | Projects, with their classification and places on the map | `src/content/projects/*.md` |
@@ -108,7 +109,7 @@ Pages are Markdown. Their title and number come from the structure, so a page fi
 - **Sub-items** are second-level headings, spelt exactly as in `src/lib/ia.ts`.
 - **Citations:** `[@record-file-name]`, or several at once: `[@one; @two]`.
 - **Notes:** a blockquote that begins `> [!NOTE] Title` is an editorial note; `> [!PENDING] Title` marks material that has not yet been documented.
-- **Modules** insert diagrams and lists generated from the data, each on a line of its own, e.g. `<!-- module: chronology -->` or `<!-- module: projects category="urban" -->`. The modules are listed in [`src/lib/modules.ts`](src/lib/modules.ts): section indexes, the layer grid, table and index, the contextual diagram and network, the relations matrix, scales, Read–Plan–Process, principles and aims, project cards, the project browser and map, record lists, the archive, reading lists, lectures, events, contributors, the founder's profile, citation tools, downloads, glossary, FAQ, sitemap, feed, contact and provenance labels. An unknown module or attribute fails the build.
+- **Modules** insert diagrams and lists generated from the data, each on a line of its own, e.g. `<!-- module: chronology -->` or `<!-- module: projects category="urban" -->`. The modules are listed in [`src/lib/modules.ts`](src/lib/modules.ts): section indexes, the layer grid, table and index, the contextual diagram and network, the relations matrix, scales, Read–Plan–Process, principles and aims, the proposed governance structure, project cards, the project browser and map, record lists, the archive, reading lists, lectures, events, contributors, the founder's profile, citation tools, downloads, glossary, FAQ, sitemap, feed, contact and provenance labels. An unknown module or attribute fails the build.
 
 **Useful fields**
 
@@ -174,6 +175,7 @@ SITE_URL=https://example.org BASE_PATH=/new-contextualism npm run build  # site 
   - Whether Chawk Bazar was a thesis or a studio project.
   - The publisher and date of the announced book, and of the guide for students listed as in progress.
 - [ ] **People.** Name the editorial team (6.3), and decide whether an advisory network (6.4) will be formed.
+- [ ] **Governance.** Approve or revise the proposed structure of five bodies on the Governance page; when a body is formed, publish its members and terms of reference there and update the pages that refer to it (6.3, 6.4, 6.6, 5.10 and the FAQ).
 - [ ] **Founder portrait.** Add an approved portrait (`src/content/people/mohammad-habib-reza.md` → `portrait`).
 - [ ] **Project images.** Obtain photographs and drawings of projects from their authors, with permission.
 - [ ] **Contact email.** Set `contactEmail` in settings once confirmed; the Contact and Community Submissions pages adapt automatically.

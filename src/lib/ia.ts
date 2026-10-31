@@ -167,7 +167,7 @@ export const SECTIONS: IaSection[] = [
     number: '2',
     key: 'methodologies',
     title: 'Methodologies and Frameworks',
-    nav: 'Methodologies',
+    nav: 'Methodologies and Frameworks',
     path: '/methodologies/',
     summary: 'How the approach is applied: the framework, the process and the tools.',
     pages: [
@@ -296,7 +296,7 @@ export const SECTIONS: IaSection[] = [
     number: '4',
     key: 'research',
     title: 'Research and Publications',
-    nav: 'Research',
+    nav: 'Research and Publications',
     path: '/research/',
     summary: 'The published record of New Contextualism and the research behind it.',
     pages: [
@@ -339,7 +339,7 @@ export const SECTIONS: IaSection[] = [
     number: '5',
     key: 'community',
     title: 'Movement and Community',
-    nav: 'Community',
+    nav: 'Movement and Community',
     path: '/community/',
     summary: 'The people, events and exchanges through which the approach develops.',
     pages: [

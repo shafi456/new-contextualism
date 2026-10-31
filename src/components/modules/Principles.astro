@@ -2,16 +2,17 @@
 /**
  * The principles of New Contextualism as published: three formulations
  * aligned by theme, the three aims summarised by Reza and Nitu (2025), the
- * focus areas of New Contextualism 2.0, and the platform's proposed mission
- * and vision. Principles are quoted as they appear in each source.
+ * focus areas of New Contextualism 2.0, and the platform's proposed mission,
+ * vision and governance structure. Principles are quoted as they appear in
+ * each source.
  */
 import type { Cite } from '../../lib/content';
 import Provenance from '../Provenance.astro';
-import { settings } from '../../lib/site';
+import { governance, settings } from '../../lib/site';
 import { pad } from '../../lib/format';
 
 interface Props {
-  name: 'formulations' | 'pillars' | 'focus-areas' | 'statements';
+  name: 'formulations' | 'pillars' | 'focus-areas' | 'statements' | 'governance';
   cite: Cite;
 }
 
@@ -209,7 +210,73 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
   )
 }
 
+{
+  name === 'governance' && (
+    <div class="bodies-module">
+      <ol class="bodies" role="list">
+        {governance.map((b, i) => (
+          <li data-reveal>
+            <span class="bodies__num">{pad(i + 1)}</span>
+            <div class="bodies__head">
+              <h3 class="bodies__name">{b.name}</h3>
+              <p class="label bodies__role">{b.role}</p>
+            </div>
+            <p class="bodies__text">{b.text}</p>
+          </li>
+        ))}
+      </ol>
+      <Provenance kind="proposed" approval="pending" note="Not yet constituted" />
+    </div>
+  )
+}
+
 <style>
+  /* Proposed governance structure */
+  .bodies {
+    margin: 0 0 1.25rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .bodies li {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 2fr) minmax(0, 3fr);
+    gap: 0.5rem var(--col-gap);
+    align-items: start;
+    padding: 1.25rem 0 1.4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bodies__num {
+    padding-top: 0.45rem;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bodies__name {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    line-height: 1.1;
+  }
+
+  .bodies__role {
+    margin-top: 0.5rem;
+  }
+
+  .bodies__text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .bodies li {
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+    }
+
+    .bodies__text {
+      grid-column: 2;
+    }
+  }
+
   /* Formulations */
   .formulations {
     overflow-x: auto;

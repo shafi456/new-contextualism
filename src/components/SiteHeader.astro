@@ -177,7 +177,8 @@ const current = (href: string) => (path === href ? 'page' : path.startsWith(href
     text-transform: uppercase;
   }
 
-  @media (max-width: 1080px) {
+  /* The full section names need about 1,240px; below that the menu takes over. */
+  @media (max-width: 1260px) {
     .primary-nav {
       display: none;
     }

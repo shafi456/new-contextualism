@@ -1,14 +1,15 @@
 /**
  * Site-wide data that is not a collection: settings, chronology, glossary,
- * frequently asked questions and the editorial map of relations between
- * layers. Each file is validated when the site is built, so an invalid edit
- * fails the build instead of shipping.
+ * frequently asked questions, the proposed governance structure and the
+ * editorial map of relations between layers. Each file is validated when the
+ * site is built, so an invalid edit fails the build instead of shipping.
  */
 import { z } from 'astro/zod';
 import settingsJson from '../content/site/settings.json';
 import chronologyJson from '../content/site/chronology.json';
 import glossaryJson from '../content/site/glossary.json';
 import faqJson from '../content/site/faq.json';
+import governanceJson from '../content/site/governance.json';
 import relationsJson from '../content/framework/relations.json';
 import { PROVENANCE } from './provenance';
 import { SECTIONS, UTILITIES, pageByPath } from './ia';
@@ -101,6 +102,22 @@ export const glossary = glossarySchema
   .sort((a, b) => a.term.localeCompare(b.term, 'en', { sensitivity: 'base' }));
 glossary.forEach((g) => g.see.forEach((path) => pageByPath(path)));
 export const faq = faqSchema.parse(faqJson).items;
+
+/** The bodies of the proposed governance structure (none yet constituted). */
+const governanceSchema = z.object({
+  bodies: z
+    .array(
+      z.object({
+        name: z.string(),
+        /** Its role, in a few words, e.g. "Theoretical guardianship". */
+        role: z.string(),
+        text: z.string(),
+      }),
+    )
+    .min(1),
+});
+
+export const governance = governanceSchema.parse(governanceJson).bodies;
 
 /** The six sections, for the header and menus. */
 export const NAV = SECTIONS.map((s) => ({ href: url(s.path), label: s.nav, number: s.number }));

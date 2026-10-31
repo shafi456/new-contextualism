@@ -28,6 +28,7 @@ export const MODULES = {
   pillars: [],
   'focus-areas': [],
   statements: [],
+  governance: [],
   projects: ['filter', 'category', 'status', 'empty'],
   'project-legend': [],
   'project-browser': [],

@@ -24,6 +24,7 @@ const base = process.env.BASE_PATH || '/';
  * does not add the base path to redirect destinations, so it is added here.
  */
 const LAYERS = ['social', 'cultural', 'historical', 'political', 'economic', 'ecological', 'geographical', 'urban', 'architectural'];
+/** @param {string} path */
 const to = (path) => `${base.replace(/\/+$/, '')}${path}`;
 const redirects = Object.fromEntries(
   Object.entries({
