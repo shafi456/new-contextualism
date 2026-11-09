@@ -1,0 +1,3 @@
+name = "new-contextualism-cms-auth"
+main = "worker.js"
+compatibility_date = "2026-11-01"

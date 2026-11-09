@@ -162,7 +162,7 @@ SITE_URL=https://example.org BASE_PATH=/new-contextualism npm run build  # site 
 `public/admin/config.yml` uses Decap's GitHub backend with the repository `shafi456/new-contextualism`.
 
 1. Editors need write access to the repository.
-2. GitHub Pages cannot sign editors in by itself, so Decap needs an OAuth provider. Netlify provides one built in; on other hosts you can run a small OAuth proxy (see Decap's documentation on external OAuth clients). Until then, edit locally with `npm run cms` and push the changes.
+2. GitHub Pages cannot sign editors in by itself, so sign-in goes through the Cloudflare Worker in `oauth-worker/` and the GitHub OAuth app "New Contextualism CMS". To change it, run `npx wrangler deploy` in that folder. The app's ID and secret are Worker secrets (`GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`), and if the site's address changes, update `SITE_ORIGIN` in `worker.js`.
 3. To require approval before anything is published, uncomment `publish_mode: editorial_workflow`. Every change then becomes a pull request that an approver publishes.
 
 ## Before launch

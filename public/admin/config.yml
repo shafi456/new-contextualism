@@ -7,7 +7,7 @@
 # Changes are written straight to the Markdown and JSON files in src/content.
 #
 # Production: the content lives in the GitHub repository below. Editors sign in
-# with GitHub once an OAuth provider is set up (see README.md, "Editorial interface").
+# with GitHub through the Cloudflare Worker in oauth-worker/.
 #
 # Keep the fields here in step with the schemas in src/content.config.ts and
 # src/lib/site.ts. The build checks every reference and fails if one is broken.
@@ -16,6 +16,8 @@ backend:
   name: github
   repo: shafi456/new-contextualism
   branch: main
+  base_url: https://new-contextualism-cms-auth.new-contextualism.workers.dev
+  auth_endpoint: auth
   commit_messages:
     create: 'Create {{collection}} “{{slug}}”'
     update: 'Update {{collection}} “{{slug}}”'
