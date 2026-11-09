@@ -91,10 +91,7 @@ const jsonLd = {
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
       <div class="hero__meta">
-        <p class="label">Architecture · Urbanism · Philosophy</p>
-        <p class="label hero__origin">
-          Originated by <a href={to.founder()}>Mohammad Habib Reza</a>
-        </p>
+        <p class="label">An intellectual movement and architectural philosophy</p>
       </div>
       <h1 class="hero__title" id="hero-title">
         <span>New</span>
@@ -130,7 +127,7 @@ const jsonLd = {
   <!-- 0.1 Start here -->
   <section class="section start" aria-labelledby="start-title">
     <div class="wrap">
-      <SectionHead index="0.1" label="Start Here" id="start-here" />
+      <SectionHead label="Start Here" id="start-here" />
       <div class="grid start__head">
         <h2 class="col-title" id="start-title" data-reveal>How to use New Contextualism.</h2>
         <p class="col-intro" data-reveal>
@@ -140,10 +137,9 @@ const jsonLd = {
       </div>
       <ol class="steps" role="list">
         {
-          steps.map((s, i) => (
+          steps.map((s) => (
             <li data-reveal>
               <a href={s.href}>
-                <span class="label">{String(i + 1).padStart(2, '0')}</span>
                 <span class="steps__title">{s.title}</span>
                 <span class="steps__text">{s.text}</span>
                 <span class="steps__arrow" aria-hidden="true">
@@ -160,7 +156,7 @@ const jsonLd = {
   <!-- 0.2 Introduction and core proposition -->
   <section class="section idea" aria-labelledby="idea-title">
     <div class="wrap">
-      <SectionHead index="0.2" label={head('0.2').title} id="introduction" />
+      <SectionHead label={head('0.2').title} id="introduction" />
       <div class="grid">
         <h2 class="idea__title" id="idea-title" data-reveal>Context is more than what surrounds us.</h2>
         <div class="idea__text" data-reveal>
@@ -190,7 +186,7 @@ const jsonLd = {
   <!-- 0.3 Key ideas -->
   <section class="section ideas" aria-labelledby="ideas-title">
     <div class="wrap">
-      <SectionHead index="0.3" label="Key Ideas" id="key-ideas" />
+      <SectionHead label="Key Ideas" id="key-ideas" />
       <div class="grid ideas__head">
         <h2 class="col-title" id="ideas-title" data-reveal>The approach in six ideas.</h2>
         <div class="col-intro" data-reveal>
@@ -200,9 +196,8 @@ const jsonLd = {
       </div>
       <ol class="ideas__list" role="list">
         {
-          ideas.map((idea, i) => (
+          ideas.map((idea) => (
             <li data-reveal>
-              <span class="label">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="ideas__title">{idea.title}</h3>
               <p class="ideas__quote">‘{idea.quote}’</p>
               <p class="ideas__text">{idea.text}</p>
@@ -222,7 +217,7 @@ const jsonLd = {
   <!-- 0.4 The ten contextual layers -->
   <section class="section framework" aria-labelledby="framework-title">
     <div class="wrap">
-      <SectionHead index="0.4" label="The Ten Contextual Layers" id="layers" />
+      <SectionHead label="The Ten Contextual Layers" id="layers" />
       <div class="grid framework__head">
         <h2 class="framework__title" id="framework-title" data-reveal>Ten layers. Interconnected realities.</h2>
         <div class="framework__intro" data-reveal>
@@ -247,7 +242,7 @@ const jsonLd = {
   <!-- 0.5 Explore the philosophy -->
   <section class="section explore" aria-labelledby="philosophy-title">
     <div class="wrap">
-      <SectionHead index="0.5" label="Explore the Philosophy" id="philosophy" />
+      <SectionHead label="Explore the Philosophy" id="philosophy" />
       <div class="grid explore__head">
         <h2 class="col-title" id="philosophy-title" data-reveal>A philosophy in development.</h2>
         <p class="col-intro" data-reveal>{philosophy.summary} Ten parts, each drawn from the published record.</p>
@@ -257,7 +252,6 @@ const jsonLd = {
           philosophy.pages.map((p) => (
             <li data-reveal>
               <a href={url(p.path)}>
-                <span class="toc-grid__num">{p.number}</span>
                 <span class="toc-grid__name">{p.title === 'Overview' ? 'Overview' : p.title}</span>
               </a>
             </li>
@@ -270,7 +264,7 @@ const jsonLd = {
   <!-- 0.6 Explore the methodologies and frameworks -->
   <section class="section explore" aria-labelledby="methodologies-title">
     <div class="wrap">
-      <SectionHead index="0.6" label="Explore the Methodologies and Frameworks" id="methodologies" />
+      <SectionHead label="Explore the Methodologies and Frameworks" id="methodologies" />
       <div class="grid explore__head">
         <h2 class="col-title" id="methodologies-title" data-reveal>From reading to design.</h2>
         <div class="col-intro" data-reveal>
@@ -296,7 +290,6 @@ const jsonLd = {
           methodologies.pages.map((p) => (
             <li data-reveal>
               <a href={url(p.path)}>
-                <span class="toc-grid__num">{p.number}</span>
                 <span class="toc-grid__name">{p.title === 'Overview' ? 'Overview' : p.title}</span>
               </a>
             </li>
@@ -309,7 +302,7 @@ const jsonLd = {
   <!-- 0.7 Featured projects and case studies -->
   <section class="section practice" aria-labelledby="practice-title">
     <div class="wrap">
-      <SectionHead index="0.7" label="Featured Projects and Case Studies" id="projects" />
+      <SectionHead label="Featured Projects and Case Studies" id="projects" />
       <div class="grid practice__head">
         <h2 class="practice__title" id="practice-title" data-reveal>Thinking through places.</h2>
         <div class="practice__intro" data-reveal>
@@ -354,7 +347,7 @@ const jsonLd = {
   <!-- 0.8 Latest research and publications -->
   <section class="section archive" aria-labelledby="archive-title">
     <div class="wrap">
-      <SectionHead index="0.8" label="Latest Research and Publications" id="research" />
+      <SectionHead label="Latest Research and Publications" id="research" />
       <div class="grid archive__head">
         <h2 class="archive__title" id="archive-title" data-reveal>An ongoing conversation.</h2>
         <div class="archive__intro" data-reveal>
@@ -379,7 +372,7 @@ const jsonLd = {
   <!-- 0.9 Join the community -->
   <section class="section community" aria-labelledby="community-title">
     <div class="wrap">
-      <SectionHead index="0.9" label="Join the Community" id="community" />
+      <SectionHead label="Join the Community" id="community" />
       <div class="grid">
         <h2 class="community__title" id="community-title" data-reveal>Context crosses disciplines.</h2>
         <div class="community__body" data-reveal>
@@ -425,11 +418,6 @@ const jsonLd = {
     flex-wrap: wrap;
     gap: 0.5rem 2rem;
     padding-bottom: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
-  }
-
-  .hero__origin a {
-    color: var(--ink);
-    text-decoration-color: var(--rule);
   }
 
   .hero__title {
@@ -538,7 +526,7 @@ const jsonLd = {
 
   .steps a {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 5fr) minmax(0, 6fr) 2rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) 2rem;
     gap: 0.5rem var(--col-gap);
     align-items: baseline;
     padding: 1.15rem 0;
@@ -661,14 +649,6 @@ const jsonLd = {
     padding: 0.85rem 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
-  }
-
-  .toc-grid__num {
-    flex: none;
-    min-width: 2.5rem;
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
   }
 
   .toc-grid__name {
@@ -846,18 +826,17 @@ const jsonLd = {
       grid-template-columns: 1fr;
     }
 
-    .steps a,
-    .community__links a {
-      grid-template-columns: 2.5rem minmax(0, 1fr) 2rem;
+    .steps a {
+      grid-template-columns: minmax(0, 1fr) 2rem;
     }
 
     .steps__text {
-      grid-column: 2;
+      grid-column: 1;
     }
 
     .steps__arrow {
       grid-row: 1;
-      grid-column: 3;
+      grid-column: 2;
     }
 
     .community__links a {

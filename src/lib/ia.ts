@@ -1,8 +1,8 @@
 /**
  * The information architecture of the platform: one source of truth for the
  * navigation, section sidebars, breadcrumbs, pagers, the sitemap and the
- * build-time checks. Numbers and titles follow the agreed page structure
- * exactly; `items` are the sub-items each page covers (rendered as its
+ * build-time checks. Titles follow the agreed page structure exactly, and
+ * `number` is an internal key that is never displayed; `items` are the sub-items each page covers (rendered as its
  * second-level headings).
  */
 import { slugify } from './format';
@@ -20,11 +20,13 @@ export interface IaPage {
   items?: string[];
   /** 'wide' pages put the section navigation above the content. */
   layout?: 'text' | 'wide';
+  /** Shows only the title, subtitle and description, with no provenance or date. */
+  introOnly?: boolean;
 }
 
 export interface IaSection {
   number: string;
-  key: 'home' | 'philosophy' | 'methodologies' | 'projects' | 'research' | 'community' | 'governance' | 'utilities';
+  key: 'home' | 'philosophy' | 'methodologies' | 'projects' | 'research' | 'community' | 'governance' | 'utilities' | 'platform';
   title: string;
   /** Label in the header navigation. */
   nav: string;
@@ -380,18 +382,14 @@ export const SECTIONS: IaSection[] = [
     title: 'Governance',
     nav: 'Governance',
     path: '/governance/',
-    summary: 'Who runs the platform and how its content is checked.',
+    summary: 'The five-part governance ecosystem of New Contextualism as an intellectual movement.',
     pages: [
-      { number: '6.1', title: 'About the Platform', path: '/governance/', summary: 'What this platform is for.' },
-      { number: '6.2', title: 'Founder and Intellectual Origins', short: 'Founder', path: '/governance/founder/', summary: 'Mohammad Habib Reza, originator of the approach.' },
-      { number: '6.3', title: 'Editorial Team', path: '/governance/editorial-team/', summary: 'The people who edit the platform.' },
-      { number: '6.4', title: 'Advisory Network', path: '/governance/advisory-network/', summary: 'Advisers to the platform.' },
-      { number: '6.5', title: 'Editorial Standards', path: '/governance/editorial-standards/', summary: 'Provenance labels, citations and approval.' },
-      { number: '6.6', title: 'Contributions and Review Process', short: 'Review Process', path: '/governance/review-process/', summary: 'How submissions are reviewed.' },
-      { number: '6.7', title: 'Intellectual Property and Copyright', short: 'Copyright', path: '/governance/copyright/', summary: 'Rights in the texts, records and drawings.' },
-      { number: '6.8', title: 'Corrections and Updates', path: '/governance/corrections/', summary: 'How errors are corrected and changes recorded.' },
-      { number: '6.9', title: 'Privacy and Terms of Use', short: 'Privacy and Terms', path: '/governance/privacy-and-terms/', summary: 'Privacy, terms of use and accessibility.' },
-      { number: '6.10', title: 'Contact', path: '/governance/contact/', summary: 'Correspondence with the editors.' },
+      { number: '6.1', title: 'Overview', path: '/governance/', summary: 'The five bodies of the governance ecosystem.' },
+      { number: '6.2', title: 'Curatorial Core', path: '/governance/curatorial-core/', summary: 'Theoretical guardianship, and the founder of the movement.' },
+      { number: '6.3', title: 'Pedagogical Nodes', path: '/governance/pedagogical-nodes/', summary: 'Academic integration through education and research.' },
+      { number: '6.4', title: 'Practice & Policy Council', path: '/governance/practice-and-policy-council/', summary: 'Real-world application in practice and policy.' },
+      { number: '6.5', title: 'Open Assembly', path: '/governance/open-assembly/', summary: 'Global discourse.', introOnly: true },
+      { number: '6.6', title: 'NC Student Nexus', path: '/governance/nc-student-nexus/', summary: 'A student-led sandbox, and its directory.' },
     ],
   },
 ];
@@ -416,6 +414,32 @@ export const UTILITIES: IaPage[] = [
   { number: '', title: 'Accessibility', path: '/accessibility/', summary: 'The platform’s accessibility statement.' },
 ];
 
+/**
+ * Administrative and legal pages about the website itself, kept apart from the
+ * governance of the movement. They keep their existing addresses.
+ */
+export const PLATFORM: IaPage[] = [
+  { number: '', title: 'About the Platform', short: 'About the platform', path: '/about/', summary: 'What this platform is for.' },
+  { number: '', title: 'Editorial Team', path: '/governance/editorial-team/', summary: 'The people who edit the platform.' },
+  { number: '', title: 'Advisory Network', path: '/governance/advisory-network/', summary: 'Advisers to the platform.' },
+  { number: '', title: 'Editorial Standards', path: '/governance/editorial-standards/', summary: 'Provenance labels, citations and approval.' },
+  { number: '', title: 'Contributions and Review Process', short: 'Review Process', path: '/governance/review-process/', summary: 'How submissions are reviewed.' },
+  { number: '', title: 'Intellectual Property and Copyright', short: 'Copyright', path: '/governance/copyright/', summary: 'Rights in the texts, records and drawings.' },
+  { number: '', title: 'Corrections and Updates', short: 'Corrections', path: '/governance/corrections/', summary: 'How errors are corrected and changes recorded.' },
+  { number: '', title: 'Privacy and Terms of Use', short: 'Privacy and Terms', path: '/governance/privacy-and-terms/', summary: 'Privacy, terms of use and accessibility.' },
+  { number: '', title: 'Contact', path: '/governance/contact/', summary: 'Correspondence with the editors.' },
+];
+
+export const PLATFORM_SECTION: IaSection = {
+  number: '',
+  key: 'platform',
+  title: 'Platform',
+  nav: 'Platform',
+  path: '/about/',
+  summary: 'How this website is run, checked and corrected.',
+  pages: PLATFORM,
+};
+
 /** The global utilities, presented as a section of their own in navigation. */
 export const UTILITY_SECTION: IaSection = {
   number: '',
@@ -437,6 +461,8 @@ export function locate(path: string): { section?: IaSection; page?: IaPage; inde
     const index = s.pages.findIndex((p) => p.path === path);
     if (index > -1) return { section: s, page: s.pages[index], index };
   }
+  const p = PLATFORM.findIndex((x) => x.path === path);
+  if (p > -1) return { section: PLATFORM_SECTION, page: PLATFORM[p], index: p };
   const u = UTILITIES.findIndex((p) => p.path === path);
   return u > -1 ? { page: UTILITIES[u], index: u } : { index: -1 };
 }
@@ -455,7 +481,7 @@ export const DEDICATED = ['/search/'];
 /** A section's first page, which stands for the section as a whole. */
 export const isOverview = (section: IaSection | undefined, page: IaPage) => section?.pages[0] === page;
 
-/** Every section page, in reading order (1.1 … 6.10). */
+/** Every section page, in reading order . */
 export const SEQUENCE: { section: IaSection; page: IaPage }[] = SECTIONS.flatMap((section) =>
   section.pages.map((page) => ({ section, page })),
 );
@@ -471,4 +497,4 @@ export function neighbours(path: string) {
 export const itemId = (item: string) => slugify(item);
 
 /** Every page in the structure, sections first, then utilities. */
-export const ALL_PAGES: IaPage[] = [...SECTIONS.flatMap((s) => s.pages), ...UTILITIES];
+export const ALL_PAGES: IaPage[] = [...SECTIONS.flatMap((s) => s.pages), ...UTILITIES, ...PLATFORM];

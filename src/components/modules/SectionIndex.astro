@@ -1,5 +1,5 @@
 ---
-/** The pages of a section, with their numbers and summaries. */
+/** The pages of a section, with their summaries. */
 import { UTILITY_SECTION, locate, sectionByKey, type IaSection } from '../../lib/ia';
 import { url } from '../../lib/url';
 
@@ -23,7 +23,6 @@ const pages = section.pages.filter((p) => p.path !== path);
     pages.map((p) => (
       <li data-reveal>
         <a href={url(p.path)}>
-          <span class="sindex__num">{p.number}</span>
           <span class="sindex__name">{p.title}</span>
           <span class="sindex__summary">{p.summary}</span>
           <span class="sindex__arrow" aria-hidden="true">
@@ -43,18 +42,12 @@ const pages = section.pages.filter((p) => p.path !== path);
 
   .sindex a {
     display: grid;
-    grid-template-columns: 3.25rem minmax(0, 5fr) minmax(0, 4fr) 2rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) 2rem;
     gap: 0.5rem var(--col-gap);
     align-items: baseline;
     padding: 1.05rem 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
-  }
-
-  .sindex__num {
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
   }
 
   .sindex__name {
@@ -84,16 +77,16 @@ const pages = section.pages.filter((p) => p.path !== path);
 
   @media (max-width: 720px) {
     .sindex a {
-      grid-template-columns: 2.75rem minmax(0, 1fr) 1.5rem;
+      grid-template-columns: minmax(0, 1fr) 1.5rem;
     }
 
     .sindex__summary {
-      grid-column: 2;
+      grid-column: 1;
     }
 
     .sindex__arrow {
       grid-row: 1;
-      grid-column: 3;
+      grid-column: 2;
     }
   }
 </style>

@@ -18,7 +18,6 @@ interface Props {
 const { section, current, subnav = [], variant } = Astro.props;
 const items = section.pages.map((p) => ({
   href: url(p.path),
-  number: p.number,
   label: p.short ?? p.title,
   current: p.path === current,
 }));
@@ -30,7 +29,7 @@ const items = section.pages.map((p) => ({
       <summary>
         <span class="label">In this section</span>
         <span class="snav-disclosure__name">
-          {section.number ? `${section.number} · ${section.title}` : section.title}
+          {section.title}
         </span>
       </summary>
       <nav aria-label={`${section.title}, all pages`}>
@@ -38,7 +37,6 @@ const items = section.pages.map((p) => ({
           {items.map((p) => (
             <li>
               <a href={p.href} aria-current={p.current ? 'page' : undefined}>
-                <span class="snav__num">{p.number}</span>
                 <span>{p.label}</span>
               </a>
             </li>
@@ -50,8 +48,6 @@ const items = section.pages.map((p) => ({
     <nav class="snav-strip" aria-label={`${section.title}, pages`} data-print="hide">
       <p class="label snav__title">
         <a href={url(section.path)}>
-          {section.number && <span class="index">{section.number}</span>}
-          {section.number && <span class="sep" aria-hidden="true">/</span>}
           <span>{section.title}</span>
         </a>
       </p>
@@ -59,7 +55,7 @@ const items = section.pages.map((p) => ({
         {items.map((p) => (
           <li>
             <a href={p.href} aria-current={p.current ? 'page' : undefined}>
-              <span class="snav__num">{p.number}</span>{' '}{p.label}
+              {p.label}
             </a>
           </li>
         ))}
@@ -69,8 +65,6 @@ const items = section.pages.map((p) => ({
     <nav class="snav" aria-label={`${section.title}, pages`} data-print="hide">
       <p class="label snav__title">
         <a href={url(section.path)}>
-          {section.number && <span class="index">{section.number}</span>}
-          {section.number && <span class="sep" aria-hidden="true">/</span>}
           <span>{section.title}</span>
         </a>
       </p>
@@ -78,8 +72,7 @@ const items = section.pages.map((p) => ({
         {items.map((p) => (
           <li>
             <a href={p.href} aria-current={p.current ? 'page' : undefined}>
-              <span class="snav__num">{p.number}</span>
-              <span>{p.label}</span>
+                <span>{p.label}</span>
             </a>
             {p.current && subnav.length > 0 && (
               <ol class="snav__children" role="list">
@@ -108,14 +101,6 @@ const items = section.pages.map((p) => ({
     text-decoration: none;
   }
 
-  .snav__title .index {
-    color: var(--ink);
-  }
-
-  .snav__title .sep {
-    color: var(--grey);
-  }
-
   .snav__list {
     margin: 0.75rem 0 0;
     border-top: 1px solid var(--rule);
@@ -138,21 +123,9 @@ const items = section.pages.map((p) => ({
     color: var(--ink);
   }
 
-  .snav__num {
-    flex: none;
-    min-width: 2.1rem;
-    padding-top: 0.12em;
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .snav__list a[aria-current] .snav__num {
-    color: var(--brick);
-  }
-
   .snav__children {
     margin: 0;
-    padding: 0.35rem 0 0.6rem 2.85rem;
+    padding: 0.35rem 0 0.6rem;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -207,9 +180,6 @@ const items = section.pages.map((p) => ({
     text-underline-offset: 0.3em;
   }
 
-  .snav-strip a[aria-current] .snav__num {
-    color: var(--brick);
-  }
 
   /* Disclosure, on small screens */
   .snav-disclosure {

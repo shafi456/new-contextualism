@@ -7,7 +7,7 @@ import type { APIRoute } from 'astro';
 import { listed, registry } from '../lib/content';
 import { displayName, slugify, stripMarkdown } from '../lib/format';
 import { EVENT_TYPE_LABELS, STATUS_LABELS, TYPE_LABELS } from '../lib/provenance';
-import { HOME, SECTIONS, UTILITIES, isOverview } from '../lib/ia';
+import { HOME, PLATFORM, SECTIONS, UTILITIES, isOverview } from '../lib/ia';
 import { glossary } from '../lib/site';
 import { to } from '../lib/routes';
 import { url } from '../lib/url';
@@ -38,14 +38,14 @@ export const GET: APIRoute = async () => {
       out.push({
         t: overview ? s.title : p.title,
         u: url(p.path),
-        k: `${p.number} · ${s.title}`,
+        k: s.title,
         s: page?.data.intro ?? p.summary,
         b: clip(text(page?.body)),
         x: (p.items ?? []).join(' '),
       });
     }
   }
-  for (const p of UTILITIES) {
+  for (const p of [...UTILITIES, ...PLATFORM]) {
     const page = reg.page.get(p.path);
     out.push({ t: p.title, u: url(p.path), k: 'Utility', s: page?.data.intro ?? p.summary, b: clip(text(page?.body)), x: (p.items ?? []).join(' ') });
   }

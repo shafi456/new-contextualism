@@ -12,6 +12,7 @@ import Records from './Records.astro';
 import Events from './Events.astro';
 import People from './People.astro';
 import Platform from './Platform.astro';
+import Profiles from './Profiles.astro';
 
 interface Props {
   name: ModuleName;
@@ -25,6 +26,7 @@ const { name, attrs, reg, cite, path } = Astro.props;
 const DIAGRAMS = ['chronology', 'layer-grid', 'layer-table', 'layer-index', 'context-diagram', 'context-network', 'relation-matrix', 'scales', 'process'];
 const PRINCIPLES = ['formulations', 'pillars', 'focus-areas', 'statements', 'governance'];
 const RECORDS = ['records', 'archive', 'bibliography', 'lectures'];
+const PROFILES = ['governance-description', 'pedagogical-nodes', 'practice-policy-council', 'student-nexus'];
 const PLATFORM = ['citation', 'downloads', 'glossary', 'faq', 'sitemap', 'feed', 'contact', 'provenance-legend', 'provenance'];
 ---
 
@@ -38,5 +40,6 @@ const PLATFORM = ['citation', 'downloads', 'glossary', 'faq', 'sitemap', 'feed',
   {RECORDS.includes(name) && <Records name={name as 'records'} reg={reg} cite={cite} attrs={attrs} />}
   {name === 'events' && <Events reg={reg} cite={cite} attrs={attrs} />}
   {(name === 'contributors' || name === 'founder') && <People name={name} reg={reg} cite={cite} />}
+  {PROFILES.includes(name) && <Profiles name={name as 'student-nexus'} path={path} />}
   {PLATFORM.includes(name) && <Platform name={name as 'citation'} reg={reg} cite={cite} path={path} attrs={attrs} />}
 </div>

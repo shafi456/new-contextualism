@@ -13,6 +13,7 @@ import { citations, registry } from '../lib/content';
 import { citedKeys } from '../lib/markdown';
 import { moduleCitations, parseModules } from '../lib/modules';
 import { pageByPath } from '../lib/ia';
+import { governance } from '../lib/site';
 
 export const getStaticPaths = (async () => {
   const reg = await registry();
@@ -43,16 +44,18 @@ const outlineGap = segments.findIndex(
     H3_MODULES.includes(s.name) &&
     !segments.slice(0, i).some((p) => p.kind === 'md' && /^##\s/m.test(p.text)),
 );
-const title = pageByPath(entry.data.path).title;
+const iaPage = pageByPath(entry.data.path);
+const title = iaPage.title;
+const intro = entry.data.intro ?? governance.find((b) => b.path === entry.data.path)?.role;
 ---
 
 <SectionPage
   path={entry.data.path}
   reg={reg}
-  intro={entry.data.intro}
-  provenance={entry.data.provenance}
+  intro={intro}
+  provenance={iaPage.introOnly ? undefined : entry.data.provenance}
   approval={entry.data.approval === 'none' ? undefined : entry.data.approval}
-  updated={entry.data.updated}
+  updated={iaPage.introOnly ? undefined : entry.data.updated}
   cited={cite.cited()}
 >
   {

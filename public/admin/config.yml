@@ -277,7 +277,7 @@ collections:
               - { label: Answer, name: answer, widget: markdown, modes: [raw], hint: 'Cite sources as [@record-file-name].' }
 
       - name: governance
-        label: Governance structure (proposed)
+        label: Governance structure
         file: src/content/site/governance.json
         format: json
         fields:
@@ -285,11 +285,74 @@ collections:
             name: bodies
             widget: list
             summary: '{{fields.name}}'
-            hint: Shown on the Governance page as a proposal. Its status is stated in the page text.
+            hint: The five bodies, shown on the Governance page. Each description also opens that body’s own page.
             fields:
               - { label: Name, name: name, widget: string }
-              - { label: Role (a few words), name: role, widget: string }
+              - { label: Subtitle (a few words), name: role, widget: string }
+              - { label: Page address (do not change), name: path, widget: string }
               - { label: Description, name: text, widget: text }
+
+      - name: pedagogical-nodes
+        label: Pedagogical Nodes (profiles)
+        file: src/content/site/pedagogical-nodes.json
+        format: json
+        fields:
+          - label: Profiles
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.name}}'
+            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Photograph, name: photo, widget: image }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string }
+              - { label: Photograph credit, name: photoCredit, widget: string }
+              - { label: Designation, name: designation, widget: string }
+              - { label: Institutional affiliation, name: affiliation, widget: string }
+              - { label: Biography, name: biography, widget: text, hint: Leave a blank line between paragraphs. }
+              - { label: Contribution to New Contextualism through education and research, name: contribution, widget: text }
+
+      - name: practice-policy-council
+        label: Practice & Policy Council (profiles)
+        file: src/content/site/practice-policy-council.json
+        format: json
+        fields:
+          - label: Profiles
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.name}}'
+            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Photograph, name: photo, widget: image }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string }
+              - { label: Photograph credit, name: photoCredit, widget: string }
+              - { label: Designation, name: designation, widget: string }
+              - { label: Professional affiliation, name: affiliation, widget: string }
+              - { label: Biography, name: biography, widget: text, hint: Leave a blank line between paragraphs. }
+              - { label: Practical or policy-related contribution, name: contribution, widget: text }
+
+      - name: student-nexus
+        label: NC Student Nexus (directory)
+        file: src/content/site/student-nexus.json
+        format: json
+        fields:
+          - label: Students
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.name}} · {{fields.university}}'
+            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Photograph, name: photo, widget: image }
+              - { label: University, name: university, widget: string }
+              - { label: Photograph credit (optional), name: photoCredit, widget: string, required: false }
 
   - name: dimensions
     label: The ten layers
@@ -314,12 +377,13 @@ collections:
       - *approval
       - { label: Definition, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name], e.g. [@reza-2025-deltaic-bangladesh].' }
 
-  - { name: pages-philosophy, label: '1 · Philosophy', label_singular: Page, folder: src/content/pages/philosophy, <<: *page_collection }
-  - { name: pages-methodologies, label: '2 · Methodologies and Frameworks', label_singular: Page, folder: src/content/pages/methodologies, <<: *page_collection }
-  - { name: pages-projects, label: '3 · Projects (pages)', label_singular: Page, folder: src/content/pages/projects, <<: *page_collection }
-  - { name: pages-research, label: '4 · Research and Publications', label_singular: Page, folder: src/content/pages/research, <<: *page_collection }
-  - { name: pages-community, label: '5 · Movement and Community', label_singular: Page, folder: src/content/pages/community, <<: *page_collection }
-  - { name: pages-governance, label: '6 · Governance', label_singular: Page, folder: src/content/pages/governance, <<: *page_collection }
+  - { name: pages-philosophy, label: 'Philosophy', label_singular: Page, folder: src/content/pages/philosophy, <<: *page_collection }
+  - { name: pages-methodologies, label: 'Methodologies and Frameworks', label_singular: Page, folder: src/content/pages/methodologies, <<: *page_collection }
+  - { name: pages-projects, label: 'Projects (pages)', label_singular: Page, folder: src/content/pages/projects, <<: *page_collection }
+  - { name: pages-research, label: 'Research and Publications', label_singular: Page, folder: src/content/pages/research, <<: *page_collection }
+  - { name: pages-community, label: 'Movement and Community', label_singular: Page, folder: src/content/pages/community, <<: *page_collection }
+  - { name: pages-governance, label: 'Governance', label_singular: Page, folder: src/content/pages/governance, <<: *page_collection }
+  - { name: pages-platform, label: Platform (website information), label_singular: Page, folder: src/content/pages/platform, <<: *page_collection }
   - { name: pages-utilities, label: Utilities, label_singular: Page, folder: src/content/pages/utilities, <<: *page_collection }
 
   - name: projects

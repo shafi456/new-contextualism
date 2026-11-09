@@ -1,28 +1,33 @@
 {
   "bodies": [
     {
-      "name": "The Curatorial Core",
+      "name": "Curatorial Core",
       "role": "Theoretical guardianship",
+      "path": "/governance/curatorial-core/",
       "text": "This core body stewards the intellectual foundation of the movement, ensuring its theoretical integrity while actively facilitating its evolution. Its primary responsibilities involve maintaining foundational principles, documenting the ongoing development of the framework, and guiding theoretical debate. By carefully evaluating proposed extensions and distinguishing core tenets from external interpretations, this group protects the movement’s intellectual lineage while simultaneously encouraging rigorous, open scholarship."
     },
     {
-      "name": "The Pedagogical Nodes",
+      "name": "Pedagogical Nodes",
       "role": "Academic integration",
+      "path": "/governance/pedagogical-nodes/",
       "text": "This branch integrates New Contextualism into formal architectural education through a distributed network of allied schools and independent academic programmes. Operating as studio laboratories, these nodes conduct context-specific design investigations and collaborative research. Through formal studio critiques and cross-institutional thesis reviews, the pedagogical network ensures continuous critical evaluation, documenting and sharing tangible outcomes to strengthen the framework’s global academic presence."
     },
     {
-      "name": "The Practice & Policy Council",
+      "name": "Practice & Policy Council",
       "role": "Real-world application",
+      "path": "/governance/practice-and-policy-council/",
       "text": "Bridging the gap between theory and execution, this council unites architects, urban designers, heritage professionals, planners and policymakers. Its mandate is to test the framework’s relevance by applying it to actual urban environments and public institutions through community participation and co-creation. By identifying theoretical gaps during field applications, the council actively develops viable policy recommendations, implementation strategies and environmental guidelines for real-world governance."
     },
     {
-      "name": "The Open Assembly",
+      "name": "Open Assembly",
       "role": "Global discourse",
+      "path": "/governance/open-assembly/",
       "text": "Functioning as the public-facing arena for the movement, this assembly provides a global forum for intellectual exchange, debate and interdisciplinary collaboration. It connects practitioner networks, critics and independent researchers through international symposia, conferences, public lectures and digital discussions. This continuous cross-cultural dialogue ensures that the framework remains a dynamic, widely debated philosophy rather than an insular academic concept."
     },
     {
       "name": "NC Student Nexus",
       "role": "Autonomous sandbox",
+      "path": "/governance/nc-student-nexus/",
       "text": "Operating as a fully independent, grassroots engine, this autonomous sandbox is a dedicated space for the next generation of architects to explore and test the movement on their own terms. It functions as a student research incubator driven by peer-to-peer design critiques, diagram sharing and independent reading groups. Governed entirely through student leadership and regional chapters, the Nexus cultivates experimental design thinking and hosts annual challenges free from formal institutional constraints."
     }
   ]

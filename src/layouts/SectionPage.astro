@@ -3,7 +3,7 @@
  * The template for every page of the site structure: breadcrumbs, page
  * header, the section's contents beside the text (or above it, on
  * full-width pages), provenance, the page's sources and a pager in reading
- * order. Numbers and titles come from src/lib/ia.ts.
+ * order. Titles come from src/lib/ia.ts.
  */
 import Base from './Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
@@ -52,8 +52,7 @@ const overview = isOverview(found.section, page);
 const layout = props.layout ?? page.layout ?? 'text';
 
 const title = props.title ?? (overview && page.title === 'Overview' ? section.title : page.title);
-const label = props.label ?? (!page.number ? 'Utilities' : title === section.title ? page.title : section.title);
-const index = props.label ? undefined : page.number || undefined;
+const label = props.label ?? (!found.section ? 'Utilities' : title === section.title ? page.title : section.title);
 const docTitle = props.title
   ? `${props.title} · ${page.short ?? page.title}`
   : overview || !found.section
@@ -72,12 +71,12 @@ const n = neighbours(page.path);
 const pager = props.pager ?? {
   prev: n.prev && {
     href: url(n.prev.page.path),
-    label: n.prev.page.number,
+    label: n.prev.page.title === 'Overview' ? 'Overview' : n.prev.section.title,
     name: n.prev.page.title === 'Overview' ? n.prev.section.title : (n.prev.page.short ?? n.prev.page.title),
   },
   next: n.next && {
     href: url(n.next.page.path),
-    label: n.next.page.number,
+    label: n.next.page.title === 'Overview' ? 'Overview' : n.next.section.title,
     name: n.next.page.title === 'Overview' ? n.next.section.title : (n.next.page.short ?? n.next.page.title),
   },
 };
@@ -86,7 +85,7 @@ const description = props.description ?? props.intro ?? page.summary;
 
 <Base title={docTitle} description={description} type={props.type} jsonLd={props.jsonLd}>
   <Breadcrumbs trail={trail} />
-  <PageHeader label={label} index={index} title={title} intro={props.intro} compact={!overview}>
+  <PageHeader label={label} title={title} intro={props.intro} compact={!overview}>
     <slot name="header" />
   </PageHeader>
 

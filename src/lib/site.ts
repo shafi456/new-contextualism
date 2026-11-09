@@ -1,6 +1,6 @@
 /**
  * Site-wide data that is not a collection: settings, chronology, glossary,
- * frequently asked questions, the proposed governance structure and the
+ * frequently asked questions, the governance structure and its profiles, and the
  * editorial map of relations between layers. Each file is validated when the
  * site is built, so an invalid edit fails the build instead of shipping.
  */
@@ -10,9 +10,12 @@ import chronologyJson from '../content/site/chronology.json';
 import glossaryJson from '../content/site/glossary.json';
 import faqJson from '../content/site/faq.json';
 import governanceJson from '../content/site/governance.json';
+import pedagogicalJson from '../content/site/pedagogical-nodes.json';
+import councilJson from '../content/site/practice-policy-council.json';
+import studentsJson from '../content/site/student-nexus.json';
 import relationsJson from '../content/framework/relations.json';
 import { PROVENANCE } from './provenance';
-import { SECTIONS, UTILITIES, pageByPath } from './ia';
+import { PLATFORM, SECTIONS, UTILITIES, pageByPath } from './ia';
 import { url } from './url';
 
 const statement = z.object({
@@ -111,6 +114,8 @@ const governanceSchema = z.object({
         name: z.string(),
         /** Its role, in a few words, e.g. "Theoretical guardianship". */
         role: z.string(),
+        /** The body's own page, as a site path. */
+        path: z.string(),
         text: z.string(),
       }),
     )
@@ -118,6 +123,38 @@ const governanceSchema = z.object({
 });
 
 export const governance = governanceSchema.parse(governanceJson).bodies;
+governance.forEach((b) => pageByPath(b.path));
+
+/** An individual profile, as listed under Pedagogical Nodes and the Council. */
+const profileSchema = z.object({
+  entries: z.array(
+    z.object({
+      name: z.string().min(1),
+      photo: z.string().min(1),
+      photoAlt: z.string().min(1, 'Every image needs alternative text.'),
+      photoCredit: z.string().min(1, 'Every image needs a credit.'),
+      designation: z.string().min(1),
+      affiliation: z.string().min(1),
+      biography: z.string().min(1),
+      contribution: z.string().min(1),
+    }),
+  ),
+});
+
+const studentSchema = z.object({
+  entries: z.array(
+    z.object({
+      name: z.string().min(1),
+      photo: z.string().min(1),
+      photoCredit: z.string().optional(),
+      university: z.string().min(1),
+    }),
+  ),
+});
+
+export const pedagogicalNodes = profileSchema.parse(pedagogicalJson).entries;
+export const practiceCouncil = profileSchema.parse(councilJson).entries;
+export const students = studentSchema.parse(studentsJson).entries;
 
 /** The six sections, for the header and menus. */
 export const NAV = SECTIONS.map((s) => ({ href: url(s.path), label: s.nav, number: s.number }));
@@ -130,13 +167,5 @@ const link = (path: string, label?: string) => {
 /** Global utilities, in the order of the site structure. */
 export const UTILITY_LINKS = UTILITIES.filter((p) => p.path !== '/accessibility/').map((p) => link(p.path));
 
-/** Governance and policy pages, for the footer. */
-export const POLICY_LINKS = [
-  link('/governance/', 'About the platform'),
-  link('/governance/editorial-standards/'),
-  link('/governance/corrections/', 'Corrections'),
-  link('/governance/copyright/'),
-  link('/governance/privacy-and-terms/'),
-  link('/accessibility/'),
-  link('/governance/contact/'),
-];
+/** Pages about the website itself, for the footer. */
+export const POLICY_LINKS = [...PLATFORM.map((p) => link(p.path)), link('/accessibility/')];

@@ -1,6 +1,5 @@
 ---
 import { NAV, UTILITY_LINKS, settings } from '../lib/site';
-import { pad } from '../lib/format';
 import { to } from '../lib/routes';
 import { url } from '../lib/url';
 
@@ -54,7 +53,6 @@ const current = (href: string) => (path === href ? 'page' : path.startsWith(href
           NAV.map((item) => (
             <li>
               <a href={item.href} aria-current={current(item.href)}>
-                <span class="label">{pad(Number(item.number))}</span>
                 <span class="site-menu__name">{item.label}</span>
               </a>
             </li>

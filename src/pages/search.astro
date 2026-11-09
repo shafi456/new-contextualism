@@ -2,7 +2,7 @@
 import SectionPage from '../layouts/SectionPage.astro';
 import { listed, registry } from '../lib/content';
 import { STATUS_LABELS, TYPE_LABELS } from '../lib/provenance';
-import { SECTIONS, UTILITIES, isOverview } from '../lib/ia';
+import { PLATFORM, SECTIONS, UTILITIES, isOverview } from '../lib/ia';
 import { to } from '../lib/routes';
 import { url } from '../lib/url';
 
@@ -10,10 +10,11 @@ const reg = await registry();
 // A complete index of the platform, shown when scripts are unavailable.
 const groups = [
   ...SECTIONS.map((s) => ({
-    title: `${s.number} · ${s.title}`,
-    items: s.pages.map((p) => [`${p.number} ${isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title}`, url(p.path)]),
+    title: s.title,
+    items: s.pages.map((p) => [isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title, url(p.path)]),
   })),
   { title: 'Utilities', items: UTILITIES.map((p) => [p.title, url(p.path)]) },
+  { title: 'Platform', items: PLATFORM.map((p) => [p.title, url(p.path)]) },
   { title: 'The ten contextual layers', items: reg.dimensions.map((d) => [d.data.name, to.layer(d.id)]) },
   {
     title: 'Projects',

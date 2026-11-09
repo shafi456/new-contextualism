@@ -6,7 +6,7 @@
 import type { Cite, Registry } from '../../lib/content';
 import { archiveRecords, listed } from '../../lib/content';
 import { downloadsIn, type DownloadGroup } from '../../lib/downloads';
-import { SECTIONS, UTILITIES, isOverview, itemId, pageByPath } from '../../lib/ia';
+import { PLATFORM, SECTIONS, UTILITIES, isOverview, itemId, pageByPath } from '../../lib/ia';
 import { PROVENANCE, PROVENANCE_META, TYPE_LABELS, type Provenance as ProvenanceKind } from '../../lib/provenance';
 import { faq, glossary, settings } from '../../lib/site';
 import { pubYear } from '../../lib/cite';
@@ -188,7 +188,7 @@ const mailto = (subject: string) => `mailto:${email}?subject=${encodeURIComponen
       <section class="sitemap__section">
         <h2 class="sitemap__title">
           <a href={url('/')}>
-            <span class="label">0</span> Home
+            Home
           </a>
         </h2>
       </section>
@@ -196,14 +196,14 @@ const mailto = (subject: string) => `mailto:${email}?subject=${encodeURIComponen
         <section class="sitemap__section">
           <h2 class="sitemap__title">
             <a href={url(s.path)}>
-              <span class="label">{s.number}</span>{' '}{s.title}
+              {s.title}
             </a>
           </h2>
           <ol class="sitemap__pages" role="list">
             {s.pages.map((p) => (
               <li>
                 <a href={url(p.path)}>
-                  <span class="sitemap__num">{p.number}</span>{' '}{isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title}
+                  {isOverview(s, p) && p.title === 'Overview' ? 'Overview' : p.title}
                 </a>
                 {p.path === '/philosophy/layers/' && (
                   <ul class="sitemap__items" role="list">
@@ -232,6 +232,16 @@ const mailto = (subject: string) => `mailto:${email}?subject=${encodeURIComponen
         <h2 class="sitemap__title">Utilities</h2>
         <ul class="sitemap__pages" role="list">
           {UTILITIES.map((p) => (
+            <li>
+              <a href={url(p.path)}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section class="sitemap__section">
+        <h2 class="sitemap__title">Platform</h2>
+        <ul class="sitemap__pages" role="list">
+          {PLATFORM.map((p) => (
             <li>
               <a href={url(p.path)}>{p.title}</a>
             </li>
@@ -554,14 +564,6 @@ const mailto = (subject: string) => `mailto:${email}?subject=${encodeURIComponen
 
   .sitemap__pages a {
     text-decoration-color: var(--rule);
-  }
-
-  .sitemap__num {
-    display: inline-block;
-    min-width: 2.4rem;
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
   }
 
   .sitemap__items {

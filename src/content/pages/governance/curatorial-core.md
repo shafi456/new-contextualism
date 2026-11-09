@@ -1,10 +1,15 @@
 ---
-path: /governance/founder/
-intro: Mohammad Habib Reza, architect, architectural historian and originator of New Contextualism. A profile compiled from published sources, each fact with its citation.
-updated: 2026-10-31
-provenance: editorial-summary
+path: /governance/curatorial-core/
+updated: 2026-11-09
+provenance: proposed
 approval: pending
 ---
+<!-- module: governance-description -->
+
+## Founder and originator
+
+Mohammad Habib Reza is the founder and originator of New Contextualism and the foundational intellectual figure of the movement. Over the past decade he has developed the approach through teaching, writing, workshops and symposia [@reza-nitu-2025-people-place-justice], and reports of its first public workshop describe the philosophy as ‘coined by Mohammad Habib Reza’ [@bracu-2023-workshop-report]. The [Ten Contextual Layers](/philosophy/layers/) are set out on this platform in his published terms.
+
 The profile below is compiled from published biographies and records, and awaits the founder’s approval. An approved portrait will be added when one is supplied.
 
 <!-- module: founder -->

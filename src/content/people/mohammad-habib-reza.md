@@ -1,7 +1,7 @@
 ---
 name: Mohammad Habib Reza
 honorific: Dr
-role: Originator of New Contextualism
+role: Founder and Originator of New Contextualism
 appointments:
   - title: Associate Professor
     organisation: School of Architecture and Design, BRAC University, Dhaka

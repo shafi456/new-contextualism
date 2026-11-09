@@ -26,11 +26,10 @@ const cite = citations(reg, `projects/${project.id}`);
 const media = projectMedia(project);
 
 const sections = [
-  { id: 'context', n: 1, title: 'Context and background', html: cite.md(d.context) },
-  { id: 'questions', n: 2, title: 'Research questions', list: d.questions },
+  { id: 'context', title: 'Context and background', html: cite.md(d.context) },
+  { id: 'questions', title: 'Research questions', list: d.questions },
   {
     id: 'conditions',
-    n: 3,
     title: 'Conditions',
     conditions: [
       { title: 'Historical', html: cite.md(d.historical) },
@@ -39,9 +38,9 @@ const sections = [
       { title: 'Ecological', html: cite.md(d.ecological) },
     ],
   },
-  { id: 'process', n: 4, title: 'Analytical process', html: cite.md(d.process) },
-  { id: 'response', n: 5, title: 'Design response', html: cite.md(d.response) },
-  { id: 'outcomes', n: 6, title: 'Outcomes and critical reflections', html: cite.md(d.outcomes) },
+  { id: 'process', title: 'Analytical process', html: cite.md(d.process) },
+  { id: 'response', title: 'Design response', html: cite.md(d.response) },
+  { id: 'outcomes', title: 'Outcomes and critical reflections', html: cite.md(d.outcomes) },
 ];
 d.sources.forEach((k) => cite.add(k));
 
@@ -202,7 +201,6 @@ const jsonLd = {
           sections.map((s) => (
             <section class="psec" id={s.id} aria-labelledby={`${s.id}-title`}>
               <h2 class="psec__title" id={`${s.id}-title`}>
-                <span class="psec__num">{pad(s.n)}</span>
                 {s.title}
               </h2>
               {'html' in s && s.html ? <div class="prose psec__body" set:html={s.html} /> : null}
@@ -237,7 +235,6 @@ const jsonLd = {
         }
         <section class="psec" id="contributors" aria-labelledby="contributors-title">
           <h2 class="psec__title" id="contributors-title">
-            <span class="psec__num">07</span>
             Contributors and references
           </h2>
           <div class="psec__body">
@@ -378,13 +375,6 @@ const jsonLd = {
     gap: 1rem;
     align-items: baseline;
     font-size: var(--fs-h3);
-  }
-
-  .psec__num {
-    font-family: var(--sans);
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
   }
 
   .psec__body {

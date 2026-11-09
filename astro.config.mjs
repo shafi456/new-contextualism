@@ -30,9 +30,9 @@ const redirects = Object.fromEntries(
   Object.entries({
     '/movement': '/community/',
     '/framework': '/methodologies/foundational-framework/',
-    '/about': '/governance/',
     '/dialogue': '/community/events/',
     '/contact': '/governance/contact/',
+    '/governance/founder': '/governance/curatorial-core/#profile',
     '/privacy': '/governance/privacy-and-terms/',
     '/editorial-standards': '/governance/editorial-standards/',
     '/framework/scientific-technological': '/philosophy/layers/scientific/',

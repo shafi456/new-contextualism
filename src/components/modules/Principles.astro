@@ -9,6 +9,7 @@
 import type { Cite } from '../../lib/content';
 import Provenance from '../Provenance.astro';
 import { governance, settings } from '../../lib/site';
+import { url } from '../../lib/url';
 import { pad } from '../../lib/format';
 
 interface Props {
@@ -154,9 +155,8 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
     <div class="pillars">
       <p class="label">Three aims, as summarised by Reza and Nitu (2025)</p>
       <ol class="pillars__list" role="list">
-        {pillars.map((p, i) => (
+        {pillars.map((p) => (
           <li data-reveal>
-            <span class="pillars__num">{pad(i + 1)}</span>
             <h3 class="pillars__title">{p.title}</h3>
             <p class="pillars__text">‘{p.quote}’</p>
           </li>
@@ -173,9 +173,8 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
   name === 'focus-areas' && (
     <div class="focus-module">
       <ol class="focus" role="list">
-        {focusAreas.map((f, i) => (
+        {focusAreas.map((f) => (
           <li data-reveal>
-            <span class="label">{pad(i + 1)}</span>
             <h3>{f.title}</h3>
             <p>{f.text}</p>
           </li>
@@ -214,11 +213,10 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
   name === 'governance' && (
     <div class="bodies-module">
       <ol class="bodies" role="list">
-        {governance.map((b, i) => (
+        {governance.map((b) => (
           <li data-reveal>
-            <span class="bodies__num">{pad(i + 1)}</span>
             <div class="bodies__head">
-              <h3 class="bodies__name">{b.name}</h3>
+              <h3 class="bodies__name"><a href={url(b.path)}>{b.name}</a></h3>
               <p class="label bodies__role">{b.role}</p>
             </div>
             <p class="bodies__text">{b.text}</p>
@@ -239,18 +237,15 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
 
   .bodies li {
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, 2fr) minmax(0, 3fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: 0.5rem var(--col-gap);
     align-items: start;
     padding: 1.25rem 0 1.4rem;
     border-bottom: 1px solid var(--rule);
   }
 
-  .bodies__num {
-    padding-top: 0.45rem;
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
+  .bodies__name a {
+    text-decoration-color: var(--rule);
   }
 
   .bodies__name {
@@ -269,11 +264,7 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
 
   @media (max-width: 720px) {
     .bodies li {
-      grid-template-columns: 2.5rem minmax(0, 1fr);
-    }
-
-    .bodies__text {
-      grid-column: 2;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
@@ -357,12 +348,6 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
     gap: 0.75rem;
     padding-top: 1rem;
     border-top: 1px solid var(--ink);
-  }
-
-  .pillars__num {
-    font-size: 0.75rem;
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
   }
 
   .pillars__title {

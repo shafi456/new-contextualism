@@ -31,7 +31,7 @@ The structure is defined once, in [`src/lib/ia.ts`](src/lib/ia.ts): the numbers,
 | 3 | Projects | `/projects/` | 3.1–3.8, and a page for each project at `/projects/{project}/` |
 | 4 | Research and Publications | `/research/` | 4.1–4.7, and a page for each record at `/research/{record}/` |
 | 5 | Movement and Community | `/community/` | 5.1–5.10 |
-| 6 | Governance | `/governance/` | 6.1–6.10 |
+| 6 | Governance | `/governance/` | 6.1–6.6 |
 | | Utilities | | Search, Sitemap, Glossary, Downloads and Resources, Project Map, Newsletter, Useful Links, FAQ, Support, Accessibility |
 
 **The build checks the structure.** Every page listed in `ia.ts` must have its Markdown file, every file must belong to the structure, and every sub-item of a page must appear in it as a second-level heading (`## Sub-item`), spelt as in the structure. Otherwise the build fails with a list of what is missing.

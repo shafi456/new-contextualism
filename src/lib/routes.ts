@@ -23,7 +23,7 @@ export const to = {
   archive: (params?: Record<string, string | undefined>) => url(`/research/archive/${query(params)}`),
   event: (id: string) => url(`/community/events/#${id}`),
   contributors: () => url('/community/contributors/'),
-  founder: () => url('/governance/founder/'),
+  founder: () => url('/governance/curatorial-core/#profile'),
   standards: (hash = '') => url(`/governance/editorial-standards/${hash}`),
   contact: (hash = '') => url(`/governance/contact/${hash}`),
   search: () => url('/search/'),
