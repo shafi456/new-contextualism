@@ -21,7 +21,7 @@ npm run preview    # serve dist/ locally
 
 ## Site structure
 
-The structure is defined once, in [`src/lib/ia.ts`](src/lib/ia.ts): the numbers, titles, addresses and sub-items of every page. The header, menus, footer, breadcrumbs, the contents beside each page, the previous and next links, the sitemap and the search index are all generated from it.
+The structure is defined once, in [`src/lib/ia.ts`](src/lib/ia.ts): the titles, addresses and sub-items of every page. Page numbers are internal keys and are not displayed anywhere on the site. The header, menus, footer, breadcrumbs, the contents beside each page, the previous and next links, the sitemap and the search index are all generated from it.
 
 | | Section | Address | Pages |
 | --- | --- | --- | --- |
@@ -31,18 +31,19 @@ The structure is defined once, in [`src/lib/ia.ts`](src/lib/ia.ts): the numbers,
 | 3 | Projects | `/projects/` | 3.1–3.8, and a page for each project at `/projects/{project}/` |
 | 4 | Research and Publications | `/research/` | 4.1–4.7, and a page for each record at `/research/{record}/` |
 | 5 | Movement and Community | `/community/` | 5.1–5.10 |
-| 6 | Governance | `/governance/` | 6.1–6.6 |
+| 6 | Governance | `/governance/` | Overview, Curatorial Core (with the founder's profile), Pedagogical Nodes, Practice & Policy Council, Open Assembly, NC Student Nexus |
+| | Platform | `/about/…` | Pages about the website itself, linked from the footer: About the Platform, Editorial Team, Advisory Network, Editorial Standards, Review Process, Copyright, Corrections, Privacy and Terms, Contact. Their earlier addresses under `/governance/` redirect |
 | | Utilities | | Search, Sitemap, Glossary, Downloads and Resources, Project Map, Newsletter, Useful Links, FAQ, Support, Accessibility |
 
 **The build checks the structure.** Every page listed in `ia.ts` must have its Markdown file, every file must belong to the structure, and every sub-item of a page must appear in it as a second-level heading (`## Sub-item`), spelt as in the structure. Otherwise the build fails with a list of what is missing.
 
-Addresses from the first edition of the site (`/movement/`, `/framework/…`, `/about/`, `/dialogue/`, `/contact/`, `/privacy/`, `/editorial-standards/`) redirect to the pages that now hold their content.
+Addresses from the first edition of the site (`/movement/`, `/framework/…`, `/dialogue/`, `/contact/`, `/privacy/`, `/editorial-standards/`) redirect to the pages that now hold their content, as does `/governance/founder/`.
 
 ## Content integrity
 
 The brief requires that nothing be invented. The site enforces this in four ways.
 
-1. **Provenance labels.** Every substantial text records where it comes from: *published source*, *editorial summary*, *proposed statement*, *approved by the founder*, or *interpretation*. Labels are shown on the page and explained at `/governance/editorial-standards/`.
+1. **Provenance labels.** Every substantial text records where it comes from: *published source*, *editorial summary*, *proposed statement*, *approved by the founder*, or *interpretation*. Labels are shown on the page and explained at `/about/editorial-standards/`.
 2. **Citations.** Texts cite records by file name, for example `[@reza-2025-deltaic-bangladesh]`. These become author–date links (Chicago style) to the list of sources at the foot of the page. **An unknown citation key fails the build.**
 3. **Reference checks.** Layers, sources, events and records referenced anywhere must exist, or the build fails with a list of broken references (`src/lib/content.ts`).
 4. **Honest gaps.** Where the structure names something the published record does not yet contain (for example the definitions of New Contextual Urbanism, New Contextual Design Methodology or Contextual Intelligence, an editorial team or an advisory network), the page says so in a marked note rather than filling the gap.
@@ -63,7 +64,7 @@ Where sources disagree (dates, the Al-Cazaba's location, the spiritual/political
 - **Layer definitions and research questions.** Editorial summaries built on the founder's own terms for each layer.
 - **The 26 relations between layers.** An editorial interpretation; 20 are illustrated with examples from the published record. Stored in `src/content/framework/relations.json`.
 - **Descriptions of the Plan and Process phases**, drawn from the published case studies, and the classification of projects into types.
-- **Proposed statements:** mission and vision, the governance structure of five bodies (none yet constituted), how contributions are reviewed, copyright, privacy and terms, and the accessibility statement.
+- **Proposed statements:** mission and vision, how contributions are reviewed, copyright, privacy and terms, and the accessibility statement.
 - **The ten-layer reading sheet**, an editorial template offered for download.
 
 ### Images and maps
@@ -92,19 +93,20 @@ Open <http://localhost:4321/admin/index.html>. Changes are written directly to t
 | The pages of each section | `src/content/pages/{section}/*.md` (one file per page; the `path` field ties it to the structure) |
 | Site settings: tagline, pre-publication flag, contact email, links, mission and vision | `src/content/site/settings.json` |
 | Chronology, glossary, frequently asked questions | `src/content/site/chronology.json`, `glossary.json`, `faq.json` |
-| The proposed governance structure (shown on the Governance page) | `src/content/site/governance.json` |
 | Relations between layers | `src/content/framework/relations.json` |
 | The ten layers | `src/content/dimensions/*.md` (the files keep the founder's earlier term, *dimensions*) |
 | Projects, with their classification and places on the map | `src/content/projects/*.md` |
 | Archive records, references and sources | `src/content/publications/*.md` |
 | Events | `src/content/events/*.md` |
-| Founder profile | `src/content/people/*.md` |
+| Founder profile, shown on Curatorial Core | `src/content/people/*.md` |
+| Governance bodies | `src/content/site/governance.json` |
+| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
 
 Schemas are in `src/content.config.ts` and `src/lib/site.ts`, and the editor's fields are in `public/admin/config.yml`. Keep them in step.
 
 ### Writing a page
 
-Pages are Markdown. Their title and number come from the structure, so a page file holds only its introduction, its text and its provenance.
+Pages are Markdown. Their title comes from the structure, so a page file holds only its introduction, its text and its provenance.
 
 - **Sub-items** are second-level headings, spelt exactly as in `src/lib/ia.ts`.
 - **Citations:** `[@record-file-name]`, or several at once: `[@one; @two]`.

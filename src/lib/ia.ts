@@ -416,18 +416,19 @@ export const UTILITIES: IaPage[] = [
 
 /**
  * Administrative and legal pages about the website itself, kept apart from the
- * governance of the movement. They keep their existing addresses.
+ * governance of the movement. Their earlier addresses under /governance/
+ * redirect here (see astro.config.mjs).
  */
 export const PLATFORM: IaPage[] = [
   { number: '', title: 'About the Platform', short: 'About the platform', path: '/about/', summary: 'What this platform is for.' },
-  { number: '', title: 'Editorial Team', path: '/governance/editorial-team/', summary: 'The people who edit the platform.' },
-  { number: '', title: 'Advisory Network', path: '/governance/advisory-network/', summary: 'Advisers to the platform.' },
-  { number: '', title: 'Editorial Standards', path: '/governance/editorial-standards/', summary: 'Provenance labels, citations and approval.' },
-  { number: '', title: 'Contributions and Review Process', short: 'Review Process', path: '/governance/review-process/', summary: 'How submissions are reviewed.' },
-  { number: '', title: 'Intellectual Property and Copyright', short: 'Copyright', path: '/governance/copyright/', summary: 'Rights in the texts, records and drawings.' },
-  { number: '', title: 'Corrections and Updates', short: 'Corrections', path: '/governance/corrections/', summary: 'How errors are corrected and changes recorded.' },
-  { number: '', title: 'Privacy and Terms of Use', short: 'Privacy and Terms', path: '/governance/privacy-and-terms/', summary: 'Privacy, terms of use and accessibility.' },
-  { number: '', title: 'Contact', path: '/governance/contact/', summary: 'Correspondence with the editors.' },
+  { number: '', title: 'Editorial Team', path: '/about/editorial-team/', summary: 'The people who edit the platform.' },
+  { number: '', title: 'Advisory Network', path: '/about/advisory-network/', summary: 'Advisers to the platform.' },
+  { number: '', title: 'Editorial Standards', path: '/about/editorial-standards/', summary: 'Provenance labels, citations and approval.' },
+  { number: '', title: 'Contributions and Review Process', short: 'Review Process', path: '/about/review-process/', summary: 'How submissions are reviewed.' },
+  { number: '', title: 'Intellectual Property and Copyright', short: 'Copyright', path: '/about/copyright/', summary: 'Rights in the texts, records and drawings.' },
+  { number: '', title: 'Corrections and Updates', short: 'Corrections', path: '/about/corrections/', summary: 'How errors are corrected and changes recorded.' },
+  { number: '', title: 'Privacy and Terms of Use', short: 'Privacy and Terms', path: '/about/privacy-and-terms/', summary: 'Privacy, terms of use and accessibility.' },
+  { number: '', title: 'Contact', path: '/about/contact/', summary: 'Correspondence with the editors.' },
 ];
 
 export const PLATFORM_SECTION: IaSection = {

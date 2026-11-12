@@ -1,5 +1,5 @@
 ---
-path: /governance/copyright/
+path: /about/copyright/
 intro: Who holds the rights in the texts, records, drawings and data on this platform.
 updated: 2026-10-31
 provenance: proposed
@@ -25,4 +25,4 @@ The base map of the [Project Map](/map/) is made with Natural Earth data, which 
 
 ## Requests
 
-To ask about permissions, or to report material that you believe infringes your rights, write to the editors; see [Contact](/governance/contact/).
+To ask about permissions, or to report material that you believe infringes your rights, write to the editors; see [Contact](/about/contact/).

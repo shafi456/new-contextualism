@@ -12,4 +12,4 @@ The approach has so far been developed within one institution. It has been culti
 
 ## Proposing a collaboration
 
-Institutions, teachers and researchers who wish to test the framework in their own contexts, through studios, theses or joint research, are invited to write to the editors. Proposals are handled as described under [Contributions and Review Process](/governance/review-process/); the address for correspondence is given under [Contact](/governance/contact/).
+Institutions, teachers and researchers who wish to test the framework in their own contexts, through studios, theses or joint research, are invited to write to the editors. Proposals are handled as described under [Contributions and Review Process](/about/review-process/); the address for correspondence is given under [Contact](/about/contact/).

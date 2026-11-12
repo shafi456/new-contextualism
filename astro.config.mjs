@@ -24,6 +24,7 @@ const base = process.env.BASE_PATH || '/';
  * does not add the base path to redirect destinations, so it is added here.
  */
 const LAYERS = ['social', 'cultural', 'historical', 'political', 'economic', 'ecological', 'geographical', 'urban', 'architectural'];
+const PLATFORM_PAGES = ['editorial-team', 'advisory-network', 'editorial-standards', 'review-process', 'copyright', 'corrections', 'privacy-and-terms', 'contact'];
 /** @param {string} path */
 const to = (path) => `${base.replace(/\/+$/, '')}${path}`;
 const redirects = Object.fromEntries(
@@ -31,10 +32,12 @@ const redirects = Object.fromEntries(
     '/movement': '/community/',
     '/framework': '/methodologies/foundational-framework/',
     '/dialogue': '/community/events/',
-    '/contact': '/governance/contact/',
+    '/contact': '/about/contact/',
     '/governance/founder': '/governance/curatorial-core/#profile',
-    '/privacy': '/governance/privacy-and-terms/',
-    '/editorial-standards': '/governance/editorial-standards/',
+    // Pages about the website, formerly under Governance.
+    ...Object.fromEntries(PLATFORM_PAGES.map((id) => [`/governance/${id}`, `/about/${id}/`])),
+    '/privacy': '/about/privacy-and-terms/',
+    '/editorial-standards': '/about/editorial-standards/',
     '/framework/scientific-technological': '/philosophy/layers/scientific/',
     ...Object.fromEntries(LAYERS.map((id) => [`/framework/${id}`, `/philosophy/layers/${id}/`])),
   }).map(([from, dest]) => [from, to(dest)]),

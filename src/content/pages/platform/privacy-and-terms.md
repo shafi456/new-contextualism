@@ -1,5 +1,5 @@
 ---
-path: /governance/privacy-and-terms/
+path: /about/privacy-and-terms/
 intro: What this website does, and does not do, with information about its visitors, and the terms on which it is offered.
 updated: 2026-10-31
 provenance: proposed
@@ -33,7 +33,7 @@ The editorial interface is used only by authorised editors. When editor sign-in 
 
 ## Terms of use
 
-The platform is offered for reading, research and teaching. Its content is compiled with care from cited sources, but readers should consult the original sources before relying on a statement. Texts marked as proposed or as interpretation are not statements by the founder. The rights in the material on the platform are described under [Intellectual Property and Copyright](/governance/copyright/).
+The platform is offered for reading, research and teaching. Its content is compiled with care from cited sources, but readers should consult the original sources before relying on a statement. Texts marked as proposed or as interpretation are not statements by the founder. The rights in the material on the platform are described under [Intellectual Property and Copyright](/about/copyright/).
 
 ## External links
 

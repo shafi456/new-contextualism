@@ -22,7 +22,7 @@ The files are generated from the platform’s data each time the site is publish
 
 ## Guidance Documents
 
-A guide to New Contextualism for students, co-edited with the founder, is listed as in progress [@bracu-nitu-profile]. The platform’s own guidance is given in its [Editorial Standards](/governance/editorial-standards/), [Citation Tools](/research/citation/) and [Contributions and Review Process](/governance/review-process/).
+A guide to New Contextualism for students, co-edited with the founder, is listed as in progress [@bracu-nitu-profile]. The platform’s own guidance is given in its [Editorial Standards](/about/editorial-standards/), [Citation Tools](/research/citation/) and [Contributions and Review Process](/about/review-process/).
 
 ## Bibliography
 

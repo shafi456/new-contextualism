@@ -25,4 +25,4 @@ The archive welcomes proposals for research, case studies, critical responses an
 
 <!-- module: contact -->
 
-Submissions are reviewed by the editors as described under [Contributions and Review Process](/governance/review-process/). Material is published with full attribution and its sources, and only with its authors’ permission. This platform is not a membership organisation, and submitting work does not make anyone a member of one.
+Submissions are reviewed by the editors as described under [Contributions and Review Process](/about/review-process/). Material is published with full attribution and its sources, and only with its authors’ permission. This platform is not a membership organisation, and submitting work does not make anyone a member of one.

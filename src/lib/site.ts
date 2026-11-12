@@ -106,7 +106,7 @@ export const glossary = glossarySchema
 glossary.forEach((g) => g.see.forEach((path) => pageByPath(path)));
 export const faq = faqSchema.parse(faqJson).items;
 
-/** The bodies of the proposed governance structure (none yet constituted). */
+/** The five bodies of the governance of the movement. */
 const governanceSchema = z.object({
   bodies: z
     .array(

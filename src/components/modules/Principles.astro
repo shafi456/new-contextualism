@@ -10,7 +10,6 @@ import type { Cite } from '../../lib/content';
 import Provenance from '../Provenance.astro';
 import { governance, settings } from '../../lib/site';
 import { url } from '../../lib/url';
-import { pad } from '../../lib/format';
 
 interface Props {
   name: 'formulations' | 'pillars' | 'focus-areas' | 'statements' | 'governance';
@@ -223,15 +222,14 @@ const SDG = name === 'focus-areas' ? ref('united-nations-2015-agenda-2030') : un
           </li>
         ))}
       </ol>
-      <Provenance kind="proposed" approval="pending" note="Not yet constituted" />
     </div>
   )
 }
 
 <style>
-  /* Proposed governance structure */
+  /* Governance structure */
   .bodies {
-    margin: 0 0 1.25rem;
+    margin: 0;
     border-top: 1px solid var(--ink);
   }
 

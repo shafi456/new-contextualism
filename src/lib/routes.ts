@@ -24,7 +24,7 @@ export const to = {
   event: (id: string) => url(`/community/events/#${id}`),
   contributors: () => url('/community/contributors/'),
   founder: () => url('/governance/curatorial-core/#profile'),
-  standards: (hash = '') => url(`/governance/editorial-standards/${hash}`),
-  contact: (hash = '') => url(`/governance/contact/${hash}`),
+  standards: (hash = '') => url(`/about/editorial-standards/${hash}`),
+  contact: (hash = '') => url(`/about/contact/${hash}`),
   search: () => url('/search/'),
 };

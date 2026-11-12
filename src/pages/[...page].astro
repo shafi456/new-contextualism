@@ -46,6 +46,8 @@ const outlineGap = segments.findIndex(
 );
 const iaPage = pageByPath(entry.data.path);
 const title = iaPage.title;
+// Governance describes the movement's own bodies, so it carries no editorial status labels.
+const plain = iaPage.introOnly || entry.data.path.startsWith('/governance/');
 const intro = entry.data.intro ?? governance.find((b) => b.path === entry.data.path)?.role;
 ---
 
@@ -53,9 +55,9 @@ const intro = entry.data.intro ?? governance.find((b) => b.path === entry.data.p
   path={entry.data.path}
   reg={reg}
   intro={intro}
-  provenance={iaPage.introOnly ? undefined : entry.data.provenance}
+  provenance={plain ? undefined : entry.data.provenance}
   approval={entry.data.approval === 'none' ? undefined : entry.data.approval}
-  updated={iaPage.introOnly ? undefined : entry.data.updated}
+  updated={plain ? undefined : entry.data.updated}
   cited={cite.cited()}
 >
   {

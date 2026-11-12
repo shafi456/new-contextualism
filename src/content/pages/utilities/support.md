@@ -24,8 +24,8 @@ Published responses, critical or not, help the approach develop. They can be pro
 
 ## Correct the record
 
-Report errors of fact, citation or attribution; see [Corrections and Updates](/governance/corrections/).
+Report errors of fact, citation or attribution; see [Corrections and Updates](/about/corrections/).
 
 ## Share images
 
-The projects on this platform are illustrated with abstract drawings until their authors supply photographs and drawings. If you hold the rights to images of a documented project, please write to the editors; see [Contact](/governance/contact/).
+The projects on this platform are illustrated with abstract drawings until their authors supply photographs and drawings. If you hold the rights to images of a documented project, please write to the editors; see [Contact](/about/contact/).

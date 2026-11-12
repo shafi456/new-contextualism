@@ -26,6 +26,6 @@ A guide to New Contextualism for students, co-edited by Upama Das Nitu in collab
 
 The platform’s own guidance:
 
-- [Editorial Standards](/governance/editorial-standards/): how texts are labelled, sourced and approved.
+- [Editorial Standards](/about/editorial-standards/): how texts are labelled, sourced and approved.
 - [Citation Tools](/research/citation/): how to cite New Contextualism and the records of the archive.
-- [Contributions and Review Process](/governance/review-process/): how to propose material for the platform.
+- [Contributions and Review Process](/about/review-process/): how to propose material for the platform.

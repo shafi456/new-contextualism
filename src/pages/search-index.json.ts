@@ -47,7 +47,7 @@ export const GET: APIRoute = async () => {
   }
   for (const p of [...UTILITIES, ...PLATFORM]) {
     const page = reg.page.get(p.path);
-    out.push({ t: p.title, u: url(p.path), k: 'Utility', s: page?.data.intro ?? p.summary, b: clip(text(page?.body)), x: (p.items ?? []).join(' ') });
+    out.push({ t: p.title, u: url(p.path), k: PLATFORM.includes(p) ? 'Platform' : 'Utility', s: page?.data.intro ?? p.summary, b: clip(text(page?.body)), x: (p.items ?? []).join(' ') });
   }
 
   for (const d of reg.dimensions)

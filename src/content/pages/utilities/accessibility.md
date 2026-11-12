@@ -27,7 +27,7 @@ This website aims to conform to the Web Content Accessibility Guidelines (WCAG) 
 
 ## Feedback
 
-If you encounter a barrier, please tell us through the [Contact](/governance/contact/) page, describing the page and the problem.
+If you encounter a barrier, please tell us through the [Contact](/about/contact/) page, describing the page and the problem.
 
 ## Preparation of this statement
 

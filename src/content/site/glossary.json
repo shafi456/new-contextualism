@@ -112,7 +112,7 @@
       "term": "Provenance label",
       "definition": "The platform’s own term. Every substantial text on this platform carries a label saying where it comes from: published source, editorial summary, proposed statement, approved by the founder, or interpretation.",
       "provenance": "proposed",
-      "see": ["/governance/editorial-standards/"]
+      "see": ["/about/editorial-standards/"]
     }
   ]
 }

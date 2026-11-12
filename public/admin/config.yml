@@ -47,7 +47,7 @@ _provenance: &provenance
   label: Provenance
   name: provenance
   widget: select
-  hint: Where the text comes from. See /governance/editorial-standards/.
+  hint: Where the text comes from. See /about/editorial-standards/.
   options:
     - { label: 'Published source (verified, cited)', value: published-source }
     - { label: 'Editorial summary (written from cited sources)', value: editorial-summary }
@@ -298,6 +298,7 @@ collections:
         format: json
         fields:
           - label: Profiles
+            label_singular: profile
             name: entries
             widget: list
             allow_add: true
@@ -320,6 +321,7 @@ collections:
         format: json
         fields:
           - label: Profiles
+            label_singular: profile
             name: entries
             widget: list
             allow_add: true
@@ -342,6 +344,7 @@ collections:
         format: json
         fields:
           - label: Students
+            label_singular: student
             name: entries
             widget: list
             allow_add: true

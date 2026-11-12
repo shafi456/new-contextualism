@@ -1,5 +1,5 @@
 ---
-path: /governance/contact/
+path: /about/contact/
 intro: Correspondence about New Contextualism, this platform and its archive.
 updated: 2026-10-31
 provenance: proposed

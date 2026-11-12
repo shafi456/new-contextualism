@@ -1,5 +1,5 @@
 ---
-path: /governance/editorial-standards/
+path: /about/editorial-standards/
 intro: How this platform distinguishes verified statements from summaries, proposals and interpretations, and how its content is checked, approved and corrected.
 updated: 2026-10-31
 provenance: proposed
@@ -47,4 +47,4 @@ The public statement of the philosophy, the founder’s profile and the platform
 
 ## Corrections
 
-Errors are corrected promptly; see [Corrections and Updates](/governance/corrections/).
+Errors are corrected promptly; see [Corrections and Updates](/about/corrections/).
