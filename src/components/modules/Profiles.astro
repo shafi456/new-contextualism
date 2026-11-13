@@ -1,16 +1,17 @@
 ---
 /**
- * The governance bodies' descriptions and their profile systems. Entries come
+ * The governance bodies' descriptions and the student directory (members of
+ * the other bodies are in Members.astro). Entries come
  * from src/content/site/*.json and are managed in the editorial interface,
  * where they can be added, edited, reordered and removed. Lists appear in the
  * order saved there.
  */
 import { Image } from 'astro:assets';
-import { governance, pedagogicalNodes, practiceCouncil, students } from '../../lib/site';
+import { governance, students } from '../../lib/site';
 import { profilePhoto } from '../../lib/profiles';
 
 interface Props {
-  name: 'governance-description' | 'pedagogical-nodes' | 'practice-policy-council' | 'student-nexus';
+  name: 'governance-description' | 'student-nexus';
   path: string;
 }
 
@@ -18,44 +19,10 @@ const { name, path } = Astro.props;
 const body = name === 'governance-description' ? governance.find((b) => b.path === path) : undefined;
 if (name === 'governance-description' && !body) throw new Error(`governance-description: no body has the page ${path}`);
 
-const profiles = name === 'pedagogical-nodes' ? pedagogicalNodes : name === 'practice-policy-council' ? practiceCouncil : [];
-const contributionLabel =
-  name === 'pedagogical-nodes' ? 'Contribution through education and research' : 'Contribution to practice and policy';
-const paragraphs = (text: string) => text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 const credits = students.filter((s) => s.photoCredit);
 ---
 
 {name === 'governance-description' && body && <div class="prose page-prose"><p>{body.text}</p></div>}
-
-{
-  (name === 'pedagogical-nodes' || name === 'practice-policy-council') &&
-    (profiles.length ? (
-      <div class="profiles-list">
-        {profiles.map((p) => (
-          <article class="profile" data-reveal>
-            <figure class="profile__photo">
-              <Image src={profilePhoto(p.photo)} alt={p.photoAlt} widths={[320, 640, 960]} sizes="(min-width: 1080px) 18vw, (min-width: 640px) 30vw, 100vw" />
-              <figcaption class="small muted">{p.photoCredit}</figcaption>
-            </figure>
-            <div class="profile__main">
-              <h2 class="profile__name">{p.name}</h2>
-              <p class="label">{p.designation}</p>
-              <p class="profile__affiliation">{p.affiliation}</p>
-              <div class="prose profile__text">
-                {paragraphs(p.biography).map((t) => <p>{t}</p>)}
-              </div>
-              <h3 class="label profile__heading">{contributionLabel}</h3>
-              <div class="prose profile__text">
-                {paragraphs(p.contribution).map((t) => <p>{t}</p>)}
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    ) : (
-      <p class="small muted profiles-empty">Profiles will appear here as they are confirmed.</p>
-    ))
-}
 
 {
   name === 'student-nexus' &&
@@ -87,52 +54,6 @@ const credits = students.filter((s) => s.photoCredit);
 }
 
 <style>
-  .profiles-list {
-    margin-top: 2.5rem;
-    border-top: 1px solid var(--ink);
-  }
-
-  .profile {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
-    gap: 1.5rem var(--col-gap);
-    align-items: start;
-    padding: 2rem 0;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .profile__photo img {
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-  }
-
-  .profile__photo figcaption {
-    margin-top: 0.4rem;
-  }
-
-  .profile__main {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .profile__name {
-    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
-    line-height: 1.05;
-  }
-
-  .profile__affiliation {
-    color: var(--ink-2);
-  }
-
-  .profile__text {
-    font-size: 1rem;
-  }
-
-  .profile__heading {
-    margin-top: 1rem;
-  }
-
   .profiles-empty {
     margin-top: 2.5rem;
     padding-top: 1rem;
@@ -168,15 +89,5 @@ const credits = students.filter((s) => s.photoCredit);
   .students__credits summary {
     cursor: pointer;
     min-height: 24px;
-  }
-
-  @media (max-width: 640px) {
-    .profile {
-      grid-template-columns: 1fr;
-    }
-
-    .profile__photo {
-      max-width: 18rem;
-    }
   }
 </style>

@@ -1,3 +1,124 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "name": "Oindriza Reza Nodi",
+      "designation": "Architect, researcher and designer",
+      "biography": "Architect whose publicly indexed professional biography identifies her as a researcher and designer, including work as a junior research and design associate at the Bengal Institute of Architecture, Landscapes and Settlements. Her public writing has addressed urban water systems and the condition of Dhaka’s canals. Her professional profile also records postgraduate study in urban/smart-city-related design at the University of Pennsylvania.",
+      "contribution": "Can connect New Contextualism to evidence-based urban research, landscape systems, water-sensitive planning and the relationship between ecological infrastructure and everyday urban life. Her writing on canals provides a strong entry point for policy discussion around urban waterways, public space and environmental justice.",
+      "work": [
+        "Published writing on urban water systems and the condition of Dhaka’s canals"
+      ],
+      "links": [
+        {
+          "label": "The Daily Star author profile",
+          "url": "https://www.thedailystar.net/author/oindriza-reza"
+        },
+        {
+          "label": "LinkedIn profile",
+          "url": "https://www.linkedin.com/in/oindriza-reza"
+        }
+      ]
+    },
+    {
+      "name": "Rafa Mashiyat Zahid",
+      "designation": "Architecture alumna",
+      "affiliation": "BRAC University",
+      "biography": "BRAC University architecture alumna recognised for her undergraduate thesis ‘PalokPolli: Rehabilitation Center for Victims of Domestic Violence’, which received the SHAH Cement DOT Student Design Award in 2022. The project explored a healing environment for women affected by violence, using spatial privacy, landscape, water and light to support safety and recovery.",
+      "contribution": "Can bring a gender-sensitive and care-centred perspective to the Practice & Policy Council. Her project demonstrates how spatial design can respond to vulnerability, wellbeing, dignity and access to supportive environments, extending contextual practice beyond physical setting to include social realities and lived experience.",
+      "work": [
+        "‘PalokPolli: Rehabilitation Center for Victims of Domestic Violence’, undergraduate thesis. SHAH Cement DOT Student Design Award, 2022"
+      ],
+      "links": [
+        {
+          "label": "BRAC University award announcement",
+          "url": "https://www.bracu.ac.bd/news/architecture-alumna-awarded-shah-cement-dot-student-design-award"
+        }
+      ]
+    },
+    {
+      "name": "Sohana Khan",
+      "designation": "Architect and community-led placemaking practitioner",
+      "affiliation": "Article 25, London",
+      "biography": "Bangladeshi architect and community-led placemaking practitioner. She completed her B.Arch at BRAC University and Master of Architecture at London South Bank University. Her experience includes work with Oxfam in Rohingya refugee camps on WASH facilities for women and children, as well as collaborations involving the BRAC Institute of Educational Development, the British Council and humanitarian/community architecture initiatives. She is associated with Article 25 in London.",
+      "contribution": "Can strengthen the council’s community engagement and spatial-justice agenda. Her practice foregrounds listening, co-design and the agency of women, young people and marginalised communities. This is central to a contextual approach that treats local people as participants in shaping space, rather than passive recipients of design.",
+      "work": [
+        "Work with Oxfam in Rohingya refugee camps on WASH facilities for women and children"
+      ],
+      "links": [
+        {
+          "label": "The Glass-House profile and essay",
+          "url": "https://theglasshouse.org.uk/blog-series/a-letter-to-future-placemakers/from-sohana-khan/"
+        }
+      ]
+    },
+    {
+      "name": "Mohammad Zillur Rahman",
+      "designation": "Architect, interior designer and academic",
+      "affiliation": "Department of Architecture, BRAC University; STUDIO PLAN.T",
+      "biography": "Architect, interior designer and academic in BRAC University’s Department of Architecture; also a co-founder and architect-partner at STUDIO PLAN.T. His interests include architectural design, urban design, landscape urbanism, transportation architecture, walkability and building technology. He has taught design studios and technical courses.",
+      "contribution": "In this council, he can help translate academic principles into professional design methods and urban interventions, ensuring that contextual research is tested against implementation, technical constraints, mobility needs and the everyday performance of places.",
+      "work": [
+        "Co-founder and architect-partner, STUDIO PLAN.T"
+      ],
+      "links": [
+        {
+          "label": "BRAC University profile",
+          "url": "https://www.bracu.ac.bd/about/people/mohammad-zillur-rahman"
+        },
+        {
+          "label": "LinkedIn profile",
+          "url": "https://bd.linkedin.com/in/mohammad-zillur-rahman-244583a4"
+        }
+      ]
+    },
+    {
+      "name": "Sohana Binte Rakib",
+      "work": [],
+      "links": []
+    },
+    {
+      "name": "Urbana Tabassum",
+      "designation": "Architecture graduate",
+      "affiliation": "BRAC University",
+      "biography": "BRAC University architecture graduate whose thesis ‘Ehyaa: The Cultural Reclamation Trail – Reviving Memory and Heritage Through Place’ (Meherpur) was selected for the Urban Design Lab Thesis Publication 2025. The project explores cultural memory, heritage-sensitive place-making, local identity and the connection between historic sites and contemporary community life.",
+      "contribution": "Can contribute to heritage conservation and place-based urban regeneration. Her work demonstrates how cultural memory can be translated into connected public spaces, local economic activity and a living heritage trail, rather than treating heritage as an isolated monument.",
+      "work": [
+        "‘Ehyaa: The Cultural Reclamation Trail – Reviving Memory and Heritage Through Place’ (Meherpur), thesis. Selected for the Urban Design Lab Thesis Publication 2025"
+      ],
+      "links": [
+        {
+          "label": "BRAC University thesis selection news",
+          "url": "https://www.bracu.ac.bd/news/architecture-thesis-selected-urban-design-lab-udl-thesis-publication-2025"
+        },
+        {
+          "label": "Urban Design Lab thesis publication",
+          "url": "https://images.adsttc.com/submissions/events/pdf_file/11291/UDL_Thesis_Publication_2025_-_Book_of_Abstract.pdf"
+        },
+        {
+          "label": "BRAC University repository record",
+          "url": "https://dspace.bracu.ac.bd/items/db727132-795f-4b75-b8d8-15d587b7d670/full"
+        }
+      ]
+    },
+    {
+      "name": "Fatiha Tanjim Oni",
+      "designation": "Architecture graduate",
+      "affiliation": "BRAC University",
+      "biography": "BRAC University architecture graduate recognised internationally for her undergraduate thesis ‘Beyond Rediscovery: Alijan Jute Mill’s Future’, which received a World Architecture Community Award in 2026. The project reimagines an abandoned jute mill in Narsingdi as a productive public landscape, connecting industrial heritage, ecology, workers’ livelihoods, housing, cultural activity and the river landscape.",
+      "contribution": "Can advance the council’s work on adaptive reuse, industrial heritage and regenerative urban development. Her project offers a concrete example of connecting historic production landscapes with contemporary community needs, economic continuity and ecological resilience through a New Contextualism lens.",
+      "work": [
+        "‘Beyond Rediscovery: Alijan Jute Mill’s Future’, undergraduate thesis. World Architecture Community Award, 2026"
+      ],
+      "links": [
+        {
+          "label": "BRAC University award announcement",
+          "url": "https://www.bracu.ac.bd/news/architecture-graduates-undergrad-thesis-wins-international-award"
+        },
+        {
+          "label": "Architecture MasterPrize project record",
+          "url": "https://architectureprize.com/winners/winner.php?id=9982"
+        }
+      ]
+    }
+  ]
 }

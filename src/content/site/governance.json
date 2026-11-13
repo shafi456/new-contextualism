@@ -10,13 +10,15 @@
       "name": "Pedagogical Nodes",
       "role": "Academic integration",
       "path": "/governance/pedagogical-nodes/",
-      "text": "This branch integrates New Contextualism into formal architectural education through a distributed network of allied schools and independent academic programmes. Operating as studio laboratories, these nodes conduct context-specific design investigations and collaborative research. Through formal studio critiques and cross-institutional thesis reviews, the pedagogical network ensures continuous critical evaluation, documenting and sharing tangible outcomes to strengthen the framework’s global academic presence."
+      "text": "This branch integrates New Contextualism into formal architectural education through a distributed network of allied schools and independent academic programmes. Operating as studio laboratories, these nodes conduct context-specific design investigations and collaborative research. Through formal studio critiques and cross-institutional thesis reviews, the pedagogical network ensures continuous critical evaluation, documenting and sharing tangible outcomes to strengthen the framework’s global academic presence.",
+      "summary": "Developing, interpreting and disseminating New Contextualism through architectural education, research and critical discourse."
     },
     {
       "name": "Practice & Policy Council",
       "role": "Real-world application",
       "path": "/governance/practice-and-policy-council/",
-      "text": "Bridging the gap between theory and execution, this council unites architects, urban designers, heritage professionals, planners and policymakers. Its mandate is to test the framework’s relevance by applying it to actual urban environments and public institutions through community participation and co-creation. By identifying theoretical gaps during field applications, the council actively develops viable policy recommendations, implementation strategies and environmental guidelines for real-world governance."
+      "text": "Bridging the gap between theory and execution, this council unites architects, urban designers, heritage professionals, planners and policymakers. Its mandate is to test the framework’s relevance by applying it to actual urban environments and public institutions through community participation and co-creation. By identifying theoretical gaps during field applications, the council actively develops viable policy recommendations, implementation strategies and environmental guidelines for real-world governance.",
+      "summary": "Translating New Contextualism into professional practice, community engagement, urban development, heritage conservation and policy."
     },
     {
       "name": "Open Assembly",

@@ -116,6 +116,8 @@ const governanceSchema = z.object({
         role: z.string(),
         /** The body's own page, as a site path. */
         path: z.string(),
+        /** A one-sentence subtitle, used on the body's page and above its members. */
+        summary: z.string().optional(),
         text: z.string(),
       }),
     )
@@ -125,19 +127,27 @@ const governanceSchema = z.object({
 export const governance = governanceSchema.parse(governanceJson).bodies;
 governance.forEach((b) => pageByPath(b.path));
 
-/** An individual profile, as listed under Pedagogical Nodes and the Council. */
+/**
+ * A member of the Pedagogical Nodes or the Practice & Policy Council. Only the
+ * name is required, so that a member can be listed before the profile is
+ * confirmed. A photograph needs a credit.
+ */
 const profileSchema = z.object({
   entries: z.array(
-    z.object({
-      name: z.string().min(1),
-      photo: z.string().min(1),
-      photoAlt: z.string().min(1, 'Every image needs alternative text.'),
-      photoCredit: z.string().min(1, 'Every image needs a credit.'),
-      designation: z.string().min(1),
-      affiliation: z.string().min(1),
-      biography: z.string().min(1),
-      contribution: z.string().min(1),
-    }),
+    z
+      .object({
+        name: z.string().min(1),
+        designation: z.string().optional(),
+        affiliation: z.string().optional(),
+        photo: z.string().optional(),
+        photoAlt: z.string().optional(),
+        photoCredit: z.string().optional(),
+        biography: z.string().optional(),
+        contribution: z.string().optional(),
+        work: z.array(z.string()).default([]),
+        links: z.array(z.object({ label: z.string().min(1), url: z.url() })).default([]),
+      })
+      .refine((p) => !p.photo || !!p.photoCredit, { message: 'Every photograph needs a credit.' }),
   ),
 });
 

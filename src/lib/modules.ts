@@ -30,6 +30,7 @@ export const MODULES = {
   statements: [],
   governance: [],
   'governance-description': [],
+  'governance-members': [],
   'pedagogical-nodes': [],
   'practice-policy-council': [],
   'student-nexus': [],

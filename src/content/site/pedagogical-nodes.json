@@ -1,3 +1,141 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "name": "S M Kaikobad",
+      "designation": "Architect, researcher and educator",
+      "affiliation": "Shoho Sthapon Design Studio",
+      "biography": "Interdisciplinary architect, researcher and educator; formerly a Senior Lecturer in BRAC University’s Department of Architecture and co-founder/principal of Shoho Sthapon Design Studio. His academic and practice interests include urban resilience, heritage, community, social justice, public space, informal urbanism and the relationship between built form and human behaviour. He pursued graduate study in Architecture Studies at MIT’s Aga Khan Program.",
+      "contribution": "Can help articulate how contextual understanding informs design decisions, especially where heritage, informal urbanism, ecological resilience and spatial justice intersect. His contribution is particularly relevant to research-led pedagogy, critical frameworks and the translation of social and environmental conditions into design methods.",
+      "work": [
+        "Graduate study in Architecture Studies, Aga Khan Program, MIT"
+      ],
+      "links": [
+        {
+          "label": "BRAC University profile",
+          "url": "https://www.bracu.ac.bd/about/people/s-m-kaikobad"
+        },
+        {
+          "label": "BRAC University: MIT award news",
+          "url": "https://www.bracu.ac.bd/news/architecture-faculty-awarded-research-assistantship-and-full-scholarship-mit-department"
+        },
+        {
+          "label": "MIT profile",
+          "url": "https://architecture.mit.edu/people/s-m-kaikobad"
+        }
+      ]
+    },
+    {
+      "name": "Tanjina Khan",
+      "designation": "Architect, academic and researcher",
+      "affiliation": "Department of Architecture, BRAC University",
+      "biography": "Architect, academic and researcher associated with BRAC University’s Department of Architecture. She holds a B.Arch from BRAC University and a Master of Design Science in Sustainable Design and Building Services from the University of Sydney. Her research and practice interests include adaptive reuse, climate-responsive adaptation, urban landscapes, place-making and people–place relationships. Her professional experience includes architectural and urban-design practice.",
+      "contribution": "Can connect New Contextualism to adaptive reuse, climate and culture-sensitive design, and the changing life of urban buildings. Her research offers a way to examine how existing places adapt over time while retaining identity, environmental performance and social meaning.",
+      "work": [],
+      "links": [
+        {
+          "label": "BRAC University profile",
+          "url": "https://www.bracu.ac.bd/about/people/tanjina-khan-0"
+        },
+        {
+          "label": "UCL Bartlett profile",
+          "url": "https://www.ucl.ac.uk/bartlett/architecture/people/mphilphd-students/architectural-design-architectural-urban-history-theory-students/tanjina-khan"
+        }
+      ]
+    },
+    {
+      "name": "Upama Das Nitu",
+      "designation": "Architect, researcher and educator",
+      "affiliation": "School of Architecture and Design, BRAC University",
+      "biography": "Architect, researcher and educator at BRAC University’s School of Architecture and Design. Her work focuses on contextual and responsive urban design, art and architecture, intangible cultural heritage, community-inclusive planning and cultural memory. She has contributed to curriculum delivery, workshops and exhibitions, and co-edited the 2025 publication project ‘New Contextualism: A Guide for Students and Beyond’.",
+      "contribution": "Provides a direct link between the conceptual framework and its teaching resources. Her work in contextual urbanism, cultural heritage, participatory planning and the New Contextualism publication can support knowledge production, student engagement, workshops and the dissemination of the framework.",
+      "work": [
+        "Co-editor, ‘New Contextualism: A Guide for Students and Beyond’, publication project, 2025"
+      ],
+      "links": [
+        {
+          "label": "BRAC University profile",
+          "url": "https://www.bracu.ac.bd/about/people/upama-das-nitu"
+        },
+        {
+          "label": "Context BD article",
+          "url": "https://contextbd.com/new-contextualism-architecture-and-urbanism-for-people-place-and-justice/"
+        }
+      ]
+    },
+    {
+      "name": "Golam Ahammad Sunny",
+      "designation": "Architect and architecture educator",
+      "affiliation": "BRAC University",
+      "biography": "Architect and architecture educator/Teaching Assistant associated with BRAC University. Publicly documented work includes collaborative urban-design and architectural projects, competition entries and academic teaching. His work has addressed urban fabric around transit infrastructure, water edges, community-oriented design and the relationship between architecture and cultural context.",
+      "contribution": "Can support the conversion of contextual analysis into studio methods, design experiments and applied case studies. His documented work on Shewrapara’s MRT-influenced urban fabric and water-edge design offers material for discussing mobility, public space, ecology and the interaction of natural and built systems.",
+      "work": [
+        "Urban-design work on Shewrapara’s MRT-influenced urban fabric",
+        "Water-edge design"
+      ],
+      "links": [
+        {
+          "label": "BRAC University: IAB urban project",
+          "url": "https://www.bracu.ac.bd/news/brac-university-faculty-and-teaching-assistant-present-innovative-urban-idea-project-iab"
+        },
+        {
+          "label": "BRAC University: Water Edges competition",
+          "url": "https://www.bracu.ac.bd/news/brac-university-architecture-students-triumph-international-water-edges-design-competition"
+        },
+        {
+          "label": "LinkedIn profile",
+          "url": "https://bd.linkedin.com/in/golam-ahammad-sunny-5950912ba"
+        }
+      ]
+    },
+    {
+      "name": "Ruaida Akter",
+      "designation": "Architectural graduate",
+      "affiliation": "BRAC University",
+      "biography": "Architectural graduate and teaching/research assistant associated with BRAC University. Publicly available professional information indicates experience in architectural research, teaching support and practice exposure, including an internship with Marina Tabassum Architects. She has also contributed to an academic urban-design project presented at the Institute of Architects Bangladesh.",
+      "contribution": "Can contribute to design pedagogy and applied research by supporting contextual mapping, studio coordination, documentation and the development of place-responsive design proposals. Her work on Shewrapara provides a practical example of responding to transit-led neighbourhood change through urban-fabric analysis.",
+      "work": [
+        "Academic urban-design project presented at the Institute of Architects Bangladesh",
+        "Internship with Marina Tabassum Architects"
+      ],
+      "links": [
+        {
+          "label": "BRAC University: IAB urban project",
+          "url": "https://www.bracu.ac.bd/news/brac-university-faculty-and-teaching-assistant-present-innovative-urban-idea-project-iab"
+        },
+        {
+          "label": "BRAC University: Residential Semester",
+          "url": "https://www.bracu.ac.bd/news/architecture-students-complete-installation-projects-at-the-residential-semester"
+        }
+      ]
+    },
+    {
+      "name": "Mohammad Zillur Rahman",
+      "designation": "Architect, interior designer and academic",
+      "affiliation": "Department of Architecture, BRAC University; STUDIO PLAN.T",
+      "biography": "Architect, interior designer and academic in BRAC University’s Department of Architecture; also a co-founder and architect-partner at STUDIO PLAN.T. His interests include architectural design, urban design, landscape urbanism, transportation architecture, walkability and building technology. He has taught design studios and technical courses.",
+      "contribution": "Acts as a key bridge between the two governance bodies. Within Pedagogical Nodes, he can develop and communicate design case studies and teaching methods; within the Practice & Policy Council, he can help test the framework against professional projects, mobility, public-space design and urban-scale interventions.",
+      "work": [
+        "Co-founder and architect-partner, STUDIO PLAN.T"
+      ],
+      "links": [
+        {
+          "label": "BRAC University profile",
+          "url": "https://www.bracu.ac.bd/about/people/mohammad-zillur-rahman"
+        },
+        {
+          "label": "BRAC University: New Contextualism workshop",
+          "url": "https://www.bracu.ac.bd/news/daylong-workshop-and-lecture-sessions-held-exploring-new-contextualism-approach-architecture"
+        },
+        {
+          "label": "LinkedIn profile",
+          "url": "https://bd.linkedin.com/in/mohammad-zillur-rahman-244583a4"
+        }
+      ]
+    },
+    {
+      "name": "Akif Akash",
+      "work": [],
+      "links": []
+    }
+  ]
 }

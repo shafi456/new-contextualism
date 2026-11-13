@@ -384,7 +384,7 @@ export const SECTIONS: IaSection[] = [
     path: '/governance/',
     summary: 'The five-part governance ecosystem of New Contextualism as an intellectual movement.',
     pages: [
-      { number: '6.1', title: 'Overview', path: '/governance/', summary: 'The five bodies of the governance ecosystem.' },
+      { number: '6.1', title: 'Overview', path: '/governance/', summary: 'The five bodies of the governance ecosystem, and their members.', layout: 'wide' },
       { number: '6.2', title: 'Curatorial Core', path: '/governance/curatorial-core/', summary: 'Theoretical guardianship, and the founder of the movement.' },
       { number: '6.3', title: 'Pedagogical Nodes', path: '/governance/pedagogical-nodes/', summary: 'Academic integration through education and research.' },
       { number: '6.4', title: 'Practice & Policy Council', path: '/governance/practice-and-policy-council/', summary: 'Real-world application in practice and policy.' },

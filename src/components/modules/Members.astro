@@ -1,0 +1,758 @@
+---
+/**
+ * The member directory of the Pedagogical Nodes and the Practice & Policy
+ * Council: a grid of portrait cards, each opening a profile panel (a native
+ * dialog, so focus is held inside it and Escape closes it). Entries come from
+ * src/content/site/*.json and are managed in the editorial interface. A member
+ * without a photograph is shown with initials until one is supplied.
+ */
+import { Image } from 'astro:assets';
+import { governance, pedagogicalNodes, practiceCouncil } from '../../lib/site';
+import { profilePhoto } from '../../lib/profiles';
+import { slugify } from '../../lib/format';
+import { url } from '../../lib/url';
+
+type Key = 'nodes' | 'council';
+interface Props {
+  groups: Key[];
+  /** With headings, subtitles and the relation between the two bodies (the Governance overview). */
+  headed?: boolean;
+}
+
+const { groups, headed = false } = Astro.props;
+const SOURCE = {
+  nodes: { path: '/governance/pedagogical-nodes/', entries: pedagogicalNodes, contribution: 'Contribution to New Contextualism' },
+  council: { path: '/governance/practice-and-policy-council/', entries: practiceCouncil, contribution: 'Contribution to New Contextualism' },
+} as const;
+const body = (k: Key) => governance.find((b) => b.path === SOURCE[k].path)!;
+const idOf = (k: Key, name: string) => `${k}-${slugify(name)}`;
+const other = (k: Key): Key => (k === 'nodes' ? 'council' : 'nodes');
+const initials = (name: string) => {
+  const words = name.trim().split(/\s+/);
+  return (words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0][0]).toUpperCase();
+};
+const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+
+const sections = groups.map((k) => {
+  const b = body(k);
+  const members = SOURCE[k].entries.map((m, i, all) => {
+    const inOther = SOURCE[other(k)].entries.some((o) => o.name === m.name);
+    return {
+      ...m,
+      id: idOf(k, m.name),
+      photoData: m.photo ? profilePhoto(m.photo) : undefined,
+      alt: m.photoAlt || `Portrait of ${m.name}`,
+      initials: initials(m.name),
+      also: inOther ? { name: body(other(k)).name, id: idOf(other(k), m.name), here: groups.includes(other(k)), href: `${url(SOURCE[other(k)].path)}#${idOf(other(k), m.name)}` } : undefined,
+      prev: all[(i - 1 + all.length) % all.length],
+      next: all[(i + 1) % all.length],
+    };
+  });
+  return { key: k, name: b.name, summary: b.summary ?? b.role, href: url(b.path), members };
+});
+---
+
+<div class="members">
+  {
+    headed && (
+      <div class="chain" data-reveal>
+        <div class="chain__group">
+          <p class="label">Pedagogical Nodes</p>
+          <ol role="list">
+            <li>Knowledge</li>
+            <li>Research</li>
+            <li>Education</li>
+          </ol>
+        </div>
+        <div class="chain__group chain__group--second">
+          <p class="label">Practice &amp; Policy Council</p>
+          <ol role="list">
+            <li>Practice</li>
+            <li>Community</li>
+            <li>Policy</li>
+          </ol>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    sections.map((s) => (
+      <section class="mgroup" aria-label={`${s.name}, members`}>
+        {headed && (
+          <div class="mgroup__head">
+            <h2 class="mgroup__title" id={`${s.key}-members`}>
+              <a href={s.href}>{s.name}</a>
+            </h2>
+            <p class="mgroup__sub">{s.summary}</p>
+          </div>
+        )}
+        <ul class="mgrid" role="list">
+          {s.members.map((m) => (
+            <li data-reveal>
+              <button type="button" class="mcard" data-member-open={m.id} aria-haspopup="dialog">
+                <span class="mcard__portrait">
+                  {m.photoData ? (
+                    <Image src={m.photoData} alt={m.alt} widths={[320, 480, 720]} sizes="(min-width: 1080px) 22vw, (min-width: 640px) 30vw, 46vw" />
+                  ) : (
+                    <span class="mcard__initials" aria-hidden="true">
+                      {m.initials}
+                    </span>
+                  )}
+                  <span class="mcard__cue" aria-hidden="true">
+                    View profile
+                  </span>
+                  <span class="mcard__mark" aria-hidden="true">
+                    +
+                  </span>
+                </span>
+                <span class="mcard__name">{m.name}</span>
+                <span class="mcard__role">{m.designation || m.affiliation || 'Profile to follow'}</span>
+                <span class="label mcard__group">{m.also ? `${s.name} · ${m.also.name}` : s.name}</span>
+                <span class="visually-hidden">View profile</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        {s.members.map((m) => (
+          <dialog class="mpanel" id={m.id} aria-labelledby={`${m.id}-name`} data-member>
+            <div class="mpanel__inner">
+              <div class="mpanel__bar">
+                <p class="label">{s.name}</p>
+                <button type="button" class="mpanel__close" data-member-close>
+                  Close
+                </button>
+              </div>
+              <header class="mpanel__head">
+                <div class="mpanel__portrait">
+                  {m.photoData ? (
+                    <figure>
+                      <Image src={m.photoData} alt={m.alt} widths={[320, 640]} sizes="(min-width: 640px) 240px, 60vw" />
+                      {m.photoCredit && <figcaption class="small muted">{m.photoCredit}</figcaption>}
+                    </figure>
+                  ) : (
+                    <span class="mcard__initials" aria-hidden="true">
+                      {m.initials}
+                    </span>
+                  )}
+                </div>
+                <div class="mpanel__id">
+                  <h2 class="mpanel__name" id={`${m.id}-name`}>
+                    {m.name}
+                  </h2>
+                  {m.designation && <p class="mpanel__designation">{m.designation}</p>}
+                  {m.affiliation && <p class="mpanel__affiliation">{m.affiliation}</p>}
+                  {m.also && (
+                    <p class="small mpanel__also">
+                      Member of both bodies.{' '}
+                      {m.also.here ? (
+                        <button type="button" class="mpanel__link" data-member-go={m.also.id}>
+                          View within the {m.also.name}
+                        </button>
+                      ) : (
+                        <a href={m.also.href}>View within the {m.also.name}</a>
+                      )}
+                    </p>
+                  )}
+                </div>
+              </header>
+
+              {m.biography || m.contribution ? (
+                <div class="mpanel__body">
+                  {m.biography && (
+                    <section>
+                      <h3 class="label">Biography</h3>
+                      <div class="prose">
+                        {paragraphs(m.biography).map((t) => (
+                          <p>{t}</p>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                  {m.contribution && (
+                    <section>
+                      <h3 class="label">{SOURCE[s.key].contribution}</h3>
+                      <div class="prose">
+                        {paragraphs(m.contribution).map((t) => (
+                          <p>{t}</p>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                  {m.work.length > 0 && (
+                    <section>
+                      <h3 class="label">Relevant work</h3>
+                      <ul class="mpanel__list" role="list">
+                        {m.work.map((w) => (
+                          <li>{w}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {m.links.length > 0 && (
+                    <section>
+                      <h3 class="label">Links</h3>
+                      <ul class="mpanel__list" role="list">
+                        {m.links.map((l) => (
+                          <li>
+                            <a class="ext" href={l.url} rel="noopener">
+                              {l.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                </div>
+              ) : (
+                <p class="mpanel__pending">A full profile will be added once it has been confirmed with the member.</p>
+              )}
+
+              <nav class="mpanel__nav" aria-label={`Other members of the ${s.name}`}>
+                <button type="button" data-member-go={idOf(s.key, m.prev.name)}>
+                  <span class="label">Previous</span>
+                  <span class="mpanel__nav-name">{m.prev.name}</span>
+                </button>
+                <button type="button" class="mpanel__nav-next" data-member-go={idOf(s.key, m.next.name)}>
+                  <span class="label">Next</span>
+                  <span class="mpanel__nav-name">{m.next.name}</span>
+                </button>
+              </nav>
+            </div>
+          </dialog>
+        ))}
+      </section>
+    ))
+  }
+
+  <p class="small muted members__note">
+    Profiles are compiled from publicly available sources and are being confirmed with each member. Contribution statements
+    describe each member’s role within the body; they are not a record of completed work.
+  </p>
+</div>
+
+<style>
+  .members {
+    container-type: inline-size;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  /* The relation between the two bodies */
+  .chain {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem var(--col-gap);
+    padding: 1.25rem 0 1.5rem;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chain ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.9rem;
+    margin: 0.6rem 0 0;
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
+    line-height: 1.15;
+  }
+
+  .chain li + li::before,
+  .chain__group--second li:first-child::before {
+    content: '→';
+    margin-right: 0.9rem;
+    color: var(--grey);
+  }
+
+  /* A body and its members */
+  .mgroup + .mgroup {
+    margin-top: clamp(3.5rem, 3rem + 3vw, 6rem);
+  }
+
+  .chain + .mgroup {
+    margin-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
+  }
+
+  .mgroup__head {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 0.75rem var(--col-gap);
+    align-items: end;
+    padding-top: 1rem;
+    margin-bottom: 2rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .mgroup__title {
+    font-size: var(--fs-h3);
+    line-height: 1.05;
+  }
+
+  .mgroup__title a {
+    text-decoration: none;
+  }
+
+  .mgroup__title a:hover {
+    color: var(--brick);
+  }
+
+  .mgroup__sub {
+    max-width: 38rem;
+    color: var(--ink-2);
+  }
+
+  .mgrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.25rem var(--col-gap);
+    margin: 0;
+  }
+
+  @container (min-width: 36rem) {
+    .mgrid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 62rem) {
+    .mgrid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @container (max-width: 36rem) {
+    .chain,
+    .mgroup__head {
+      grid-template-columns: 1fr;
+    }
+
+    .chain__group--second li:first-child::before {
+      content: none;
+    }
+  }
+
+  /* Card */
+  .mcard {
+    display: grid;
+    gap: 0.3rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mcard__portrait {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    margin-bottom: 0.6rem;
+    overflow: hidden;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+  }
+
+  .mcard__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+
+  .mcard:hover .mcard__portrait :global(img),
+  .mcard:focus-visible .mcard__portrait :global(img) {
+    transform: scale(1.03);
+  }
+
+  .mcard__initials {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 1.5rem + 4cqi, 4.5rem);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+  }
+
+  .mcard__cue {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 0.55rem 0.75rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transform: translateY(100%);
+    transition: transform 0.35s var(--ease);
+  }
+
+  .mcard:hover .mcard__cue,
+  .mcard:focus-visible .mcard__cue {
+    transform: none;
+  }
+
+  .mcard__mark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--paper);
+    border-left: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .mcard__name {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.625rem);
+    line-height: 1.12;
+    transition: color 0.3s var(--ease);
+  }
+
+  .mcard:hover .mcard__name {
+    color: var(--brick);
+  }
+
+  .mcard__role {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  .mcard__group {
+    margin-top: 0.35rem;
+    font-size: 0.6875rem;
+  }
+
+  .members__note {
+    max-width: 40rem;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* Profile panel */
+  :global(html:has(dialog.mpanel[open])) {
+    overflow: hidden;
+  }
+
+  .mpanel {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(46rem, 100vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    transition:
+      transform 0.45s var(--ease),
+      overlay 0.45s allow-discrete,
+      display 0.45s allow-discrete;
+  }
+
+  .mpanel[open] {
+    transform: none;
+  }
+
+  @starting-style {
+    .mpanel[open] {
+      transform: translateX(100%);
+    }
+  }
+
+  .mpanel::backdrop {
+    background: rgb(36 36 31 / 0);
+    transition:
+      background 0.45s var(--ease),
+      overlay 0.45s allow-discrete,
+      display 0.45s allow-discrete;
+  }
+
+  .mpanel[open]::backdrop {
+    background: rgb(36 36 31 / 0.4);
+  }
+
+  @starting-style {
+    .mpanel[open]::backdrop {
+      background: rgb(36 36 31 / 0);
+    }
+  }
+
+  .mpanel[data-instant],
+  .mpanel[data-instant]::backdrop {
+    transition: none;
+  }
+
+  .mpanel__inner {
+    display: grid;
+    gap: 2rem;
+    padding: 0 clamp(1.25rem, 0.5rem + 3vw, 3rem) 2.5rem;
+    animation: mpanel-in 0.4s var(--ease) both;
+  }
+
+  @keyframes mpanel-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .mpanel__bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mpanel__close,
+  .mpanel__link,
+  .mpanel__nav button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .mpanel__close {
+    min-height: 2.75rem;
+    padding: 0 0.25rem;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.3em;
+  }
+
+  .mpanel__close:hover,
+  .mpanel__link:hover {
+    text-decoration-color: var(--brick);
+  }
+
+  .mpanel__link {
+    min-height: 1.5rem;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.2em;
+  }
+
+  .mpanel__head {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .mpanel__portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+  }
+
+  .mpanel__portrait figure {
+    height: 100%;
+  }
+
+  .mpanel__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mpanel__portrait figcaption {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+  }
+
+  .mpanel__id {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .mpanel__name {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+    line-height: 1.02;
+  }
+
+  .mpanel__affiliation {
+    color: var(--ink-2);
+  }
+
+  .mpanel__also {
+    margin-top: 0.5rem;
+    color: var(--ink-2);
+  }
+
+  .mpanel__body {
+    display: grid;
+    gap: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .mpanel__body .prose {
+    margin-top: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .mpanel__list {
+    margin: 0.6rem 0 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .mpanel__list li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .mpanel__list a {
+    text-decoration-color: var(--rule);
+  }
+
+  .mpanel__pending {
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--ink);
+    color: var(--ink-2);
+  }
+
+  .mpanel__nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
+  }
+
+  .mpanel__nav button {
+    display: grid;
+    gap: 0.3rem;
+    text-align: left;
+  }
+
+  .mpanel__nav .mpanel__nav-next {
+    text-align: right;
+  }
+
+  .mpanel__nav-name {
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.1;
+    transition: color 0.3s var(--ease);
+  }
+
+  .mpanel__nav button:hover .mpanel__nav-name {
+    color: var(--brick);
+  }
+
+  @media (max-width: 640px) {
+    .mpanel {
+      width: 100vw;
+      border-left: 0;
+    }
+
+    .mpanel__head {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .mpanel__portrait {
+      max-width: 14rem;
+    }
+
+    .mpanel__portrait:has(figcaption) {
+      margin-bottom: 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mpanel,
+    .mpanel::backdrop,
+    .mcard__cue,
+    .mcard__portrait :global(img) {
+      transition: none;
+    }
+
+    .mpanel__inner {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Profile panels: open from a card, move between members, close, and keep the address in step.
+  const panel = (id?: string | null) => {
+    const el = id ? document.getElementById(id) : null;
+    return el instanceof HTMLDialogElement && el.hasAttribute('data-member') ? el : null;
+  };
+  const show = (id?: string | null) => {
+    const d = panel(id);
+    if (!d || d.open) return;
+    d.showModal();
+    d.scrollTop = 0;
+    history.replaceState(null, '', `#${d.id}`);
+  };
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const open = t.closest<HTMLElement>('[data-member-open]');
+    if (open) return show(open.dataset.memberOpen);
+    const go = t.closest<HTMLElement>('[data-member-go]');
+    if (go) {
+      const from = go.closest('dialog');
+      const to = panel(go.dataset.memberGo);
+      if (!to) return;
+      // Swap without sliding; the new profile fades in.
+      [from, to].forEach((d) => d?.setAttribute('data-instant', ''));
+      from?.close();
+      show(to.id);
+      setTimeout(() => [from, to].forEach((d) => d?.removeAttribute('data-instant')), 80);
+      return;
+    }
+    if (t.closest('[data-member-close]')) return t.closest('dialog')?.close();
+    // A click on the backdrop lands on the dialog itself.
+    if (t instanceof HTMLDialogElement && t.hasAttribute('data-member')) t.close();
+  });
+
+  document.addEventListener(
+    'close',
+    (e) => {
+      const d = e.target;
+      if (!(d instanceof HTMLDialogElement) || !d.hasAttribute('data-member')) return;
+      if (document.querySelector('dialog[data-member][open]')) return;
+      history.replaceState(null, '', location.pathname + location.search);
+      document.querySelector<HTMLElement>(`[data-member-open="${d.id}"]`)?.focus({ preventScroll: true });
+    },
+    true,
+  );
+
+  // A profile's address opens it, on arrival or when followed from the same page.
+  show(location.hash.slice(1));
+  window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+</script>

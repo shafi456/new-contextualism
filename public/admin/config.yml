@@ -289,11 +289,12 @@ collections:
             fields:
               - { label: Name, name: name, widget: string }
               - { label: Subtitle (a few words), name: role, widget: string }
+              - { label: 'Longer subtitle (one sentence, optional)', name: summary, widget: string, required: false }
               - { label: Page address (do not change), name: path, widget: string }
               - { label: Description, name: text, widget: text }
 
       - name: pedagogical-nodes
-        label: Pedagogical Nodes (profiles)
+        label: Pedagogical Nodes (members)
         file: src/content/site/pedagogical-nodes.json
         format: json
         fields:
@@ -304,19 +305,34 @@ collections:
             allow_add: true
             collapsed: true
             summary: '{{fields.name}}'
-            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
             fields:
               - { label: Name, name: name, widget: string }
-              - { label: Photograph, name: photo, widget: image }
-              - { label: Describe the photograph (alt text), name: photoAlt, widget: string }
-              - { label: Photograph credit, name: photoCredit, widget: string }
-              - { label: Designation, name: designation, widget: string }
-              - { label: Institutional affiliation, name: affiliation, widget: string }
-              - { label: Biography, name: biography, widget: text, hint: Leave a blank line between paragraphs. }
-              - { label: Contribution to New Contextualism through education and research, name: contribution, widget: text }
+              - { label: Designation, name: designation, widget: string, required: false }
+              - { label: Institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
+              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
+              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
+              - label: Relevant work
+                name: work
+                widget: list
+                required: false
+                label_singular: item
+                field: { label: 'Project, publication, research, award or achievement', name: item, widget: string }
+              - label: Links
+                name: links
+                widget: list
+                required: false
+                label_singular: link
+                summary: '{{fields.label}}'
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
 
       - name: practice-policy-council
-        label: Practice & Policy Council (profiles)
+        label: Practice & Policy Council (members)
         file: src/content/site/practice-policy-council.json
         format: json
         fields:
@@ -327,16 +343,31 @@ collections:
             allow_add: true
             collapsed: true
             summary: '{{fields.name}}'
-            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
             fields:
               - { label: Name, name: name, widget: string }
-              - { label: Photograph, name: photo, widget: image }
-              - { label: Describe the photograph (alt text), name: photoAlt, widget: string }
-              - { label: Photograph credit, name: photoCredit, widget: string }
-              - { label: Designation, name: designation, widget: string }
-              - { label: Professional affiliation, name: affiliation, widget: string }
-              - { label: Biography, name: biography, widget: text, hint: Leave a blank line between paragraphs. }
-              - { label: Practical or policy-related contribution, name: contribution, widget: text }
+              - { label: Designation, name: designation, widget: string, required: false }
+              - { label: Professional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
+              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
+              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
+              - label: Relevant work
+                name: work
+                widget: list
+                required: false
+                label_singular: item
+                field: { label: 'Project, publication, research, award or achievement', name: item, widget: string }
+              - label: Links
+                name: links
+                widget: list
+                required: false
+                label_singular: link
+                summary: '{{fields.label}}'
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
 
       - name: student-nexus
         label: NC Student Nexus (directory)

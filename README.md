@@ -100,7 +100,7 @@ Open <http://localhost:4321/admin/index.html>. Changes are written directly to t
 | Events | `src/content/events/*.md` |
 | Founder profile, shown on Curatorial Core | `src/content/people/*.md` |
 | Governance bodies | `src/content/site/governance.json` |
-| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
+| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`. Members appear as portrait cards that open a profile panel (`src/components/modules/Members.astro`); initials are shown until a photograph is added. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
 
 Schemas are in `src/content.config.ts` and `src/lib/site.ts`, and the editor's fields are in `public/admin/config.yml`. Keep them in step.
 
