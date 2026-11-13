@@ -33,6 +33,14 @@ const figure = (image: () => any) =>
     caption: z.string().optional(),
   });
 
+/** Images are optional in the editor: an entry saved without an image is ignored. */
+const hasImage = (v: unknown) => !!v && typeof v === 'object' && !!(v as { src?: unknown }).src;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const optionalFigure = (image: () => any) => z.preprocess((v) => (hasImage(v) ? v : undefined), figure(image).optional());
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const figureList = (image: () => any) =>
+  z.preprocess((v) => (Array.isArray(v) ? v.filter(hasImage) : v), z.array(figure(image)).default([]));
+
 /**
  * The ten contextual layers. The collection keeps its original name,
  * "dimensions", the founder's term in his April 2025 essay.
@@ -108,8 +116,8 @@ const projects = defineCollection({
       plate: z
         .enum(['river', 'canal', 'fabric', 'megablock', 'waterfront', 'hilltop', 'village', 'strata', 'studio'])
         .default('fabric'),
-      cover: figure(image).optional(),
-      gallery: z.array(figure(image)).default([]),
+      cover: optionalFigure(image),
+      gallery: figureList(image),
       featured: z.boolean().default(false),
       order: z.number().default(100),
       provenance: provenance.default('editorial-summary'),
@@ -228,7 +236,7 @@ const people = defineCollection({
       name: z.string(),
       honorific: z.string().optional(),
       role: z.string(),
-      portrait: figure(image).optional(),
+      portrait: optionalFigure(image),
       appointments: z
         .array(
           z.object({

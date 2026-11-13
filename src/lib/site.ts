@@ -155,7 +155,7 @@ const studentSchema = z.object({
   entries: z.array(
     z.object({
       name: z.string().min(1),
-      photo: z.string().min(1),
+      photo: z.string().optional(),
       photoCredit: z.string().optional(),
       university: z.string().min(1),
     }),

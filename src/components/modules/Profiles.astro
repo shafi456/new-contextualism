@@ -19,7 +19,11 @@ const { name, path } = Astro.props;
 const body = name === 'governance-description' ? governance.find((b) => b.path === path) : undefined;
 if (name === 'governance-description' && !body) throw new Error(`governance-description: no body has the page ${path}`);
 
-const credits = students.filter((s) => s.photoCredit);
+const credits = students.filter((s) => s.photo && s.photoCredit);
+const initials = (name: string) => {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+};
 ---
 
 {name === 'governance-description' && body && <div class="prose page-prose"><p>{body.text}</p></div>}
@@ -31,7 +35,11 @@ const credits = students.filter((s) => s.photoCredit);
         <ul class="students" role="list">
           {students.map((s) => (
             <li data-reveal>
-              <Image src={profilePhoto(s.photo)} alt={`Portrait of ${s.name}`} widths={[240, 480]} sizes="(min-width: 640px) 200px, 45vw" />
+              {s.photo ? (
+                <Image src={profilePhoto(s.photo)} alt={`Portrait of ${s.name}`} widths={[240, 480]} sizes="(min-width: 640px) 200px, 45vw" />
+              ) : (
+                <div class="students__initials" aria-hidden="true">{initials(s.name)}</div>
+              )}
               <p class="students__name">{s.name}</p>
               <p class="small muted">{s.university}</p>
             </li>
@@ -73,6 +81,19 @@ const credits = students.filter((s) => s.photoCredit);
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
+  }
+
+  .students__initials {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
   }
 
   .students__name {

@@ -109,9 +109,9 @@ _sources: &sources
   multiple: true
 
 _figure: &figure
-  - { label: Image, name: src, widget: image }
-  - { label: Alternative text, name: alt, widget: text, hint: Describe what the image shows for readers who cannot see it. }
-  - { label: Credit, name: credit, widget: string, hint: 'Author or rights holder, e.g. “Drawing: A. Rahman”.' }
+  - { label: Image, name: src, widget: image, required: false, hint: Optional. Leave empty if there is no image yet. }
+  - { label: Alternative text (needed with an image), name: alt, widget: text, required: false, hint: Describe what the image shows for readers who cannot see it. }
+  - { label: Credit (needed with an image), name: credit, widget: string, required: false, hint: 'Author or rights holder, e.g. “Drawing: A. Rahman”.' }
   - { label: Caption, name: caption, widget: text, required: false }
 
 # The pages of the site structure. Their titles and numbers come from
@@ -381,10 +381,10 @@ collections:
             allow_add: true
             collapsed: true
             summary: '{{fields.name}} · {{fields.university}}'
-            hint: Drag to reorder. Photographs must be JPG, PNG or WebP.
+            hint: Drag to reorder. A photograph is optional (JPG, PNG or WebP); initials are shown until one is added.
             fields:
               - { label: Name, name: name, widget: string }
-              - { label: Photograph, name: photo, widget: image }
+              - { label: Photograph (optional), name: photo, widget: image, required: false }
               - { label: University, name: university, widget: string }
               - { label: Photograph credit (optional), name: photoCredit, widget: string, required: false }
 
