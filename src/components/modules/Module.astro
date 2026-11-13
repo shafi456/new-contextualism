@@ -42,6 +42,8 @@ const PLATFORM = ['citation', 'downloads', 'glossary', 'faq', 'sitemap', 'feed',
   {name === 'events' && <Events reg={reg} cite={cite} attrs={attrs} />}
   {(name === 'contributors' || name === 'founder') && <People name={name} reg={reg} cite={cite} />}
   {name === 'governance-members' && <Members groups={['nodes', 'council']} headed />}
+  {name === 'community-contributors' && <Members groups={['contributors']} />}
+  {name === 'early-adopters' && <Members groups={['adopters']} />}
   {name === 'pedagogical-nodes' && <Members groups={['nodes']} />}
   {name === 'practice-policy-council' && <Members groups={['council']} />}
   {PROFILES.includes(name) && <Profiles name={name as 'student-nexus'} path={path} />}

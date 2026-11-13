@@ -1,0 +1,369 @@
+{
+  "sections": [
+    {
+      "title": "Philosophy",
+      "path": "/philosophy/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Definition and Scope",
+          "path": "/philosophy/definition-and-scope/",
+          "status": "published"
+        },
+        {
+          "title": "Origins and Evolution",
+          "path": "/philosophy/origins-and-evolution/",
+          "status": "published"
+        },
+        {
+          "title": "Foundational Propositions and Key Principles",
+          "path": "/philosophy/principles/",
+          "status": "published"
+        },
+        {
+          "title": "Relational Ontology of the Built Environment",
+          "path": "/philosophy/relational-ontology/",
+          "status": "published"
+        },
+        {
+          "title": "The Ten Contextual Layers: Definitions",
+          "path": "/philosophy/layers/",
+          "status": "published"
+        },
+        {
+          "title": "Global South and Postcolonial Positioning",
+          "path": "/philosophy/global-south/",
+          "status": "published"
+        },
+        {
+          "title": "Framework Family and Related Concepts",
+          "path": "/philosophy/framework-family/",
+          "status": "published"
+        },
+        {
+          "title": "Relationship to Other Theories",
+          "path": "/philosophy/related-theories/",
+          "status": "published"
+        },
+        {
+          "title": "Critical Perspectives and Open Questions",
+          "path": "/philosophy/critical-perspectives/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Methodologies and Frameworks",
+      "path": "/methodologies/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Foundational Framework",
+          "path": "/methodologies/foundational-framework/",
+          "status": "published"
+        },
+        {
+          "title": "Read–Plan–Process",
+          "path": "/methodologies/read-plan-process/",
+          "status": "published"
+        },
+        {
+          "title": "Architectural Design",
+          "path": "/methodologies/architectural-design/",
+          "status": "published"
+        },
+        {
+          "title": "Urbanism and Urban Design",
+          "path": "/methodologies/urbanism/",
+          "status": "published"
+        },
+        {
+          "title": "Heritage Management",
+          "path": "/methodologies/heritage-management/",
+          "status": "published"
+        },
+        {
+          "title": "Contextual Intelligence",
+          "path": "/methodologies/contextual-intelligence/",
+          "status": "published"
+        },
+        {
+          "title": "Analytical Tools and Methods",
+          "path": "/methodologies/analytical-tools/",
+          "status": "published"
+        },
+        {
+          "title": "Evaluation and Trade-offs",
+          "path": "/methodologies/evaluation/",
+          "status": "published"
+        },
+        {
+          "title": "Tools and Resources",
+          "path": "/methodologies/tools-and-resources/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Projects",
+      "path": "/projects/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Featured Projects",
+          "path": "/projects/featured/",
+          "status": "published"
+        },
+        {
+          "title": "Built and Realised Projects",
+          "path": "/projects/built/",
+          "status": "published"
+        },
+        {
+          "title": "Design Proposals",
+          "path": "/projects/design-proposals/",
+          "status": "published"
+        },
+        {
+          "title": "Research and Documentation Projects",
+          "path": "/projects/research-and-documentation/",
+          "status": "published"
+        },
+        {
+          "title": "Teaching and Studio Projects",
+          "path": "/projects/teaching-and-studio/",
+          "status": "published"
+        },
+        {
+          "title": "Comparative and Experimental Studies",
+          "path": "/projects/comparative-and-experimental/",
+          "status": "published"
+        },
+        {
+          "title": "All Projects",
+          "path": "/projects/all/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Research and Publications",
+      "path": "/research/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Publications",
+          "path": "/research/publications/",
+          "status": "published"
+        },
+        {
+          "title": "Lectures and Presentations",
+          "path": "/research/lectures/",
+          "status": "published"
+        },
+        {
+          "title": "Civilizational and Historical Research",
+          "path": "/research/civilizational-history/",
+          "status": "published"
+        },
+        {
+          "title": "Bibliographic Archive",
+          "path": "/research/archive/",
+          "status": "published"
+        },
+        {
+          "title": "Further Reading",
+          "path": "/research/further-reading/",
+          "status": "published"
+        },
+        {
+          "title": "Citation Tools",
+          "path": "/research/citation/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Movement and Community",
+      "path": "/community/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Timeline and Milestones",
+          "path": "/community/timeline/",
+          "status": "published"
+        },
+        {
+          "title": "Events",
+          "path": "/community/events/",
+          "status": "published"
+        },
+        {
+          "title": "Contributors",
+          "path": "/community/contributors/",
+          "status": "published"
+        },
+        {
+          "title": "Collaborations and Partnerships",
+          "path": "/community/collaborations/",
+          "status": "published"
+        },
+        {
+          "title": "Early Adopters and Applications",
+          "path": "/community/adopters/",
+          "status": "published"
+        },
+        {
+          "title": "Calls for Papers and Contributions",
+          "path": "/community/calls/",
+          "status": "published"
+        },
+        {
+          "title": "Community Submissions",
+          "path": "/community/submissions/",
+          "status": "published"
+        },
+        {
+          "title": "Community Discussions and Critical Responses",
+          "path": "/community/discussions/",
+          "status": "published"
+        },
+        {
+          "title": "Student Engagement and Opportunities",
+          "path": "/community/students/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Governance",
+      "path": "/governance/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Curatorial Core",
+          "path": "/governance/curatorial-core/",
+          "status": "published"
+        },
+        {
+          "title": "Pedagogical Nodes",
+          "path": "/governance/pedagogical-nodes/",
+          "status": "published"
+        },
+        {
+          "title": "Practice & Policy Council",
+          "path": "/governance/practice-and-policy-council/",
+          "status": "published"
+        },
+        {
+          "title": "Open Assembly",
+          "path": "/governance/open-assembly/",
+          "status": "published"
+        },
+        {
+          "title": "NC Student Nexus",
+          "path": "/governance/nc-student-nexus/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Utilities",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Sitemap",
+          "path": "/sitemap/",
+          "status": "published"
+        },
+        {
+          "title": "Glossary",
+          "path": "/glossary/",
+          "status": "published"
+        },
+        {
+          "title": "Downloads and Resources",
+          "path": "/resources/",
+          "status": "published"
+        },
+        {
+          "title": "Project Map",
+          "path": "/map/",
+          "status": "published"
+        },
+        {
+          "title": "Newsletter Subscription",
+          "path": "/newsletter/",
+          "status": "published"
+        },
+        {
+          "title": "Useful Links",
+          "path": "/links/",
+          "status": "published"
+        },
+        {
+          "title": "Frequently Asked Questions",
+          "path": "/faq/",
+          "status": "published"
+        },
+        {
+          "title": "Support the Initiative",
+          "path": "/support/",
+          "status": "published"
+        },
+        {
+          "title": "Accessibility",
+          "path": "/accessibility/",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "title": "Platform (website information)",
+      "path": "/about/",
+      "status": "published",
+      "pages": [
+        {
+          "title": "Editorial Team",
+          "path": "/about/editorial-team/",
+          "status": "published"
+        },
+        {
+          "title": "Advisory Network",
+          "path": "/about/advisory-network/",
+          "status": "published"
+        },
+        {
+          "title": "Editorial Standards",
+          "path": "/about/editorial-standards/",
+          "status": "published"
+        },
+        {
+          "title": "Contributions and Review Process",
+          "path": "/about/review-process/",
+          "status": "published"
+        },
+        {
+          "title": "Intellectual Property and Copyright",
+          "path": "/about/copyright/",
+          "status": "published"
+        },
+        {
+          "title": "Corrections and Updates",
+          "path": "/about/corrections/",
+          "status": "published"
+        },
+        {
+          "title": "Privacy and Terms of Use",
+          "path": "/about/privacy-and-terms/",
+          "status": "published"
+        },
+        {
+          "title": "Contact",
+          "path": "/about/contact/",
+          "status": "published"
+        }
+      ]
+    }
+  ]
+}

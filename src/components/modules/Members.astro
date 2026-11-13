@@ -1,32 +1,48 @@
 ---
 /**
- * The member directory of the Pedagogical Nodes and the Practice & Policy
- * Council: a grid of portrait cards, each opening a profile panel (a native
+ * The profile directory of the Pedagogical Nodes, the Practice & Policy
+ * Council, the Contributors and the Early Adopters: a grid of portrait cards, each opening a profile panel (a native
  * dialog, so focus is held inside it and Escape closes it). Entries come from
  * src/content/site/*.json and are managed in the editorial interface. A member
  * without a photograph is shown with initials until one is supplied.
  */
 import { Image } from 'astro:assets';
-import { governance, pedagogicalNodes, practiceCouncil } from '../../lib/site';
+import { contributors, earlyAdopters, governance, pedagogicalNodes, practiceCouncil } from '../../lib/site';
+import { isPublic, pageByPath } from '../../lib/ia';
 import { profilePhoto } from '../../lib/profiles';
 import { slugify } from '../../lib/format';
 import { url } from '../../lib/url';
 
-type Key = 'nodes' | 'council';
+type Key = 'nodes' | 'council' | 'contributors' | 'adopters';
 interface Props {
   groups: Key[];
   /** With headings, subtitles and the relation between the two bodies (the Governance overview). */
   headed?: boolean;
 }
 
-const { groups, headed = false } = Astro.props;
+const { headed = false } = Astro.props;
 const SOURCE = {
-  nodes: { path: '/governance/pedagogical-nodes/', entries: pedagogicalNodes, contribution: 'Contribution to New Contextualism' },
-  council: { path: '/governance/practice-and-policy-council/', entries: practiceCouncil, contribution: 'Contribution to New Contextualism' },
+  nodes: { path: '/governance/pedagogical-nodes/', entries: pedagogicalNodes, pair: 'council' },
+  council: { path: '/governance/practice-and-policy-council/', entries: practiceCouncil, pair: 'nodes' },
+  contributors: { path: '/community/contributors/', entries: contributors, pair: undefined },
+  adopters: { path: '/community/adopters/', entries: earlyAdopters, pair: undefined },
 } as const;
-const body = (k: Key) => governance.find((b) => b.path === SOURCE[k].path)!;
+// A group whose page is not published is left out.
+const groups = Astro.props.groups.filter((k) => isPublic(SOURCE[k].path));
+const community = groups.some((k) => !SOURCE[k].pair);
+/** The group's name and subtitle: from the governance structure, or from its page. */
+const body = (k: Key) => {
+  const b = governance.find((x) => x.path === SOURCE[k].path);
+  if (b) return { name: b.name, summary: b.summary ?? b.role, path: b.path };
+  const page = pageByPath(SOURCE[k].path);
+  return { name: page.short ?? page.title, summary: page.summary, path: page.path };
+};
 const idOf = (k: Key, name: string) => `${k}-${slugify(name)}`;
-const other = (k: Key): Key => (k === 'nodes' ? 'council' : 'nodes');
+/** The other governance body, where a member may also sit, if it is published. */
+const other = (k: Key): Key | undefined => {
+  const pair = SOURCE[k].pair;
+  return pair && isPublic(SOURCE[pair].path) ? pair : undefined;
+};
 const initials = (name: string) => {
   const words = name.trim().split(/\s+/);
   return (words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0][0]).toUpperCase();
@@ -36,25 +52,26 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).map((p) => p
 const sections = groups.map((k) => {
   const b = body(k);
   const members = SOURCE[k].entries.map((m, i, all) => {
-    const inOther = SOURCE[other(k)].entries.some((o) => o.name === m.name);
+    const o = other(k);
+    const inOther = !!o && SOURCE[o].entries.some((x) => x.name === m.name);
     return {
       ...m,
       id: idOf(k, m.name),
       photoData: m.photo ? profilePhoto(m.photo) : undefined,
       alt: m.photoAlt || `Portrait of ${m.name}`,
       initials: initials(m.name),
-      also: inOther ? { name: body(other(k)).name, id: idOf(other(k), m.name), here: groups.includes(other(k)), href: `${url(SOURCE[other(k)].path)}#${idOf(other(k), m.name)}` } : undefined,
+      also: o && inOther ? { name: body(o).name, id: idOf(o, m.name), here: groups.includes(o), href: `${url(SOURCE[o].path)}#${idOf(o, m.name)}` } : undefined,
       prev: all[(i - 1 + all.length) % all.length],
       next: all[(i + 1) % all.length],
     };
   });
-  return { key: k, name: b.name, summary: b.summary ?? b.role, href: url(b.path), members };
+  return { key: k, name: b.name, summary: b.summary, href: url(b.path), members };
 });
 ---
 
 <div class="members">
   {
-    headed && (
+    headed && groups.length === 2 && (
       <div class="chain" data-reveal>
         <div class="chain__group">
           <p class="label">Pedagogical Nodes</p>
@@ -87,6 +104,7 @@ const sections = groups.map((k) => {
             <p class="mgroup__sub">{s.summary}</p>
           </div>
         )}
+        {s.members.length === 0 && <p class="small muted members__empty">Profiles will appear here as they are confirmed.</p>}
         <ul class="mgrid" role="list">
           {s.members.map((m) => (
             <li data-reveal>
@@ -158,7 +176,7 @@ const sections = groups.map((k) => {
                 </div>
               </header>
 
-              {m.biography || m.contribution ? (
+              {m.biography || m.contribution || m.role ? (
                 <div class="mpanel__body">
                   {m.biography && (
                     <section>
@@ -170,9 +188,19 @@ const sections = groups.map((k) => {
                       </div>
                     </section>
                   )}
+                  {m.role && (
+                    <section>
+                      <h3 class="label">Role within the movement</h3>
+                      <div class="prose">
+                        {paragraphs(m.role).map((t) => (
+                          <p>{t}</p>
+                        ))}
+                      </div>
+                    </section>
+                  )}
                   {m.contribution && (
                     <section>
-                      <h3 class="label">{SOURCE[s.key].contribution}</h3>
+                      <h3 class="label">Contribution to New Contextualism</h3>
                       <div class="prose">
                         {paragraphs(m.contribution).map((t) => (
                           <p>{t}</p>
@@ -226,16 +254,25 @@ const sections = groups.map((k) => {
     ))
   }
 
-  <p class="small muted members__note">
-    Profiles are compiled from publicly available sources and are being confirmed with each member. Contribution statements
-    describe each member’s role within the body; they are not a record of completed work.
-  </p>
+  {
+    !community && sections.some((s) => s.members.length > 0) && (
+      <p class="small muted members__note">
+        Profiles are compiled from publicly available sources and are being confirmed with each member. Contribution statements
+        describe each member’s role within the body; they are not a record of completed work.
+      </p>
+    )
+  }
 </div>
 
 <style>
   .members {
     container-type: inline-size;
     margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .members__empty {
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink);
   }
 
   /* The relation between the two bodies */

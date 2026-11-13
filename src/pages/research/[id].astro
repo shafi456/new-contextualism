@@ -5,6 +5,7 @@ import Provenance from '../../components/Provenance.astro';
 import RecordList from '../../components/RecordList.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { citations, listed, registry } from '../../lib/content';
+import { isPublic } from '../../lib/visibility';
 import { apa, bibtex, chicago, pubYear, ris } from '../../lib/cite';
 import { displayName, formatDate, joinList } from '../../lib/format';
 import { COLLECTION_LABELS, TYPE_LABELS } from '../../lib/provenance';
@@ -13,7 +14,7 @@ import { url } from '../../lib/url';
 
 export const getStaticPaths = (async () => {
   const reg = await registry();
-  return reg.publications.map((p) => ({ params: { id: p.id } }));
+  return reg.publications.filter((p) => isPublic(`/research/${p.id}/`)).map((p) => ({ params: { id: p.id } }));
 }) satisfies GetStaticPaths;
 
 const reg = await registry();

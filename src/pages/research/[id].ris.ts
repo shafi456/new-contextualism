@@ -1,11 +1,12 @@
 /** Each record's citation as an RIS file (/research/{id}.ris), for reference managers. */
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { registry } from '../../lib/content';
+import { isPublic } from '../../lib/visibility';
 import { ris } from '../../lib/cite';
 
 export const getStaticPaths = (async () => {
   const reg = await registry();
-  return reg.publications.map((p) => ({ params: { id: p.id } }));
+  return reg.publications.filter((p) => isPublic(`/research/${p.id}/`)).map((p) => ({ params: { id: p.id } }));
 }) satisfies GetStaticPaths;
 
 export const GET: APIRoute = async ({ params }) => {

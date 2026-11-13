@@ -7,10 +7,10 @@ import type { APIRoute } from 'astro';
 import { listed, registry } from '../lib/content';
 import { displayName, slugify, stripMarkdown } from '../lib/format';
 import { EVENT_TYPE_LABELS, STATUS_LABELS, TYPE_LABELS } from '../lib/provenance';
-import { HOME, PLATFORM, SECTIONS, UTILITIES, isOverview } from '../lib/ia';
+import { HOME, PLATFORM, SECTIONS, UTILITIES, isOverview, isPublic } from '../lib/ia';
 import { glossary } from '../lib/site';
 import { to } from '../lib/routes';
-import { url } from '../lib/url';
+import { sitePath, url } from '../lib/url';
 
 interface Entry {
   t: string;
@@ -114,7 +114,9 @@ export const GET: APIRoute = async () => {
       x: '',
     });
 
-  return new Response(JSON.stringify(out), {
+  // Nothing that is not published is indexed (src/lib/visibility.ts).
+  const open = out.filter((e) => isPublic(sitePath(e.u)));
+  return new Response(JSON.stringify(open), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 };

@@ -2,6 +2,7 @@
   "entries": [
     {
       "name": "S M Kaikobad",
+      "status": "published",
       "designation": "Architect, researcher and educator",
       "affiliation": "Shoho Sthapon Design Studio",
       "biography": "Interdisciplinary architect, researcher and educator; formerly a Senior Lecturer in BRAC University’s Department of Architecture and co-founder/principal of Shoho Sthapon Design Studio. His academic and practice interests include urban resilience, heritage, community, social justice, public space, informal urbanism and the relationship between built form and human behaviour. He pursued graduate study in Architecture Studies at MIT’s Aga Khan Program.",
@@ -26,6 +27,7 @@
     },
     {
       "name": "Tanjina Khan",
+      "status": "published",
       "designation": "Architect, academic and researcher",
       "affiliation": "Department of Architecture, BRAC University",
       "biography": "Architect, academic and researcher associated with BRAC University’s Department of Architecture. She holds a B.Arch from BRAC University and a Master of Design Science in Sustainable Design and Building Services from the University of Sydney. Her research and practice interests include adaptive reuse, climate-responsive adaptation, urban landscapes, place-making and people–place relationships. Her professional experience includes architectural and urban-design practice.",
@@ -44,6 +46,7 @@
     },
     {
       "name": "Upama Das Nitu",
+      "status": "published",
       "designation": "Architect, researcher and educator",
       "affiliation": "School of Architecture and Design, BRAC University",
       "biography": "Architect, researcher and educator at BRAC University’s School of Architecture and Design. Her work focuses on contextual and responsive urban design, art and architecture, intangible cultural heritage, community-inclusive planning and cultural memory. She has contributed to curriculum delivery, workshops and exhibitions, and co-edited the 2025 publication project ‘New Contextualism: A Guide for Students and Beyond’.",
@@ -64,6 +67,7 @@
     },
     {
       "name": "Golam Ahammad Sunny",
+      "status": "published",
       "designation": "Architect and architecture educator",
       "affiliation": "BRAC University",
       "biography": "Architect and architecture educator/Teaching Assistant associated with BRAC University. Publicly documented work includes collaborative urban-design and architectural projects, competition entries and academic teaching. His work has addressed urban fabric around transit infrastructure, water edges, community-oriented design and the relationship between architecture and cultural context.",
@@ -89,6 +93,7 @@
     },
     {
       "name": "Ruaida Akter",
+      "status": "published",
       "designation": "Architectural graduate",
       "affiliation": "BRAC University",
       "biography": "Architectural graduate and teaching/research assistant associated with BRAC University. Publicly available professional information indicates experience in architectural research, teaching support and practice exposure, including an internship with Marina Tabassum Architects. She has also contributed to an academic urban-design project presented at the Institute of Architects Bangladesh.",
@@ -110,6 +115,7 @@
     },
     {
       "name": "Mohammad Zillur Rahman",
+      "status": "published",
       "designation": "Architect, interior designer and academic",
       "affiliation": "Department of Architecture, BRAC University; STUDIO PLAN.T",
       "biography": "Architect, interior designer and academic in BRAC University’s Department of Architecture; also a co-founder and architect-partner at STUDIO PLAN.T. His interests include architectural design, urban design, landscape urbanism, transportation architecture, walkability and building technology. He has taught design studios and technical courses.",
@@ -134,16 +140,19 @@
     },
     {
       "name": "Akif Akash",
+      "status": "published",
       "work": [],
       "links": []
     },
     {
       "name": "Athena Rahman ",
+      "status": "published",
       "affiliation": "BRAC University",
       "biography": "Athena Rahman is an architect and researcher with a keen interest in heritage conservation, urban studies, and the cultural dimensions of the built environment. A BRAC University alumna, she is associated with New Contextual Lab, where her work engages with the relationship between architecture, collective memory, cultural identity, and place. Her research explores context-sensitive approaches to heritage management and the revitalisation of historic urban landscapes, particularly in Old Dhaka. Through research and design, she seeks to understand how architectural interventions can preserve cultural continuity while responding to contemporary social and urban realities."
     },
     {
       "name": "Monishita Mumtahina",
+      "status": "published",
       "biography": "Monishita Mumtahina is an architect and emerging researcher pursuing a Master of Landscape Architecture at Texas Tech University, where she also works as a Graduate Research Assistant at the XR Lab. A BRAC University alumna, her work explores the intersections of architecture, landscape, urban design, heritage, and human-environment relationships. With a strong interest in New Contextualism, she investigates how context-sensitive and human-centered design approaches can reconnect people with place, culture, and collective memory. Her interests extend to immersive technologies and their potential to inform more inclusive, resilient, and meaningful built environments.",
       "designation": "Landscape Architect ",
       "affiliation": "Master of Landscape Architecture at Texas Tech University",

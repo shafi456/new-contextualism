@@ -1,4 +1,6 @@
-# Builds the site and publishes it with GitHub Pages on every push to main.
+# Builds the site and publishes it with GitHub Pages on every push to main,
+# and once an hour, so that content scheduled in the editorial interface
+# becomes public at its time (see src/lib/visibility.ts).
 #
 # The site address and base path come from the Pages configuration, so the
 # same workflow works for https://shafi456.github.io/new-contextualism/ and,
@@ -9,6 +11,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '7 * * * *'
   workflow_dispatch:
 
 permissions:

@@ -8,6 +8,12 @@
  */
 const BASE = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
+/** The site path of an internal link: without the base path, query or fragment. */
+export function sitePath(href: string): string {
+  const path = BASE && href.startsWith(BASE) ? href.slice(BASE.length) : href;
+  return path.replace(/[?#].*$/, '') || '/';
+}
+
 export function url(path: string): string {
   if (!path.startsWith('/') || path.startsWith('//')) return path;
   return `${BASE}${path}`;

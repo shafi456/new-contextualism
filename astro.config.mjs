@@ -1,6 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { HIDDEN, isPublic } from './src/lib/visibility.ts';
 
 /**
  * The public URL of the site, e.g. https://newcontextualism.org
@@ -27,6 +30,8 @@ const LAYERS = ['social', 'cultural', 'historical', 'political', 'economic', 'ec
 const PLATFORM_PAGES = ['editorial-team', 'advisory-network', 'editorial-standards', 'review-process', 'copyright', 'corrections', 'privacy-and-terms', 'contact'];
 /** @param {string} path */
 const to = (path) => `${base.replace(/\/+$/, '')}${path}`;
+/** The site path of a destination: without its fragment. @param {string} dest */
+const pathOf = (dest) => dest.replace(/[?#].*$/, '');
 const redirects = Object.fromEntries(
   Object.entries({
     '/movement': '/community/',
@@ -40,8 +45,44 @@ const redirects = Object.fromEntries(
     '/editorial-standards': '/about/editorial-standards/',
     '/framework/scientific-technological': '/philosophy/layers/scientific/',
     ...Object.fromEntries(LAYERS.map((id) => [`/framework/${id}`, `/philosophy/layers/${id}/`])),
-  }).map(([from, dest]) => [from, to(dest)]),
+  })
+    // A redirect to a page that is not published would lead nowhere.
+    .filter(([, dest]) => isPublic(pathOf(dest)))
+    .map(([from, dest]) => [from, to(dest)]),
 );
+
+/**
+ * Removes links to sections and pages that are not published (see
+ * src/lib/visibility.ts). The navigation and listings already leave them out;
+ * this catches links written by hand in the text, which become plain text, so
+ * that no link on the public site leads to a missing page.
+ */
+const unlinkHidden = {
+  name: 'nc-unlink-hidden',
+  hooks: {
+    /** @param {{ dir: URL }} options */
+    'astro:build:done': async ({ dir }) => {
+      if (!HIDDEN.length) return;
+      const root = fileURLToPath(dir);
+      const prefix = base.replace(/\/+$/, '');
+      const files = (await readdir(root, { recursive: true })).filter((f) => f.endsWith('.html'));
+      let count = 0;
+      for (const f of files) {
+        const file = `${root}/${f}`;
+        const html = await readFile(file, 'utf8');
+        const out = html.replace(/<a\b([^>]*?)\shref="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g, (all, before, href, after, inner) => {
+          if (!href.startsWith('/') || href.startsWith('//')) return all;
+          const path = pathOf(prefix && href.startsWith(prefix) ? href.slice(prefix.length) : href);
+          if (isPublic(path.endsWith('/') ? path : `${path}/`)) return all;
+          count++;
+          return `<span${before}${after}>${inner}</span>`.replace(/\s(rel|target)="[^"]*"/g, '');
+        });
+        if (out !== html) await writeFile(file, out);
+      }
+      console.log(`Publication status: ${HIDDEN.length} address(es) not published; ${count} link(s) to them removed.`);
+    },
+  },
+};
 
 export default defineConfig({
   site,
@@ -51,9 +92,7 @@ export default defineConfig({
   // where the default changes to 'jsx'.
   compressHTML: true,
   build: { format: 'directory' },
-  integrations: site
-    ? [sitemap({ filter: (page) => !page.includes('/admin/') })]
-    : [],
+  integrations: [...(site ? [sitemap({ filter: (page) => !page.includes('/admin/') })] : []), unlinkHidden],
   image: {
     // Uploaded images are optimised at build time; remote images are not fetched.
     domains: [],

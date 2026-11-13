@@ -14,8 +14,8 @@ const section: IaSection | undefined = attrs.section
     ? UTILITY_SECTION
     : sectionByKey(attrs.section as IaSection['key'])
   : locate(path).section;
-if (!section) throw new Error(`section-index on ${path}: no section`);
-const pages = section.pages.filter((p) => p.path !== path);
+// A section that is not published has nothing to list.
+const pages = (section?.pages ?? []).filter((p) => p.path !== path);
 ---
 
 <ol class="sindex" role="list">

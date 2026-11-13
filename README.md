@@ -100,9 +100,32 @@ Open <http://localhost:4321/admin/index.html>. Changes are written directly to t
 | Events | `src/content/events/*.md` |
 | Founder profile, shown on Curatorial Core | `src/content/people/*.md` |
 | Governance bodies | `src/content/site/governance.json` |
-| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`. Members appear as portrait cards that open a profile panel (`src/components/modules/Members.astro`); initials are shown until a photograph is added. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
+| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus, Contributors, Early Adopters | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`, `contributors.json`, `early-adopters.json`. Members appear as portrait cards that open a profile panel (`src/components/modules/Members.astro`); initials are shown until a photograph is added. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
 
 Schemas are in `src/content.config.ts` and `src/lib/site.ts`, and the editor's fields are in `public/admin/config.yml`. Keep them in step.
+
+### Publishing: Published, Draft and Scheduled
+
+Every section, page and profile has a status, set in the editorial interface.
+
+| What | Where in the editor | File |
+| --- | --- | --- |
+| Sections and their pages | Site › Publishing: sections and pages | `src/content/site/visibility.json` |
+| Profiles (Pedagogical Nodes, Practice & Policy Council, NC Student Nexus, Contributors, Early Adopters) | The **Status** field of each profile | the profile lists in `src/content/site/` |
+| Projects, records and events | The **Draft** switch of each entry | the entry's own file |
+
+- **Published** is public. **Draft** is kept in the repository but is not built: it has no address, and it is left out of the navigation, listings, sitemap, search index and feeds. Links to it written in other pages become plain text. **Scheduled** becomes public at the first build after its date; the site is rebuilt every hour (`.github/workflows/deploy.yml`).
+- A section set to Draft hides all of its pages and the records beneath its address. A page set to Draft also hides what lies beneath its address (hiding The Ten Contextual Layers hides the ten layer pages). Setting it back to Published restores everything; nothing is deleted.
+- The rules are in [`src/lib/visibility.ts`](src/lib/visibility.ts) and are applied when the site is built, never with CSS.
+- **Checking drafts before publication:** `npm run dev:drafts` runs the site locally with drafts and scheduled items shown.
+- **After adding, moving or removing a page** in `src/lib/ia.ts`, run `npm run sync:visibility`. It rewrites the publishing list and keeps every status already set. A page missing from the list is treated as published.
+- **History:** every save in the editor is a commit, with the editor's GitHub name, the date and the change. To see or restore an earlier version, open the file's history on GitHub.
+
+**Limits to know about**
+
+- The repository is public, so a draft is absent from the website but its text can still be read on GitHub. Confidential drafts need a private repository.
+- Everyone with write access to the repository can publish. Roles with different rights (administrator, editor-in-chief, section editor, contributor) are not available with GitHub Pages and a personal repository; they need a GitHub organisation with protected branches, or a different content system.
+- There is no private online preview of drafts; preview is local (`npm run dev:drafts`).
 
 ### Writing a page
 

@@ -44,6 +44,8 @@ export const MODULES = {
   lectures: [],
   events: ['type', 'empty'],
   contributors: [],
+  'community-contributors': [],
+  'early-adopters': [],
   founder: [],
   citation: [],
   downloads: ['group'],

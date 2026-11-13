@@ -13,12 +13,13 @@ import RecordList from '../../../components/RecordList.astro';
 import ProjectCard from '../../../components/ProjectCard.astro';
 import { citations, projectsForDimension, recordsForDimension, registry, relationsFor } from '../../../lib/content';
 import { dimensionMedia } from '../../../lib/media';
+import { isPublic } from '../../../lib/visibility';
 import { pad } from '../../../lib/format';
 import { to } from '../../../lib/routes';
 
 export const getStaticPaths = (async () => {
   const reg = await registry();
-  return reg.dimensions.map((d) => ({ params: { id: d.id } }));
+  return reg.dimensions.filter((d) => isPublic(`/philosophy/layers/${d.id}/`)).map((d) => ({ params: { id: d.id } }));
 }) satisfies GetStaticPaths;
 
 const reg = await registry();

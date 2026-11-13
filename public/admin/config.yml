@@ -78,6 +78,27 @@ _archived: &archived
   default: false
   required: false
 
+# Publication status, for sections, pages and profiles (src/lib/visibility.ts).
+_status: &status
+  label: Status
+  name: status
+  widget: select
+  default: published
+  hint: Published is public. Draft is kept here but removed from the public site. Scheduled becomes public at the time set below.
+  options:
+    - { label: 'Published', value: published }
+    - { label: 'Draft (not public)', value: draft }
+    - { label: 'Scheduled', value: scheduled }
+
+_publish_at: &publish_at
+  label: Publish on (only for Scheduled)
+  name: publishAt
+  widget: datetime
+  required: false
+  default: ''
+  format: 'YYYY-MM-DDTHH:mm:ssZ'
+  hint: The site is rebuilt every hour, so a scheduled item appears within an hour of this time.
+
 _dimensions: &dimensions
   label: Layers
   name: dimensions
@@ -155,6 +176,42 @@ collections:
     label: Site
     editor: { preview: false }
     files:
+      - name: visibility
+        label: 'Publishing: sections and pages'
+        file: src/content/site/visibility.json
+        format: json
+        fields:
+          - label: Sections
+            label_singular: section
+            name: sections
+            widget: list
+            allow_add: false
+            collapsed: true
+            summary: '{{fields.title}} · {{fields.status}}'
+            hint: >-
+              Every section of the website and the pages inside it. Open a section to change its status or the status of
+              one of its pages. A section set to Draft is removed from the public site together with all of its pages;
+              nothing is deleted, and setting it back to Published restores it exactly as it was. Please do not remove
+              rows.
+            fields:
+              - { label: Title (for reference), name: title, widget: string }
+              - { label: Address, name: path, widget: hidden }
+              - *status
+              - *publish_at
+              - label: Pages in this section
+                label_singular: page
+                name: pages
+                widget: list
+                allow_add: false
+                collapsed: true
+                required: false
+                summary: '{{fields.title}} · {{fields.status}}'
+                fields:
+                  - { label: Title (for reference), name: title, widget: string }
+                  - { label: Address, name: path, widget: hidden }
+                  - *status
+                  - *publish_at
+
       - name: settings
         label: Site settings
         file: src/content/site/settings.json
@@ -304,10 +361,12 @@ collections:
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}}'
+            summary: '{{fields.name}} · {{fields.status}}'
             hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
             fields:
               - { label: Name, name: name, widget: string }
+              - *status
+              - *publish_at
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Institutional affiliation, name: affiliation, widget: string, required: false }
               - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
@@ -342,10 +401,12 @@ collections:
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}}'
+            summary: '{{fields.name}} · {{fields.status}}'
             hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
             fields:
               - { label: Name, name: name, widget: string }
+              - *status
+              - *publish_at
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Professional affiliation, name: affiliation, widget: string, required: false }
               - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
@@ -387,6 +448,90 @@ collections:
               - { label: Photograph (optional), name: photo, widget: image, required: false }
               - { label: University, name: university, widget: string }
               - { label: Photograph credit (optional), name: photoCredit, widget: string, required: false }
+              - *status
+              - *publish_at
+
+      - name: contributors
+        label: Contributors (profiles)
+        file: src/content/site/contributors.json
+        format: json
+        fields:
+          - label: Profiles
+            label_singular: profile
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.name}} · {{fields.status}}'
+            hint: Shown on Movement and Community › Contributors. Drag to reorder. Only the name is required. Set a profile to Draft to take it off the site without deleting it.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - *status
+              - *publish_at
+              - { label: Designation, name: designation, widget: string, required: false }
+              - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Role within the movement, name: role, widget: text, required: false }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
+              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
+              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
+              - label: Relevant work
+                name: work
+                widget: list
+                required: false
+                label_singular: item
+                field: { label: 'Project, initiative, research or area of engagement', name: item, widget: string }
+              - label: Links
+                name: links
+                widget: list
+                required: false
+                label_singular: link
+                summary: '{{fields.label}}'
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
+
+      - name: early-adopters
+        label: Early Adopters (profiles)
+        file: src/content/site/early-adopters.json
+        format: json
+        fields:
+          - label: Profiles
+            label_singular: profile
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.name}} · {{fields.status}}'
+            hint: Shown on Movement and Community › Early Adopters. Drag to reorder. Only the name is required. Set a profile to Draft to take it off the site without deleting it.
+            fields:
+              - { label: Name, name: name, widget: string }
+              - *status
+              - *publish_at
+              - { label: Designation, name: designation, widget: string, required: false }
+              - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Role within the movement, name: role, widget: text, required: false }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
+              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
+              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
+              - label: Relevant work
+                name: work
+                widget: list
+                required: false
+                label_singular: item
+                field: { label: 'Project, initiative, research or area of engagement', name: item, widget: string }
+              - label: Links
+                name: links
+                widget: list
+                required: false
+                label_singular: link
+                summary: '{{fields.label}}'
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
 
   - name: dimensions
     label: The ten layers

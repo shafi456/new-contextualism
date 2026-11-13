@@ -2,6 +2,7 @@
   "entries": [
     {
       "name": "Oindriza Reza Nodi",
+      "status": "published",
       "designation": "Architect, researcher and designer",
       "biography": "Architect whose publicly indexed professional biography identifies her as a researcher and designer, including work as a junior research and design associate at the Bengal Institute of Architecture, Landscapes and Settlements. Her public writing has addressed urban water systems and the condition of Dhaka’s canals. Her professional profile also records postgraduate study in urban/smart-city-related design at the University of Pennsylvania.",
       "contribution": "Can connect New Contextualism to evidence-based urban research, landscape systems, water-sensitive planning and the relationship between ecological infrastructure and everyday urban life. Her writing on canals provides a strong entry point for policy discussion around urban waterways, public space and environmental justice.",
@@ -21,6 +22,7 @@
     },
     {
       "name": "Rafa Mashiyat Zahid",
+      "status": "published",
       "designation": "Architecture alumna",
       "affiliation": "BRAC University",
       "biography": "BRAC University architecture alumna recognised for her undergraduate thesis ‘PalokPolli: Rehabilitation Center for Victims of Domestic Violence’, which received the SHAH Cement DOT Student Design Award in 2022. The project explored a healing environment for women affected by violence, using spatial privacy, landscape, water and light to support safety and recovery.",
@@ -37,6 +39,7 @@
     },
     {
       "name": "Sohana Khan",
+      "status": "published",
       "designation": "Architect and community-led placemaking practitioner",
       "affiliation": "Article 25, London",
       "biography": "Bangladeshi architect and community-led placemaking practitioner. She completed her B.Arch at BRAC University and Master of Architecture at London South Bank University. Her experience includes work with Oxfam in Rohingya refugee camps on WASH facilities for women and children, as well as collaborations involving the BRAC Institute of Educational Development, the British Council and humanitarian/community architecture initiatives. She is associated with Article 25 in London.",
@@ -53,6 +56,7 @@
     },
     {
       "name": "Mohammad Zillur Rahman",
+      "status": "published",
       "designation": "Architect, interior designer and academic",
       "affiliation": "Department of Architecture, BRAC University; STUDIO PLAN.T",
       "biography": "Architect, interior designer and academic in BRAC University’s Department of Architecture; also a co-founder and architect-partner at STUDIO PLAN.T. His interests include architectural design, urban design, landscape urbanism, transportation architecture, walkability and building technology. He has taught design studios and technical courses.",
@@ -73,11 +77,13 @@
     },
     {
       "name": "Sohana Binte Rakib",
+      "status": "published",
       "work": [],
       "links": []
     },
     {
       "name": "Urbana Tabassum",
+      "status": "published",
       "designation": "Architecture graduate",
       "affiliation": "BRAC University",
       "biography": "BRAC University architecture graduate whose thesis ‘Ehyaa: The Cultural Reclamation Trail – Reviving Memory and Heritage Through Place’ (Meherpur) was selected for the Urban Design Lab Thesis Publication 2025. The project explores cultural memory, heritage-sensitive place-making, local identity and the connection between historic sites and contemporary community life.",
@@ -102,6 +108,7 @@
     },
     {
       "name": "Fatiha Tanjim Oni",
+      "status": "published",
       "designation": "Architecture graduate",
       "affiliation": "BRAC University",
       "biography": "BRAC University architecture graduate recognised internationally for her undergraduate thesis ‘Beyond Rediscovery: Alijan Jute Mill’s Future’, which received a World Architecture Community Award in 2026. The project reimagines an abandoned jute mill in Narsingdi as a productive public landscape, connecting industrial heritage, ecology, workers’ livelihoods, housing, cultural activity and the river landscape.",

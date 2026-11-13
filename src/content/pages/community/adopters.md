@@ -1,10 +1,14 @@
 ---
 path: /community/adopters/
 intro: Where New Contextualism is documented as being taught and used, by institution, practice, course and project.
-updated: 2026-10-31
+updated: 2026-11-13
 provenance: editorial-summary
 approval: pending
 ---
+<!-- module: early-adopters -->
+
+## Documented Use
+
 The evidence of use documented so far comes from teaching at one university: studios, theses and competition entries by students and teachers of BRAC University. It is listed here as published.
 
 ## Institutions and Programmes

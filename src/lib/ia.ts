@@ -7,6 +7,7 @@
  */
 import { slugify } from './format';
 import { url } from './url';
+import { isPublic } from './visibility';
 
 export interface IaPage {
   number: string;
@@ -68,7 +69,8 @@ export const HOME: IaSection = {
   ],
 };
 
-export const SECTIONS: IaSection[] = [
+/** The whole structure, whatever its publication status. */
+export const ALL_SECTIONS: IaSection[] = [
   {
     number: '1',
     key: 'philosophy',
@@ -394,7 +396,17 @@ export const SECTIONS: IaSection[] = [
   },
 ];
 
-export const UTILITIES: IaPage[] = [
+/**
+ * The published structure: sections and pages that are drafts, or scheduled
+ * for later, are left out, and with them their navigation, listings and
+ * addresses (see src/lib/visibility.ts).
+ */
+export const SECTIONS: IaSection[] = ALL_SECTIONS.filter((s) => isPublic(s.path)).map((s) => ({
+  ...s,
+  pages: s.pages.filter((p) => isPublic(p.path)),
+}));
+
+const ALL_UTILITIES: IaPage[] = [
   { number: '', title: 'Search', path: '/search/', summary: 'Search the platform.' },
   { number: '', title: 'Sitemap', path: '/sitemap/', summary: 'Every page on the platform.' },
   { number: '', title: 'Glossary', path: '/glossary/', summary: 'Terms used on the platform.' },
@@ -419,7 +431,7 @@ export const UTILITIES: IaPage[] = [
  * governance of the movement. Their earlier addresses under /governance/
  * redirect here (see astro.config.mjs).
  */
-export const PLATFORM: IaPage[] = [
+const ALL_PLATFORM: IaPage[] = [
   { number: '', title: 'About the Platform', short: 'About the platform', path: '/about/', summary: 'What this platform is for.' },
   { number: '', title: 'Editorial Team', path: '/about/editorial-team/', summary: 'The people who edit the platform.' },
   { number: '', title: 'Advisory Network', path: '/about/advisory-network/', summary: 'Advisers to the platform.' },
@@ -430,6 +442,9 @@ export const PLATFORM: IaPage[] = [
   { number: '', title: 'Privacy and Terms of Use', short: 'Privacy and Terms', path: '/about/privacy-and-terms/', summary: 'Privacy, terms of use and accessibility.' },
   { number: '', title: 'Contact', path: '/about/contact/', summary: 'Correspondence with the editors.' },
 ];
+
+export const UTILITIES = ALL_UTILITIES.filter((p) => isPublic(p.path));
+export const PLATFORM = ALL_PLATFORM.filter((p) => isPublic(p.path));
 
 export const PLATFORM_SECTION: IaSection = {
   number: '',
@@ -454,7 +469,8 @@ export const UTILITY_SECTION: IaSection = {
 
 /* ------------------------------------------------------------- Queries */
 
-export const sectionByKey = (key: IaSection['key']) => SECTIONS.find((s) => s.key === key)!;
+/** A published section; undefined while the section is not published. */
+export const sectionByKey = (key: IaSection['key']) => SECTIONS.find((s) => s.key === key);
 
 /** Finds the section and page for a site path (without base). */
 export function locate(path: string): { section?: IaSection; page?: IaPage; index: number } {
@@ -499,3 +515,8 @@ export const itemId = (item: string) => slugify(item);
 
 /** Every page in the structure, sections first, then utilities. */
 export const ALL_PAGES: IaPage[] = [...SECTIONS.flatMap((s) => s.pages), ...UTILITIES, ...PLATFORM];
+
+/** Every page of the whole structure, published or not, for the build-time checks. */
+export const STRUCTURE_PAGES: IaPage[] = [...ALL_SECTIONS.flatMap((s) => s.pages), ...ALL_UTILITIES, ...ALL_PLATFORM];
+
+export { isPublic };

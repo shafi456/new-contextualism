@@ -13,9 +13,12 @@ import governanceJson from '../content/site/governance.json';
 import pedagogicalJson from '../content/site/pedagogical-nodes.json';
 import councilJson from '../content/site/practice-policy-council.json';
 import studentsJson from '../content/site/student-nexus.json';
+import contributorsJson from '../content/site/contributors.json';
+import adoptersJson from '../content/site/early-adopters.json';
 import relationsJson from '../content/framework/relations.json';
 import { PROVENANCE } from './provenance';
-import { PLATFORM, SECTIONS, UTILITIES, pageByPath } from './ia';
+import { PLATFORM, SECTIONS, STRUCTURE_PAGES, UTILITIES, isPublic, pageByPath } from './ia';
+import { isLive, statusFields } from './visibility';
 import { url } from './url';
 
 const statement = z.object({
@@ -103,7 +106,14 @@ export const glossary = glossarySchema
   .parse(glossaryJson)
   .terms.slice()
   .sort((a, b) => a.term.localeCompare(b.term, 'en', { sensitivity: 'base' }));
-glossary.forEach((g) => g.see.forEach((path) => pageByPath(path)));
+// Each address must exist in the site structure; those not published are left out.
+const inStructure = (path: string, what: string) => {
+  if (!STRUCTURE_PAGES.some((p) => p.path === path)) throw new Error(`${what}: no page in the site structure for ${path}`);
+};
+glossary.forEach((g) => {
+  g.see.forEach((path) => inStructure(path, `glossary “${g.term}”`));
+  g.see = g.see.filter(isPublic);
+});
 export const faq = faqSchema.parse(faqJson).items;
 
 /** The five bodies of the governance of the movement. */
@@ -124,13 +134,17 @@ const governanceSchema = z.object({
     .min(1),
 });
 
-export const governance = governanceSchema.parse(governanceJson).bodies;
-governance.forEach((b) => pageByPath(b.path));
+const bodies = governanceSchema.parse(governanceJson).bodies;
+bodies.forEach((b) => inStructure(b.path, `governance “${b.name}”`));
+/** The bodies whose pages are published. */
+export const governance = bodies.filter((b) => isPublic(b.path));
 
 /**
- * A member of the Pedagogical Nodes or the Practice & Policy Council. Only the
- * name is required, so that a member can be listed before the profile is
- * confirmed. A photograph needs a credit.
+ * A profile: a member of the Pedagogical Nodes or the Practice & Policy
+ * Council, a contributor or an early adopter. Only the name is required, so
+ * that a person can be listed before the profile is confirmed. A photograph
+ * needs a credit. A profile that is a draft, or scheduled for later, is kept
+ * in the file but left out of the site.
  */
 const profileSchema = z.object({
   entries: z.array(
@@ -139,6 +153,9 @@ const profileSchema = z.object({
         name: z.string().min(1),
         designation: z.string().optional(),
         affiliation: z.string().optional(),
+        /** Role within the movement (contributors and early adopters). */
+        role: z.string().optional(),
+        ...statusFields,
         photo: z.string().optional(),
         photoAlt: z.string().optional(),
         photoCredit: z.string().optional(),
@@ -158,15 +175,19 @@ const studentSchema = z.object({
       photo: z.string().optional(),
       photoCredit: z.string().optional(),
       university: z.string().min(1),
+      ...statusFields,
     }),
   ),
 });
 
-export const pedagogicalNodes = profileSchema.parse(pedagogicalJson).entries;
-export const practiceCouncil = profileSchema.parse(councilJson).entries;
-export const students = studentSchema.parse(studentsJson).entries;
+export const pedagogicalNodes = profileSchema.parse(pedagogicalJson).entries.filter(isLive);
+export const practiceCouncil = profileSchema.parse(councilJson).entries.filter(isLive);
+export const students = studentSchema.parse(studentsJson).entries.filter(isLive);
+export const contributors = profileSchema.parse(contributorsJson).entries.filter(isLive);
+export const earlyAdopters = profileSchema.parse(adoptersJson).entries.filter(isLive);
+export type Profile = (typeof contributors)[number];
 
-/** The six sections, for the header and menus. */
+/** The published sections, for the header and menus. */
 export const NAV = SECTIONS.map((s) => ({ href: url(s.path), label: s.nav, number: s.number }));
 
 const link = (path: string, label?: string) => {
@@ -178,4 +199,4 @@ const link = (path: string, label?: string) => {
 export const UTILITY_LINKS = UTILITIES.filter((p) => p.path !== '/accessibility/').map((p) => link(p.path));
 
 /** Pages about the website itself, for the footer. */
-export const POLICY_LINKS = [...PLATFORM.map((p) => link(p.path)), link('/accessibility/')];
+export const POLICY_LINKS = [...PLATFORM.map((p) => link(p.path)), ...(isPublic('/accessibility/') ? [link('/accessibility/')] : [])];

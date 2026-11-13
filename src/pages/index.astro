@@ -10,11 +10,11 @@ import RecordList from '../components/RecordList.astro';
 import { archiveRecords, eventIsUpcoming, listed, registry } from '../lib/content';
 import { HERO_PLATE } from '../lib/media';
 import { settings } from '../lib/site';
-import { HOME, sectionByKey } from '../lib/ia';
+import { HOME, isPublic, sectionByKey } from '../lib/ia';
 import { STATUS_LABELS } from '../lib/provenance';
 import { pubYear } from '../lib/cite';
 import { to } from '../lib/routes';
-import { url } from '../lib/url';
+import { sitePath, url } from '../lib/url';
 
 const reg = await registry();
 const dims = reg.dimensions;
@@ -38,13 +38,16 @@ const head = (n: string) => HOME.pages.find((p) => p.number === n)!;
 const philosophy = sectionByKey('philosophy');
 const methodologies = sectionByKey('methodologies');
 
-const steps = [
+// Links to sections and pages that are not published are left out.
+const open = <T extends { href: string }>(items: T[]) => items.filter((i) => isPublic(sitePath(i.href)));
+
+const steps = open([
   { title: 'Read the core proposition', text: 'What New Contextualism is, why it was proposed and what it covers.', href: url('/philosophy/definition-and-scope/') },
   { title: 'Learn the ten layers', text: 'The ten contextual layers through which a place is read, each defined in the founder’s terms.', href: to.layers() },
   { title: 'Follow the method', text: 'How a project reads its context, then plans and develops a response.', href: url('/methodologies/read-plan-process/') },
   { title: 'See it applied', text: 'Theses, studio projects and proposals, documented from published sources.', href: url('/projects/') },
   { title: 'Go to the sources', text: 'Every claim links to a published record that you can read and cite.', href: url('/research/') },
-];
+]);
 
 // Each idea quotes the founder’s published wording, checked against the source.
 const ideas = [
@@ -62,7 +65,7 @@ const phases = [
   { name: 'Process', text: 'Developing, testing and refining the response.' },
 ];
 
-const community = [
+const community = open([
   { title: 'Community submissions', text: 'Propose research, case studies or critical responses for the archive.', href: url('/community/submissions/') },
   {
     title: 'Events',
@@ -76,7 +79,7 @@ const community = [
   { title: 'Calls for papers', text: 'There are no open calls at present.', href: url('/community/calls/') },
   { title: 'Students', text: 'Studios, theses and workshops in which the approach has been taught.', href: url('/community/students/') },
   { title: 'Discussions and responses', text: 'Critical questions raised about the approach, and how to add to them.', href: url('/community/discussions/') },
-];
+]);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -240,6 +243,7 @@ const jsonLd = {
   </section>
 
   <!-- 0.5 Explore the philosophy -->
+  {philosophy && (
   <section class="section explore" aria-labelledby="philosophy-title">
     <div class="wrap">
       <SectionHead label="Explore the Philosophy" id="philosophy" />
@@ -260,8 +264,10 @@ const jsonLd = {
       </ol>
     </div>
   </section>
+  )}
 
   <!-- 0.6 Explore the methodologies and frameworks -->
+  {methodologies && (
   <section class="section explore" aria-labelledby="methodologies-title">
     <div class="wrap">
       <SectionHead label="Explore the Methodologies and Frameworks" id="methodologies" />
@@ -298,8 +304,10 @@ const jsonLd = {
       </ol>
     </div>
   </section>
+  )}
 
   <!-- 0.7 Featured projects and case studies -->
+  {isPublic('/projects/') && (
   <section class="section practice" aria-labelledby="practice-title">
     <div class="wrap">
       <SectionHead label="Featured Projects and Case Studies" id="projects" />
@@ -343,8 +351,10 @@ const jsonLd = {
       </p>
     </div>
   </section>
+  )}
 
   <!-- 0.8 Latest research and publications -->
+  {isPublic('/research/') && (
   <section class="section archive" aria-labelledby="archive-title">
     <div class="wrap">
       <SectionHead label="Latest Research and Publications" id="research" />
@@ -368,8 +378,10 @@ const jsonLd = {
       </p>
     </div>
   </section>
+  )}
 
   <!-- 0.9 Join the community -->
+  {isPublic('/community/') && (
   <section class="section community" aria-labelledby="community-title">
     <div class="wrap">
       <SectionHead label="Join the Community" id="community" />
@@ -404,6 +416,7 @@ const jsonLd = {
       </ul>
     </div>
   </section>
+  )}
 </Base>
 
 <style>

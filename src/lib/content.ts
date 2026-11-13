@@ -9,7 +9,8 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { buildLabels, pubYear, type Publication } from './cite';
 import { renderInline, renderMarkdown, type CiteContext } from './markdown';
 import { chronology, relations, type Relation } from './site';
-import { ALL_PAGES, DEDICATED, itemId, locate } from './ia';
+import { DEDICATED, STRUCTURE_PAGES, isPublic, itemId } from './ia';
+import { LISTED_PATHS } from './visibility';
 import { headings, parseModules } from './modules';
 import { slugify } from './format';
 
@@ -76,6 +77,10 @@ async function load(): Promise<Registry> {
     page: new Map(pages.map((p) => [p.data.path, p])),
   };
   validate(reg);
+  // Checked whole, then reduced to what is published (src/lib/visibility.ts).
+  reg.pages = pages.filter((p) => isPublic(p.data.path));
+  reg.page = new Map(reg.pages.map((p) => [p.data.path, p]));
+  reg.projects = projects.filter((p) => isPublic(`/projects/${p.id}/`));
   return reg;
 }
 
@@ -136,7 +141,7 @@ function validateStructure(reg: Registry, errors: string[]) {
   const seen = new Set<string>();
   for (const p of reg.pages) {
     const where = `pages/${p.id}`;
-    const { page } = locate(p.data.path);
+    const page = STRUCTURE_PAGES.find((x) => x.path === p.data.path);
     if (!page) {
       errors.push(`${where}: path ${p.data.path} is not in the site structure (src/lib/ia.ts)`);
       continue;
@@ -149,12 +154,17 @@ function validateStructure(reg: Registry, errors: string[]) {
       if (!ids.includes(itemId(item))) errors.push(`${where}: missing the sub-item heading "## ${item}"`);
     }
   }
-  for (const page of ALL_PAGES) {
+  for (const page of STRUCTURE_PAGES) {
     if (!DEDICATED.includes(page.path) && !seen.has(page.path) && !page.path.includes('#')) {
       errors.push(`site structure: no page in src/content/pages for ${page.number} ${page.title} (${page.path})`);
     }
   }
-  const taken = new Set(ALL_PAGES.map((p) => p.path));
+  for (const path of LISTED_PATHS) {
+    if (!STRUCTURE_PAGES.some((p) => p.path === path)) errors.push(`publishing list (visibility.json): ${path} is not in the site structure; run npm run sync:visibility`);
+  }
+  const unlisted = STRUCTURE_PAGES.filter((p) => !p.path.includes('#') && !DEDICATED.includes(p.path) && !LISTED_PATHS.includes(p.path));
+  if (unlisted.length) console.warn(`Not in the publishing list (shown as published): ${unlisted.map((p) => p.path).join(', ')}. Run npm run sync:visibility.`);
+  const taken = new Set(STRUCTURE_PAGES.map((p) => p.path));
   const clash = (path: string, what: string) => taken.has(path) && errors.push(`${what}: address ${path} is used by a page`);
   reg.projects.forEach((p) => clash(`/projects/${p.id}/`, `projects/${p.id}`));
   reg.publications.forEach((p) => clash(`/research/${p.id}/`, `publications/${p.id}`));
