@@ -87,6 +87,15 @@ const jsonLd = {
   name: settings.title,
   description: settings.description,
   inLanguage: 'en-GB',
+  ...(Astro.site && {
+    url: new URL(url('/'), Astro.site).href,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${new URL(url('/search/'), Astro.site).href}?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  }),
+  about: { '@type': 'Thing', name: settings.title, description: settings.description },
 };
 ---
 

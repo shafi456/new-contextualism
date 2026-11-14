@@ -81,9 +81,23 @@ const pager = props.pager ?? {
   },
 };
 const description = props.description ?? props.intro ?? page.summary;
+
+// The breadcrumb trail, for search engines.
+const site = Astro.site;
+const crumbs = site && {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: trail.map((t, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: t.label,
+    item: new URL(t.href ?? Astro.url.pathname, site).href,
+  })),
+};
+const jsonLd = [...(props.jsonLd ? [props.jsonLd].flat() : []), ...(crumbs ? [crumbs] : [])];
 ---
 
-<Base title={docTitle} description={description} type={props.type} jsonLd={props.jsonLd}>
+<Base title={docTitle} description={description} type={props.type} jsonLd={jsonLd.length ? jsonLd : undefined}>
   <Breadcrumbs trail={trail} />
   <PageHeader label={label} title={title} intro={props.intro} compact={!overview}>
     <slot name="header" />

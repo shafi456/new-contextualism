@@ -225,7 +225,13 @@ collections:
           - label: Pre-publication edition
             name: prepublication
             widget: boolean
-            hint: Shows the pre-publication notice and keeps the site out of search engines. Turn off only after approval.
+            hint: Shows the pre-publication notice at the top of every page. Turn off only after approval.
+          - label: Allow search engines (Google) to list the site
+            name: searchEngines
+            widget: boolean
+            default: false
+            required: false
+            hint: When off, every page asks search engines not to list it.
           - { label: Pre-publication note, name: prepublicationNote, widget: string }
           - label: Contact email
             name: contactEmail

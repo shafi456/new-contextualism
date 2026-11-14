@@ -21,8 +21,8 @@ interface Props {
 const { title, description = settings.description, type = 'website', jsonLd, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · ${settings.title}` : `${settings.title} — ${settings.tagline}`;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
-// A pre-publication edition is kept out of search engines until approved.
-const robots = noindex || settings.prepublication ? 'noindex, nofollow' : undefined;
+// Search engines index the site only when the editors allow it (Site settings).
+const robots = noindex || !settings.searchEngines ? 'noindex, nofollow' : undefined;
 ---
 
 <!doctype html>
