@@ -28,7 +28,7 @@ const { name, reg, cite, path, attrs } = Astro.props;
 // Citation tools
 const withDoi = name === 'citation' ? listed(reg.publications).filter((p) => p.data.doi) : [];
 const thisPage = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
-const platformRef = `New Contextualism (platform, pre-publication edition). ${new Date().getUTCFullYear()}. “${pageByPath(path).title}.” ${thisPage}. Accessed [day month year].`;
+const platformRef = `New Contextualism (platform${settings.prepublication ? ', pre-publication edition' : ''}). ${new Date().getUTCFullYear()}. “${pageByPath(path).title}.” ${thisPage}. Accessed [day month year].`;
 
 // Downloads
 const groups: DownloadGroup[] = (attrs.group?.split(',').map((g) => g.trim()) as DownloadGroup[]) ?? [];

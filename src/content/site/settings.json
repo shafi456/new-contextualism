@@ -4,7 +4,7 @@
   "taglineApproved": false,
   "description": "An architectural and urban design philosophy exploring the relationships between people, place, history, culture, ecology, and the built environment.",
   "footerLine": "Architecture. Context. Relationships.",
-  "prepublication": true,
+  "prepublication": false,
   "searchEngines": true,
   "prepublicationNote": "Texts are drawn from published sources and from editorial drafts awaiting the founder’s approval.",
   "contactEmail": "",
