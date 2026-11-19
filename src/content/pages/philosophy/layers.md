@@ -1,9 +1,9 @@
 ---
 path: /philosophy/layers/
-intro: The ten layers through which New Contextualism reads a place, each defined in the terms the founder uses for it, with a page of its own.
+intro: ""
 updated: 2026-10-31
-provenance: editorial-summary
-approval: pending
+provenance: founder-approved
+approval: approved
 ---
 The most explicit statement of the layers appears in the founder’s April 2025 essay, which describes ‘a tenfold overlapping analysis’ of context and characterises each dimension in a few words [@reza-2025-deltaic-bangladesh]. The purpose of the analysis is practical: it ‘prevents the imposition of predetermined solutions and fosters locally attuned responses’ [@reza-2025-deltaic-bangladesh].
 
@@ -14,7 +14,7 @@ The most explicit statement of the layers appears in the founder’s April 2025 
 
 ## Social
 
-Who a place is for: its communities, people and ways of life. In the founder’s terms, community structures, demographics and lifestyles [@reza-2025-deltaic-bangladesh]. [The social layer](/philosophy/layers/social/)
+Who a place is for: its communities, people and ways of life. In the founder’s terms, community structures, demographics and lifestyles. [The social layer](/philosophy/layers/social/)
 
 ## Cultural
 
