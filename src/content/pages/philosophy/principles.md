@@ -1,11 +1,12 @@
 ---
 path: /philosophy/principles/
-intro: The propositions on which the approach rests, and the principles derived from them, as they have been formulated in published texts.
+intro: The propositions on which the approach rests, and the principles derived
+  from them, as they have been formulated in published texts.
 updated: 2026-10-31
-provenance: editorial-summary
-approval: pending
+provenance: founder-approved
+approval: none
 ---
-The founder presents the principles of New Contextualism as ‘not rigid dogmas, but guiding principles for a more thoughtful and responsible design process’ [@reza-2025-deltaic-bangladesh]. They have been stated several times, with different emphases, and no single formulation has yet been approved as definitive.
+The principles of New Contextualism as ‘not rigid dogmas, but guiding principles for a more thoughtful and responsible design process’ [@reza-2025-deltaic-bangladesh]. They have been stated several times, with different emphases, and no single formulation has yet been approved as definitive.
 
 ## Three formulations
 
