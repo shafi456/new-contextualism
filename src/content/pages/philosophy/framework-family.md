@@ -1,6 +1,7 @@
 ---
 path: /philosophy/framework-family/
-intro: New Contextualism and the frameworks named alongside it in this platform’s structure, with what the published record says about each.
+intro: New Contextualism and the frameworks named alongside it in this
+  platform’s structure, with what the published record says about each.
 updated: 2026-10-31
 provenance: editorial-summary
 approval: pending
@@ -13,9 +14,6 @@ The platform’s structure names a family of frameworks developed from New Conte
 The foundational philosophy: ‘a forward-thinking philosophy that advocates for creating built environments informed by accurate predictions of the future, deeply rooted in the past and encompassing a holistic understanding of the context’ [@reza-2023-new-contextualism-path]. Its definition, origins, principles and layers are set out in the other pages of this section, beginning with [Definition and Scope](/philosophy/definition-and-scope/).
 
 ## New Contextual Urbanism (NCU)
-
-> [!PENDING] Not yet defined in a published source
-> No published text found by the editors uses the name New Contextual Urbanism.
 
 The published texts already extend New Contextualism to urbanism. The approach is described as ‘a layered framework for architecture and urbanism’ that operates at scales from ‘building to city’ [@reza-nitu-2025-people-place-justice], and its principle of equity commits design to protect ‘the “right to the city”’ [@reza-nitu-2025-people-place-justice]. A 2026 author note describes the founder’s work on ‘deltaic urbanism’ [@reza-2026-bongabdo]. A similar-sounding term, ‘neo-contextual resilient urbanism’, is attributed in the report of the 2023 workshop to S M Kaikobad, one of its speakers, rather than to the founder [@bracu-2023-workshop-report]. See [Urbanism and Urban Design](/methodologies/urbanism/).
 
