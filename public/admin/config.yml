@@ -312,36 +312,37 @@ collections:
               - { label: Page address (do not change), name: path, widget: string }
               - { label: Description, name: text, widget: text }
 
-      - name: pedagogical-nodes
-        label: Pedagogical Nodes (members)
-        file: src/content/site/pedagogical-nodes.json
+      - name: profiles
+        label: 'People (profiles)'
+        file: src/content/site/profiles.json
         format: json
         fields:
-          - label: Profiles
-            label_singular: profile
+          - label: People
+            label_singular: person
             name: entries
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}} · {{fields.status}}'
-            hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
+            summary: '{{fields.name}}'
+            hint: >-
+              Everyone who appears in the Pedagogical Nodes, the Practice & Policy Council, the Contributors or the Early
+              Adopters is entered here once. A change here appears everywhere the person is listed. To add someone to a
+              group, add them here first, then choose them in that group's list. Please do not rename someone who is
+              already in a group without choosing them again there.
             fields:
               - { label: Name, name: name, widget: string }
-              - *status
-              - *publish_at
               - { label: Designation, name: designation, widget: string, required: false }
-              - { label: Institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Affiliation, name: affiliation, widget: string, required: false }
               - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
               - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
               - label: Relevant work
                 name: work
                 widget: list
                 required: false
                 label_singular: item
-                field: { label: 'Project, publication, research, award or achievement', name: item, widget: string }
+                field: { label: 'Project, publication, research, initiative or achievement', name: item, widget: string }
               - label: Links
                 name: links
                 widget: list
@@ -352,45 +353,63 @@ collections:
                   - { label: Label, name: label, widget: string }
                   - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
 
+      - name: pedagogical-nodes
+        label: Pedagogical Nodes (members)
+        file: src/content/site/pedagogical-nodes.json
+        format: json
+        fields:
+          - label: Members
+            label_singular: member
+            name: entries
+            widget: list
+            allow_add: true
+            collapsed: true
+            summary: '{{fields.person}} · {{fields.status}}'
+            hint: >-
+              Shown on Governance › Pedagogical Nodes. Choose each person from People (profiles), where their name, photograph, biography and links are
+              edited. Here, add only what is specific to this group. Drag to reorder. Set a member to Draft to take
+              them off this page without deleting anything.
+            fields:
+              - label: Person
+                name: person
+                widget: relation
+                collection: settings
+                file: profiles
+                value_field: 'entries.*.name'
+                search_fields: ['entries.*.name']
+                display_fields: ['entries.*.name']
+              - *status
+              - *publish_at
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
+
       - name: practice-policy-council
         label: Practice & Policy Council (members)
         file: src/content/site/practice-policy-council.json
         format: json
         fields:
-          - label: Profiles
-            label_singular: profile
+          - label: Members
+            label_singular: member
             name: entries
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}} · {{fields.status}}'
-            hint: Drag to reorder. Only the name is required, so a member can be listed before the profile is confirmed.
+            summary: '{{fields.person}} · {{fields.status}}'
+            hint: >-
+              Shown on Governance › Practice & Policy Council. Choose each person from People (profiles), where their name, photograph, biography and links are
+              edited. Here, add only what is specific to this group. Drag to reorder. Set a member to Draft to take
+              them off this page without deleting anything.
             fields:
-              - { label: Name, name: name, widget: string }
+              - label: Person
+                name: person
+                widget: relation
+                collection: settings
+                file: profiles
+                value_field: 'entries.*.name'
+                search_fields: ['entries.*.name']
+                display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Designation, name: designation, widget: string, required: false }
-              - { label: Professional affiliation, name: affiliation, widget: string, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
-              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
-              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
-              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
-              - label: Relevant work
-                name: work
-                widget: list
-                required: false
-                label_singular: item
-                field: { label: 'Project, publication, research, award or achievement', name: item, widget: string }
-              - label: Links
-                name: links
-                widget: list
-                required: false
-                label_singular: link
-                summary: '{{fields.label}}'
-                fields:
-                  - { label: Label, name: label, widget: string }
-                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
 
       - name: student-nexus
         label: NC Student Nexus (directory)
@@ -414,87 +433,64 @@ collections:
               - *publish_at
 
       - name: contributors
-        label: Contributors (profiles)
+        label: Contributors (members)
         file: src/content/site/contributors.json
         format: json
         fields:
-          - label: Profiles
-            label_singular: profile
+          - label: Members
+            label_singular: member
             name: entries
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}} · {{fields.status}}'
-            hint: Shown on Movement and Community › Contributors. Drag to reorder. Only the name is required. Set a profile to Draft to take it off the site without deleting it.
+            summary: '{{fields.person}} · {{fields.status}}'
+            hint: >-
+              Shown on Movement and Community › Contributors. Choose each person from People (profiles), where their name, photograph, biography and links are
+              edited. Here, add only what is specific to this group. Drag to reorder. Set a member to Draft to take
+              them off this page without deleting anything.
             fields:
-              - { label: Name, name: name, widget: string }
+              - label: Person
+                name: person
+                widget: relation
+                collection: settings
+                file: profiles
+                value_field: 'entries.*.name'
+                search_fields: ['entries.*.name']
+                display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Designation, name: designation, widget: string, required: false }
-              - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
               - { label: Role within the movement, name: role, widget: text, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
-              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
-              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
-              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
-              - label: Relevant work
-                name: work
-                widget: list
-                required: false
-                label_singular: item
-                field: { label: 'Project, initiative, research or area of engagement', name: item, widget: string }
-              - label: Links
-                name: links
-                widget: list
-                required: false
-                label_singular: link
-                summary: '{{fields.label}}'
-                fields:
-                  - { label: Label, name: label, widget: string }
-                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
 
       - name: early-adopters
-        label: Early Adopters (profiles)
+        label: Early Adopters (members)
         file: src/content/site/early-adopters.json
         format: json
         fields:
-          - label: Profiles
-            label_singular: profile
+          - label: Members
+            label_singular: member
             name: entries
             widget: list
             allow_add: true
             collapsed: true
-            summary: '{{fields.name}} · {{fields.status}}'
-            hint: Shown on Movement and Community › Early Adopters. Drag to reorder. Only the name is required. Set a profile to Draft to take it off the site without deleting it.
+            summary: '{{fields.person}} · {{fields.status}}'
+            hint: >-
+              Shown on Movement and Community › Early Adopters. Choose each person from People (profiles), where their name, photograph, biography and links are
+              edited. Here, add only what is specific to this group. Drag to reorder. Set a member to Draft to take
+              them off this page without deleting anything.
             fields:
-              - { label: Name, name: name, widget: string }
+              - label: Person
+                name: person
+                widget: relation
+                collection: settings
+                file: profiles
+                value_field: 'entries.*.name'
+                search_fields: ['entries.*.name']
+                display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Designation, name: designation, widget: string, required: false }
-              - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
+              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
               - { label: Role within the movement, name: role, widget: text, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
-              - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
-              - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
-              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false }
-              - label: Relevant work
-                name: work
-                widget: list
-                required: false
-                label_singular: item
-                field: { label: 'Project, initiative, research or area of engagement', name: item, widget: string }
-              - label: Links
-                name: links
-                widget: list
-                required: false
-                label_singular: link
-                summary: '{{fields.label}}'
-                fields:
-                  - { label: Label, name: label, widget: string }
-                  - { label: Address, name: url, widget: string, hint: 'In full, starting with https://' }
-
   - name: dimensions
     label: The ten layers
     label_singular: Layer

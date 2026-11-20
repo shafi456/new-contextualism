@@ -15,6 +15,7 @@ import councilJson from '../content/site/practice-policy-council.json';
 import studentsJson from '../content/site/student-nexus.json';
 import contributorsJson from '../content/site/contributors.json';
 import adoptersJson from '../content/site/early-adopters.json';
+import profilesJson from '../content/site/profiles.json';
 import relationsJson from '../content/framework/relations.json';
 import { PROVENANCE } from './provenance';
 import { PLATFORM, SECTIONS, STRUCTURE_PAGES, UTILITIES, isPublic, pageByPath } from './ia';
@@ -142,31 +143,42 @@ bodies.forEach((b) => inStructure(b.path, `governance “${b.name}”`));
 export const governance = bodies.filter((b) => isPublic(b.path));
 
 /**
- * A profile: a member of the Pedagogical Nodes or the Practice & Policy
- * Council, a contributor or an early adopter. Only the name is required, so
- * that a person can be listed before the profile is confirmed. A photograph
- * needs a credit. A profile that is a draft, or scheduled for later, is kept
- * in the file but left out of the site.
+ * The people of the movement, each entered once and shown wherever they
+ * belong: in the Pedagogical Nodes, the Practice & Policy Council, the
+ * Contributors and the Early Adopters. Only the name is required, so that a
+ * person can be listed before the profile is confirmed.
  */
-const profileSchema = z.object({
+const peopleSchema = z.object({
   entries: z.array(
-    z
-      .object({
-        name: z.string().min(1),
-        designation: z.string().optional(),
-        affiliation: z.string().optional(),
-        /** Role within the movement (contributors and early adopters). */
-        role: z.string().optional(),
-        ...statusFields,
-        photo: z.string().optional(),
-        photoAlt: z.string().optional(),
-        photoCredit: z.string().optional(),
-        biography: z.string().optional(),
-        contribution: z.string().optional(),
-        work: z.array(z.string()).default([]),
-        links: z.array(z.object({ label: z.string().min(1), url: z.url() })).default([]),
-      })
+    z.object({
+      name: z.string().trim().min(1),
+      designation: z.string().optional(),
+      affiliation: z.string().optional(),
+      photo: z.string().optional(),
+      photoAlt: z.string().optional(),
+      photoCredit: z.string().optional(),
+      biography: z.string().optional(),
+      work: z.array(z.string()).default([]),
+      links: z.array(z.object({ label: z.string().min(1), url: z.url() })).default([]),
+    }),
+  ),
+});
 
+/**
+ * A group's members: who belongs to it, chosen from the people above, and
+ * what is specific to the group (the person's contribution to it, and, for
+ * contributors and early adopters, their role). A membership that is a
+ * draft, or scheduled for later, is kept in the file but left out of the site.
+ */
+const groupSchema = z.object({
+  entries: z.array(
+    z.object({
+      person: z.string().trim().min(1),
+      ...statusFields,
+      contribution: z.string().optional(),
+      /** Role within the movement (contributors and early adopters). */
+      role: z.string().optional(),
+    }),
   ),
 });
 
@@ -182,22 +194,41 @@ const studentSchema = z.object({
   ),
 });
 
-/**
- * Every photograph needs a credit. One saved without a credit is not shown
- * (the profile shows initials) rather than stopping the site from updating.
- */
-const credited = <T extends { name: string; photo?: string; photoCredit?: string }>(list: T[], where: string): T[] =>
-  list.map((p) => {
-    if (!p.photo || p.photoCredit?.trim()) return p;
-    console.warn(`${where}: the photograph of ${p.name} has no credit, so it is not shown.`);
-    return { ...p, photo: undefined };
-  });
+const people = peopleSchema.parse(profilesJson).entries;
+const seen = new Set<string>();
+people.forEach((p) => {
+  if (seen.has(p.name)) throw new Error(`People: "${p.name}" is entered twice; keep one entry.`);
+  seen.add(p.name);
+});
 
-export const pedagogicalNodes = credited(profileSchema.parse(pedagogicalJson).entries.filter(isLive), 'Pedagogical Nodes');
-export const practiceCouncil = credited(profileSchema.parse(councilJson).entries.filter(isLive), 'Practice & Policy Council');
+/**
+ * A group's published members, each with the person's shared profile. A
+ * member whose person is missing from the list of people is left out, with a
+ * warning in the build log. Every photograph needs a credit: one saved
+ * without a credit is not shown (the profile shows initials), rather than
+ * stopping the site from updating.
+ */
+function members(json: unknown, where: string) {
+  return groupSchema
+    .parse(json)
+    .entries.filter(isLive)
+    .flatMap((m) => {
+      const p = people.find((x) => x.name === m.person);
+      if (!p) {
+        console.warn(`${where}: "${m.person}" is not in the list of people, so is not shown.`);
+        return [];
+      }
+      const photo = p.photo && p.photoCredit?.trim() ? p.photo : undefined;
+      if (p.photo && !photo) console.warn(`${where}: the photograph of ${p.name} has no credit, so it is not shown.`);
+      return [{ ...p, photo, status: m.status, publishAt: m.publishAt, contribution: m.contribution, role: m.role }];
+    });
+}
+
+export const pedagogicalNodes = members(pedagogicalJson, 'Pedagogical Nodes');
+export const practiceCouncil = members(councilJson, 'Practice & Policy Council');
 export const students = studentSchema.parse(studentsJson).entries.filter(isLive);
-export const contributors = credited(profileSchema.parse(contributorsJson).entries.filter(isLive), 'Contributors');
-export const earlyAdopters = credited(profileSchema.parse(adoptersJson).entries.filter(isLive), 'Early Adopters');
+export const contributors = members(contributorsJson, 'Contributors');
+export const earlyAdopters = members(adoptersJson, 'Early Adopters');
 export type Profile = (typeof contributors)[number];
 
 /** The published sections, for the header and menus. */

@@ -100,7 +100,7 @@ Open <http://localhost:4321/admin/index.html>. Changes are written directly to t
 | Events | `src/content/events/*.md` |
 | Founder profile, shown on Curatorial Core | `src/content/people/*.md` |
 | Governance bodies | `src/content/site/governance.json` |
-| Profiles: Pedagogical Nodes, Practice & Policy Council, NC Student Nexus, Contributors, Early Adopters | `src/content/site/pedagogical-nodes.json`, `practice-policy-council.json`, `student-nexus.json`, `contributors.json`, `early-adopters.json`. Members appear as portrait cards that open a profile panel (`src/components/modules/Members.astro`); initials are shown until a photograph is added. Photographs must be JPG, PNG, WebP or AVIF files in `src/assets/uploads` |
+| People and their groups | Each person (name, photograph, credit, biography, work, links) is entered once in `src/content/site/profiles.json` (People in the editor). The groups list who belongs to them, by name, with what is specific to the group: `pedagogical-nodes.json`, `practice-policy-council.json`, `contributors.json`, `early-adopters.json` (contribution, role, status). A person in two groups appears in both from the one profile. Shown as portrait cards with a profile panel (`src/components/modules/Members.astro`); initials until a credited photograph is added. The NC Student Nexus directory (`student-nexus.json`) and the founder (`src/content/people/`) are kept separately. |
 
 Schemas are in `src/content.config.ts` and `src/lib/site.ts`, and the editor's fields are in `public/admin/config.yml`. Keep them in step.
 
