@@ -375,7 +375,7 @@ collections:
               - *publish_at
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Institutional affiliation, name: affiliation, widget: string, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
               - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
@@ -415,7 +415,7 @@ collections:
               - *publish_at
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Professional affiliation, name: affiliation, widget: string, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
               - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
@@ -477,7 +477,7 @@ collections:
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
               - { label: Role within the movement, name: role, widget: text, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
               - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
@@ -518,7 +518,7 @@ collections:
               - { label: Designation, name: designation, widget: string, required: false }
               - { label: Professional or institutional affiliation, name: affiliation, widget: string, required: false }
               - { label: Role within the movement, name: role, widget: text, required: false }
-              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). Initials are shown until a photograph is added.' }
+              - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
               - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }

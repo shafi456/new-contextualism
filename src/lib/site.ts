@@ -166,7 +166,7 @@ const profileSchema = z.object({
         work: z.array(z.string()).default([]),
         links: z.array(z.object({ label: z.string().min(1), url: z.url() })).default([]),
       })
-      .refine((p) => !p.photo || !!p.photoCredit, { message: 'Every photograph needs a credit.' }),
+
   ),
 });
 
@@ -182,11 +182,22 @@ const studentSchema = z.object({
   ),
 });
 
-export const pedagogicalNodes = profileSchema.parse(pedagogicalJson).entries.filter(isLive);
-export const practiceCouncil = profileSchema.parse(councilJson).entries.filter(isLive);
+/**
+ * Every photograph needs a credit. One saved without a credit is not shown
+ * (the profile shows initials) rather than stopping the site from updating.
+ */
+const credited = <T extends { name: string; photo?: string; photoCredit?: string }>(list: T[], where: string): T[] =>
+  list.map((p) => {
+    if (!p.photo || p.photoCredit?.trim()) return p;
+    console.warn(`${where}: the photograph of ${p.name} has no credit, so it is not shown.`);
+    return { ...p, photo: undefined };
+  });
+
+export const pedagogicalNodes = credited(profileSchema.parse(pedagogicalJson).entries.filter(isLive), 'Pedagogical Nodes');
+export const practiceCouncil = credited(profileSchema.parse(councilJson).entries.filter(isLive), 'Practice & Policy Council');
 export const students = studentSchema.parse(studentsJson).entries.filter(isLive);
-export const contributors = profileSchema.parse(contributorsJson).entries.filter(isLive);
-export const earlyAdopters = profileSchema.parse(adoptersJson).entries.filter(isLive);
+export const contributors = credited(profileSchema.parse(contributorsJson).entries.filter(isLive), 'Contributors');
+export const earlyAdopters = credited(profileSchema.parse(adoptersJson).entries.filter(isLive), 'Early Adopters');
 export type Profile = (typeof contributors)[number];
 
 /** The published sections, for the header and menus. */

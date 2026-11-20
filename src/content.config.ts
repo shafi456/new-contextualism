@@ -33,8 +33,20 @@ const figure = (image: () => any) =>
     caption: z.string().optional(),
   });
 
-/** Images are optional in the editor: an entry saved without an image is ignored. */
-const hasImage = (v: unknown) => !!v && typeof v === 'object' && !!(v as { src?: unknown }).src;
+/**
+ * Images are optional in the editor: an entry saved without an image is
+ * ignored. An image saved without its alternative text or credit is also left
+ * out, with a warning in the build log, so the site keeps updating.
+ */
+const hasImage = (v: unknown) => {
+  if (!v || typeof v !== 'object') return false;
+  const f = v as { src?: unknown; alt?: unknown; credit?: unknown };
+  if (!f.src) return false;
+  const ok = (x: unknown) => typeof x === 'string' && x.trim().length > 0;
+  if (ok(f.alt) && ok(f.credit)) return true;
+  console.warn(`Image ${String(f.src)} is not shown: it needs alternative text and a credit.`);
+  return false;
+};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const optionalFigure = (image: () => any) => z.preprocess((v) => (hasImage(v) ? v : undefined), figure(image).optional());
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
