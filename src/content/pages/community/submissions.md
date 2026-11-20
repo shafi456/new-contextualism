@@ -5,7 +5,7 @@ updated: 2026-10-31
 provenance: proposed
 approval: pending
 ---
-The archive welcomes proposals for research, case studies, critical responses and documentation of projects that apply, extend or question the approach. This page describes how submissions work. The arrangements are proposed, pending the founder’s approval.
+The archive welcomes proposals for research, case studies, critical responses and documentation of projects that apply, extend or question the approach. This page describes how submissions work.
 
 ## What can be submitted
 

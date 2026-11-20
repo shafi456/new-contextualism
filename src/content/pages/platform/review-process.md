@@ -5,7 +5,7 @@ updated: 2026-10-31
 provenance: proposed
 approval: pending
 ---
-These arrangements are proposed, pending the founder’s approval. What can be submitted, and what to include, is set out under [Community Submissions](/community/submissions/).
+What can be submitted, and what to include, is set out under [Community Submissions](/community/submissions/).
 
 ## Review
 

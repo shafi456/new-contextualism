@@ -43,27 +43,6 @@ slug:
   sanitize_replacement: '-'
 
 # Reusable field definitions
-_provenance: &provenance
-  label: Provenance
-  name: provenance
-  widget: select
-  hint: Where the text comes from. See /about/editorial-standards/.
-  options:
-    - { label: 'Published source (verified, cited)', value: published-source }
-    - { label: 'Editorial summary (written from cited sources)', value: editorial-summary }
-    - { label: 'Proposed statement (draft for discussion)', value: proposed }
-    - { label: 'Approved by the founder', value: founder-approved }
-    - { label: 'Interpretation or critical commentary', value: interpretation }
-
-_approval: &approval
-  label: Founder’s approval
-  name: approval
-  widget: select
-  default: pending
-  options:
-    - { label: 'Awaiting approval', value: pending }
-    - { label: 'Approved', value: approved }
-
 _draft: &draft
   label: Draft (hidden from the published site)
   name: draft
@@ -141,16 +120,6 @@ _figure: &figure
 _page_fields: &page_fields
   - { label: Address (do not change), name: path, widget: string, hint: 'The page’s place in the site structure, e.g. /philosophy/principles/.' }
   - { label: Introduction, name: intro, widget: text, required: false }
-  - { label: Last updated, name: updated, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
-  - *provenance
-  - label: Founder’s approval
-    name: approval
-    widget: select
-    default: pending
-    options:
-      - { label: 'Awaiting approval', value: pending }
-      - { label: 'Approved', value: approved }
-      - { label: 'Not needed (e.g. the sitemap)', value: none }
   - label: Text
     name: body
     widget: markdown
@@ -257,23 +226,11 @@ collections:
             widget: object
             fields:
               - { label: Text, name: text, widget: text }
-              - label: Status
-                name: provenance
-                widget: select
-                options:
-                  - { label: Proposed, value: proposed }
-                  - { label: Approved by the founder, value: founder-approved }
           - label: Vision
             name: vision
             widget: object
             fields:
               - { label: Text, name: text, widget: text }
-              - label: Status
-                name: provenance
-                widget: select
-                options:
-                  - { label: Proposed, value: proposed }
-                  - { label: Approved by the founder, value: founder-approved }
 
       - name: chronology
         label: Chronology
@@ -323,7 +280,6 @@ collections:
             fields:
               - { label: Term, name: term, widget: string }
               - { label: Definition, name: definition, widget: markdown, modes: [raw], hint: 'Cite sources as [@record-file-name].' }
-              - *provenance
               - { label: See also (site addresses), name: see, widget: list, required: false, hint: 'e.g. /philosophy/layers/' }
 
       - name: faq
@@ -558,8 +514,6 @@ collections:
       - { label: The founder’s terms, name: keywords, widget: list, hint: As published, word for word. }
       - { <<: *source, label: Source of the terms, name: keywordsSource }
       - { label: Key research questions, name: questions, widget: list, required: false }
-      - *provenance
-      - *approval
       - { label: Definition, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name], e.g. [@reza-2025-deltaic-bangladesh].' }
 
   - { name: pages-philosophy, label: 'Philosophy', label_singular: Page, folder: src/content/pages/philosophy, <<: *page_collection }
@@ -668,8 +622,6 @@ collections:
       - { label: Further images (with permission), name: gallery, widget: list, required: false, fields: *figure }
       - { label: Featured (home page and Featured Projects), name: featured, widget: boolean, default: false, required: false }
       - { label: Order, name: order, widget: number, value_type: int, default: 100 }
-      - *provenance
-      - *approval
       - *draft
       - *archived
 
@@ -762,7 +714,6 @@ collections:
         display_fields: [title]
         required: false
       - { <<: *sources, label: Cited in, name: citedBy, required: false }
-      - *provenance
       - *draft
       - *archived
       - { label: Abstract (editorial), name: body, widget: markdown, required: false }
@@ -819,7 +770,6 @@ collections:
       - *sources
       - { label: Registration link (forthcoming events), name: registration, widget: string, required: false }
       - { label: Deadline (calls for papers), name: deadline, widget: datetime, required: false, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
-      - *provenance
       - *draft
       - *archived
       - { label: Description, name: body, widget: markdown, required: false }
@@ -879,7 +829,5 @@ collections:
         fields:
           - { label: Label, name: label, widget: string }
           - { label: URL, name: url, widget: string }
-      - *provenance
-      - *approval
       - { label: Biography, name: body, widget: markdown, hint: 'Cite sources as [@record-file-name].' }
 

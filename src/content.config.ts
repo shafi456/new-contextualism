@@ -299,7 +299,7 @@ const pages = defineCollection({
     /** The page's address, as listed in src/lib/ia.ts. */
     path: z.string().regex(/^\/([a-z0-9-]+\/)*$/, 'A path starts and ends with a slash, e.g. /philosophy/principles/'),
     intro: z.string().optional(),
-    updated: z.coerce.date(),
+    updated: z.coerce.date().optional(),
     provenance: provenance.default('editorial-summary'),
     /** "none" for pages that make no claims needing the founder's approval, such as the sitemap. */
     approval: z.enum(['pending', 'approved', 'none']).default('pending'),

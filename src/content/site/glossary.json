@@ -107,12 +107,6 @@
       "definition": "The name under which the online symposium of August 2025 was organised [@contextbd-2025-symposium-listing].",
       "provenance": "published-source",
       "see": ["/community/events/"]
-    },
-    {
-      "term": "Provenance label",
-      "definition": "The platform’s own term. Every substantial text on this platform carries a label saying where it comes from: published source, editorial summary, proposed statement, approved by the founder, or interpretation.",
-      "provenance": "proposed",
-      "see": ["/about/editorial-standards/"]
     }
   ]
 }

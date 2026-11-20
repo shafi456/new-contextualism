@@ -22,7 +22,6 @@ In the thesis on Panatirtha, the reading combined several layers. ‘Historical 
 
 In the published case studies, what is found in reading becomes the basis of strategy. In the Panatirtha thesis, the routes traced in the reading ‘became the skeleton of new circulation networks, ensuring the space did not feel alien but grounded in familiar movement’ [@reza-nitu-2025-people-place-justice]. The Kallyanpur thesis ‘devised a strategic plan that could be replicated for canal revival elsewhere’, built on reintroducing navigability within a transit-oriented development [@reza-nitu-2025-people-place-justice].
 
-<!-- module: provenance kind="interpretation" note="Editorial reading of the published case studies" -->
 
 > [!PENDING] Awaiting the founder’s definition
 > A definition of the Plan phase will be added here once published or approved by the founder.
@@ -31,7 +30,6 @@ In the published case studies, what is found in reading becomes the basis of str
 
 The case studies also show strategies developed into design. In the Kallyanpur thesis, ‘a transit station was designed as the first point of interaction with the canal during daily commutes’, and ‘edge treatments were proposed to encourage frequent community engagement’ [@reza-nitu-2025-people-place-justice]. The redevelopment proposal for Chawk Bazar led to ‘strategies focused on phased interventions, integrating livelihoods, adaptive reuse of historic buildings, and the introduction of contextually sensitive materials and forms’ [@reza-2025-deltaic-bangladesh].
 
-<!-- module: provenance kind="interpretation" note="Editorial reading of the published case studies" -->
 
 > [!PENDING] Awaiting the founder’s definition
 > How designs are tested and refined against the ten layers has not yet been described in a published source. See also [Evaluation and Trade-offs](/methodologies/evaluation/).

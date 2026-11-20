@@ -23,7 +23,6 @@ The published texts describe the layers as overlapping, but they do not specify 
 
 <!-- module: relation-matrix -->
 
-<!-- module: provenance kind="interpretation" note="Relations proposed by the editors, for review against the founder’s publications" -->
 
 ## Scales of Context
 

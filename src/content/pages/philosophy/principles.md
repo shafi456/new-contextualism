@@ -40,4 +40,3 @@ Read together, the texts rest on a small number of propositions, summarised here
 - **The universal and the particular can be reconciled.** Global knowledge is embraced, but with ‘its critical adaptation to the specificities of the local’ [@reza-2025-deltaic-bangladesh].
 - **Justice is part of design.** The approach places ‘equity and justice’ at its centre [@reza-2023-new-contextualism-path; @reza-2025-deltaic-bangladesh].
 
-<!-- module: provenance kind="interpretation" note="Editorial reading of the published texts" -->

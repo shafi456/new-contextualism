@@ -25,7 +25,6 @@ Historical analysis is fundamental to the approach: ‘A deep, critical engageme
 
 The approach is described as ‘incorporating systems thinking’ [@reza-nitu-2025-people-place-justice], but the published texts do not include diagrams of systems or relationships. The diagrams on this platform are editorial: the [contextual diagram and relations matrix](/methodologies/foundational-framework/), and the ten marks that show which layers a project foregrounds. They can be downloaded from [Tools and Resources](/methodologies/tools-and-resources/).
 
-<!-- module: provenance kind="interpretation" note="Editorial diagrams, not part of the founder’s framework" -->
 
 ## Participatory Assessment
 

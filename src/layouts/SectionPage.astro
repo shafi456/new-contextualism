@@ -119,14 +119,6 @@ const jsonLd = [...(props.jsonLd ? [props.jsonLd].flat() : []), ...(crumbs ? [cr
       )
     }
     <div class="section-page__body" data-page-body>
-      {
-        (props.provenance || props.updated) && (
-          <div class="page-meta">
-            {props.provenance && <Provenance kind={props.provenance} approval={props.approval} note={props.provenanceNote} />}
-            {props.updated && <p class="label page-meta__updated">Updated {formatDate(props.updated)}</p>}
-          </div>
-        )
-      }
       <slot />
       {
         props.cited && props.cited.length > 0 && (

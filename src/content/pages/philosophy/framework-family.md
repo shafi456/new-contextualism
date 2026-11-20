@@ -7,7 +7,6 @@ approval: pending
 ---
 The platform’s structure names a family of frameworks developed from New Contextualism for particular fields. Of these, only New Contextualism itself is defined in published texts. The name New Contextual Heritage Management appears in the subtitle of a 2026 article. The others have not yet been defined in any source the editors have found. They are listed here with what the record does say about each field, and will be defined here once the founder has published or approved a definition.
 
-<!-- module: provenance kind="editorial-summary" approval="pending" note="Definitions awaited from the founder" -->
 
 ## New Contextualism (NC)
 
