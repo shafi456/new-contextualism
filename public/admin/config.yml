@@ -304,13 +304,13 @@ collections:
             name: bodies
             widget: list
             summary: '{{fields.name}}'
-            hint: The five bodies, shown on the Governance page. Each description also opens that body’s own page.
+            hint: The five bodies. The Governance page lists each with its short description and an arrow to the body’s own page, where the full description is shown.
             fields:
               - { label: Name, name: name, widget: string }
               - { label: Subtitle (a few words), name: role, widget: string }
-              - { label: 'Longer subtitle (one sentence, optional)', name: summary, widget: string, required: false }
+              - { label: 'Short description (one or two lines, shown on the Governance page)', name: summary, widget: string, required: false }
               - { label: Page address (do not change), name: path, widget: string }
-              - { label: Description, name: text, widget: text }
+              - { label: Full description (shown on the body’s own page), name: text, widget: text }
 
       - name: profiles
         label: 'People (profiles)'
