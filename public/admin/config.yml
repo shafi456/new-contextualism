@@ -201,7 +201,7 @@ collections:
             default: false
             required: false
             hint: When off, every page asks search engines not to list it.
-          - { label: Pre-publication note, name: prepublicationNote, widget: string }
+          - { label: Pre-publication note, name: prepublicationNote, widget: string, required: false, hint: Shown in the notice when the pre-publication edition is on. }
           - label: Contact email
             name: contactEmail
             widget: string

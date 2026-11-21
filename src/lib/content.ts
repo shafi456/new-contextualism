@@ -149,10 +149,6 @@ function validateStructure(reg: Registry, errors: string[]) {
     if (seen.has(p.data.path)) errors.push(`${where}: a second page claims ${p.data.path}`);
     seen.add(p.data.path);
     parseModules(p.body, where);
-    const ids = headings(p.body).map((h) => slugify(h));
-    for (const item of page.items ?? []) {
-      if (!ids.includes(itemId(item))) errors.push(`${where}: missing the sub-item heading "## ${item}"`);
-    }
   }
   for (const page of STRUCTURE_PAGES) {
     if (!DEDICATED.includes(page.path) && !seen.has(page.path) && !page.path.includes('#')) {
@@ -205,6 +201,16 @@ export function citations(reg: Registry, where: string) {
 export type Cite = ReturnType<typeof citations>;
 
 /* ------------------------------------------------------------- Queries */
+
+/**
+ * The sub-items of a page that its text actually has as headings. Editors may
+ * remove a sub-item; the contents and the sitemap then leave it out, rather
+ * than link to a heading that is not there.
+ */
+export function presentItems(reg: Registry, path: string, items: string[] = []): string[] {
+  const ids = headings(reg.page.get(path)?.body).map((h) => slugify(h));
+  return items.filter((item) => ids.includes(itemId(item)));
+}
 
 /** Listed projects selected by flag, category or status (all if none given). */
 export function projectsWhere(

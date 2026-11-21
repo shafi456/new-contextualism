@@ -36,7 +36,7 @@ const settingsSchema = z.object({
   prepublication: z.boolean(),
   /** Whether search engines may index the site. */
   searchEngines: z.boolean().default(false),
-  prepublicationNote: z.string(),
+  prepublicationNote: z.string().default(''),
   contactEmail: z.union([z.literal(''), z.email()]),
   institutionalLinks: z.array(z.object({ label: z.string(), url: z.url() })),
   socialLinks: z.array(z.object({ label: z.string(), url: z.url() })),

@@ -9,9 +9,10 @@
 import type { GetStaticPaths } from 'astro';
 import SectionPage from '../layouts/SectionPage.astro';
 import Module from '../components/modules/Module.astro';
-import { citations, registry } from '../lib/content';
+import { citations, presentItems, registry } from '../lib/content';
+import { itemId } from '../lib/ia';
 import { citedKeys } from '../lib/markdown';
-import { moduleCitations, parseModules } from '../lib/modules';
+import { moduleCitations, parseModules, type ModuleName } from '../lib/modules';
 import { pageByPath } from '../lib/ia';
 import { governance } from '../lib/site';
 
@@ -27,7 +28,37 @@ const reg = await registry();
 const entry = reg.pages.find((p) => p.id === Astro.props.id)!;
 const where = `pages/${entry.id}`;
 const cite = citations(reg, where);
+/**
+ * The profile directories and descriptions belong to their pages. If the
+ * marker that places one is removed while editing the text, it is added back
+ * (before the text, or after it on the Governance overview), so that editing
+ * the text cannot remove the directory.
+ */
+const REQUIRED: Record<string, { name: ModuleName; end?: boolean }> = {
+  '/governance/': { name: 'governance-members', end: true },
+  '/governance/curatorial-core/': { name: 'governance-description' },
+  '/governance/pedagogical-nodes/': { name: 'governance-description' },
+  '/governance/practice-and-policy-council/': { name: 'governance-description' },
+  '/governance/open-assembly/': { name: 'governance-description' },
+  '/governance/nc-student-nexus/': { name: 'governance-description' },
+  '/community/contributors/': { name: 'community-contributors' },
+  '/community/adopters/': { name: 'early-adopters' },
+};
+const DIRECTORY: Record<string, ModuleName> = {
+  '/governance/pedagogical-nodes/': 'pedagogical-nodes',
+  '/governance/practice-and-policy-council/': 'practice-policy-council',
+  '/governance/nc-student-nexus/': 'student-nexus',
+};
 const segments = parseModules(entry.body, where);
+const has = (name: ModuleName) => segments.some((s) => s.kind === 'module' && s.name === name);
+const dir = DIRECTORY[entry.data.path];
+if (dir && !has(dir)) segments.push({ kind: 'module', name: dir, attrs: {} });
+const req = REQUIRED[entry.data.path];
+if (req && !has(req.name)) {
+  const seg = { kind: 'module' as const, name: req.name, attrs: {} };
+  if (req.end) segments.push(seg);
+  else segments.unshift(seg);
+}
 for (const s of segments) {
   const keys = s.kind === 'md' ? citedKeys(s.text) : moduleCitations(reg, s);
   keys.forEach((k) => cite.add(k));
@@ -45,6 +76,7 @@ const outlineGap = segments.findIndex(
     !segments.slice(0, i).some((p) => p.kind === 'md' && /^##\s/m.test(p.text)),
 );
 const iaPage = pageByPath(entry.data.path);
+const items = presentItems(reg, entry.data.path, iaPage.items);
 const title = iaPage.title;
 // Governance describes the movement's own bodies, so it carries no editorial status labels.
 const plain = iaPage.introOnly || entry.data.path.startsWith('/governance/');
@@ -62,6 +94,7 @@ const intro = entry.data.intro ?? (() => {
   approval={entry.data.approval === 'none' ? undefined : entry.data.approval}
   updated={plain ? undefined : entry.data.updated}
   cited={cite.cited()}
+  subnav={items.map((item) => ({ href: `#${itemId(item)}`, label: item }))}
 >
   {
     rendered.map((s, i) =>
