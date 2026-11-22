@@ -174,12 +174,12 @@
         {
           "title": "Further Reading",
           "path": "/research/further-reading/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Citation Tools",
           "path": "/research/citation/",
-          "status": "published"
+          "status": "draft"
         }
       ]
     },
@@ -221,12 +221,12 @@
         {
           "title": "Community Submissions",
           "path": "/community/submissions/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Community Discussions and Critical Responses",
           "path": "/community/discussions/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Student Engagement and Opportunities",
@@ -274,7 +274,7 @@
         {
           "title": "Sitemap",
           "path": "/sitemap/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Glossary",
@@ -289,12 +289,12 @@
         {
           "title": "Project Map",
           "path": "/map/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Newsletter Subscription",
           "path": "/newsletter/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Useful Links",
@@ -309,12 +309,12 @@
         {
           "title": "Support the Initiative",
           "path": "/support/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Accessibility",
           "path": "/accessibility/",
-          "status": "published"
+          "status": "draft"
         }
       ]
     },
@@ -336,22 +336,22 @@
         {
           "title": "Editorial Standards",
           "path": "/about/editorial-standards/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Contributions and Review Process",
           "path": "/about/review-process/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Intellectual Property and Copyright",
           "path": "/about/copyright/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Corrections and Updates",
           "path": "/about/corrections/",
-          "status": "published"
+          "status": "draft"
         },
         {
           "title": "Privacy and Terms of Use",
