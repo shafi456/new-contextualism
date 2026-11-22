@@ -9,6 +9,8 @@ import PrepubBanner from '../components/PrepubBanner.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 import { settings } from '../lib/site';
 import { url } from '../lib/url';
+import { getImage } from 'astro:assets';
+import { uploadedImage } from '../lib/profiles';
 
 interface Props {
   title?: string;
@@ -23,6 +25,11 @@ const fullTitle = title ? `${title} Â· ${settings.title}` : `${settings.title} â
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 // Search engines index the site only when the editors allow it (Site settings).
 const robots = noindex || !settings.searchEngines ? 'noindex, nofollow' : undefined;
+// The site's icon: one uploaded in Site settings, as square PNGs, or the default mark.
+const iconAsset = uploadedImage(settings.siteIcon ?? undefined, 'Site icon');
+const icons = iconAsset
+  ? await Promise.all([48, 192].map((size) => getImage({ src: iconAsset, width: size, height: size, fit: 'cover', format: 'png' })))
+  : undefined;
 ---
 
 <!doctype html>
@@ -42,7 +49,17 @@ const robots = noindex || !settings.searchEngines ? 'noindex, nofollow' : undefi
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#f1efe9" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    {
+      icons ? (
+        <>
+          <link rel="icon" href={icons[0].src} type="image/png" sizes="48x48" />
+          <link rel="icon" href={icons[1].src} type="image/png" sizes="192x192" />
+          <link rel="apple-touch-icon" href={icons[1].src} />
+        </>
+      ) : (
+        <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+      )
+    }
     <script is:inline>document.documentElement.classList.add('js');</script>
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>

@@ -129,6 +129,10 @@ Every section, page and profile has a status, set in the editorial interface.
 
 ### Writing a page
 
+Page text, biographies, contributions and governance descriptions are edited in the rich-text editor (a Markdown view is a click away). It saves citations as `[@key]` and callouts as `> [!NOTE]`; both forms are read like the plain ones. Sub-item headings are optional: the contents and the sitemap list only those a page has. The profile directories and governance descriptions are placed on their pages even if their module marker is removed.
+
+Site settings also take an optional home page image (used only with alt text and a credit; otherwise the drawing is shown) and an optional site icon, converted to square PNGs.
+
 Pages are Markdown. Their title comes from the structure, so a page file holds only its introduction, its text and its provenance.
 
 - **Sub-items** are second-level headings, spelt exactly as in `src/lib/ia.ts`.

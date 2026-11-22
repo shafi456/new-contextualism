@@ -21,6 +21,7 @@ import { PROVENANCE } from './provenance';
 import { PLATFORM, SECTIONS, STRUCTURE_PAGES, UTILITIES, isPublic, pageByPath } from './ia';
 import { isLive, statusFields } from './visibility';
 import { url } from './url';
+import { slugify } from './format';
 
 const statement = z.object({
   text: z.string(),
@@ -37,6 +38,12 @@ const settingsSchema = z.object({
   /** Whether search engines may index the site. */
   searchEngines: z.boolean().default(false),
   prepublicationNote: z.string().default(''),
+  /** A picture for the top of the home page, in place of the drawing. Used only with alt text and a credit. */
+  homeImage: z
+    .object({ src: z.string().nullish(), alt: z.string().nullish(), credit: z.string().nullish(), caption: z.string().nullish() })
+    .nullish(),
+  /** The site's icon (browser tab and search results), in place of the default mark. */
+  siteIcon: z.string().nullish(),
   contactEmail: z.union([z.literal(''), z.email()]),
   institutionalLinks: z.array(z.object({ label: z.string(), url: z.url() })),
   socialLinks: z.array(z.object({ label: z.string(), url: z.url() })),
@@ -230,6 +237,26 @@ export const students = studentSchema.parse(studentsJson).entries.filter(isLive)
 export const contributors = members(contributorsJson, 'Contributors');
 export const earlyAdopters = members(adoptersJson, 'Early Adopters');
 export type Profile = (typeof contributors)[number];
+
+/**
+ * The address of a person's published profile, found by name (ignoring
+ * case): first among the contributors, then the early adopters, the
+ * Pedagogical Nodes and the Practice & Policy Council.
+ */
+export function profileHref(name: string): string | undefined {
+  const wanted = name.trim().toLowerCase();
+  const groups: [Profile[], string, string][] = [
+    [contributors, '/community/contributors/', 'contributors'],
+    [earlyAdopters, '/community/adopters/', 'adopters'],
+    [pedagogicalNodes, '/governance/pedagogical-nodes/', 'nodes'],
+    [practiceCouncil, '/governance/practice-and-policy-council/', 'council'],
+  ];
+  for (const [list, path, key] of groups) {
+    const p = list.find((x) => x.name.trim().toLowerCase() === wanted);
+    if (p && isPublic(path)) return `${url(path)}#${key}-${slugify(p.name)}`;
+  }
+  return undefined;
+}
 
 /** The published sections, for the header and menus. */
 export const NAV = SECTIONS.map((s) => ({ href: url(s.path), label: s.nav, number: s.number }));

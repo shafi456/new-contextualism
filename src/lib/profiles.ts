@@ -15,3 +15,11 @@ export function profilePhoto(stored: string): ImageMetadata {
   if (!found) throw new Error(`Profile photograph not found, or not a JPG, PNG, WebP or AVIF file: ${stored}`);
   return found.default;
 }
+
+/** An uploaded image, or undefined (with a warning) if the file is missing or not a supported type. */
+export function uploadedImage(stored: string | undefined, what: string): ImageMetadata | undefined {
+  if (!stored) return undefined;
+  const found = uploads[`/src/assets/uploads/${stored.split('/').pop()}`];
+  if (!found) console.warn(`${what}: ${stored} is missing or not a JPG, PNG, WebP or AVIF file, so it is not used.`);
+  return found?.default;
+}

@@ -9,6 +9,7 @@
 import { Image } from 'astro:assets';
 import { governance, students } from '../../lib/site';
 import { profilePhoto } from '../../lib/profiles';
+import { renderPlain } from '../../lib/markdown';
 
 interface Props {
   name: 'governance-description' | 'student-nexus';
@@ -26,7 +27,7 @@ const initials = (name: string) => {
 };
 ---
 
-{name === 'governance-description' && body && <div class="prose page-prose"><p>{body.text}</p></div>}
+{name === 'governance-description' && body && <div class="prose page-prose" set:html={renderPlain(body.text)} />}
 
 {
   name === 'student-nexus' &&

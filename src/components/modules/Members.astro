@@ -12,6 +12,7 @@ import { isPublic, pageByPath } from '../../lib/ia';
 import { profilePhoto } from '../../lib/profiles';
 import { slugify } from '../../lib/format';
 import { url } from '../../lib/url';
+import { renderPlain } from '../../lib/markdown';
 
 type Key = 'nodes' | 'council' | 'contributors' | 'adopters';
 interface Props {
@@ -47,7 +48,6 @@ const initials = (name: string) => {
   const words = name.trim().split(/\s+/);
   return (words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0][0]).toUpperCase();
 };
-const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
 const sections = groups.map((k) => {
   const b = body(k);
@@ -181,31 +181,19 @@ const sections = groups.map((k) => {
                   {m.biography && (
                     <section>
                       <h3 class="label">Biography</h3>
-                      <div class="prose">
-                        {paragraphs(m.biography).map((t) => (
-                          <p>{t}</p>
-                        ))}
-                      </div>
+                      <div class="prose" set:html={renderPlain(m.biography)} />
                     </section>
                   )}
                   {m.role && (
                     <section>
                       <h3 class="label">Role within the movement</h3>
-                      <div class="prose">
-                        {paragraphs(m.role).map((t) => (
-                          <p>{t}</p>
-                        ))}
-                      </div>
+                      <div class="prose" set:html={renderPlain(m.role)} />
                     </section>
                   )}
                   {m.contribution && (
                     <section>
                       <h3 class="label">Contribution to New Contextualism</h3>
-                      <div class="prose">
-                        {paragraphs(m.contribution).map((t) => (
-                          <p>{t}</p>
-                        ))}
-                      </div>
+                      <div class="prose" set:html={renderPlain(m.contribution)} />
                     </section>
                   )}
                   {m.work.length > 0 && (

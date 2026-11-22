@@ -9,6 +9,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import RecordList from '../components/RecordList.astro';
 import { archiveRecords, eventIsUpcoming, listed, registry } from '../lib/content';
 import { HERO_PLATE } from '../lib/media';
+import { uploadedImage } from '../lib/profiles';
 import { settings } from '../lib/site';
 import { HOME, isPublic, sectionByKey } from '../lib/ia';
 import { STATUS_LABELS } from '../lib/provenance';
@@ -81,6 +82,11 @@ const community = open([
   { title: 'Discussions and responses', text: 'Critical questions raised about the approach, and how to add to them.', href: url('/community/discussions/') },
 ]);
 
+// The picture at the top: one chosen in Site settings, if it has alt text and a credit; otherwise the drawing.
+const home = settings.homeImage;
+const homeAsset = home?.alt?.trim() && home?.credit?.trim() ? uploadedImage(home.src ?? undefined, 'Home page image') : undefined;
+if (home?.src && !homeAsset) console.warn('Home page image: it needs alt text and a credit, so the drawing is shown instead.');
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -121,18 +127,24 @@ const jsonLd = {
           </p>
         </div>
       </div>
-      <Plate
-        class="hero__plate"
-        src={HERO_PLATE.src}
-        alt={HERO_PLATE.alt}
-        width={HERO_PLATE.width}
-        height={HERO_PLATE.height}
-        number="Plate I"
-        caption={HERO_PLATE.caption}
-        eager
-        reveal={false}
-        sizes="100vw"
-      />
+      {
+        homeAsset ? (
+          <Plate class="hero__plate" src={homeAsset} alt={home!.alt!} caption={home!.caption ?? undefined} credit={home!.credit!} eager reveal={false} sizes="100vw" />
+        ) : (
+          <Plate
+            class="hero__plate"
+            src={HERO_PLATE.src}
+            alt={HERO_PLATE.alt}
+            width={HERO_PLATE.width}
+            height={HERO_PLATE.height}
+            number="Plate I"
+            caption={HERO_PLATE.caption}
+            eager
+            reveal={false}
+            sizes="100vw"
+          />
+        )
+      }
     </div>
   </section>
 

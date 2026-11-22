@@ -13,6 +13,7 @@ import { pubYear } from '../../lib/cite';
 import { EVENT_TYPE_LABELS } from '../../lib/provenance';
 import { to } from '../../lib/routes';
 import Provenance from '../Provenance.astro';
+import { profileHref } from '../../lib/site';
 
 interface Props {
   name: 'contributors' | 'founder';
@@ -87,12 +88,19 @@ const ncWritings =
     <div class="contributors">
       <p class="small muted contributors__note">
         Compiled automatically from the records, projects and events on this platform. Names are given as they appear in the
-        sources. Inclusion records a contribution; it does not imply membership of any organisation.
+        sources. Inclusion records a contribution; it does not imply membership of any organisation. A name links to the
+        person’s profile where there is one.
       </p>
       <ol class="contributors__list" role="list">
         {contributors.map(([who, items]) => (
           <li>
-            <span class="contributors__name">{who}</span>
+            {profileHref(who) ? (
+              <a class="contributors__name contributors__name--link" href={profileHref(who)}>
+                {who}
+              </a>
+            ) : (
+              <span class="contributors__name">{who}</span>
+            )}
             <ul role="list">
               {items.map((c) => (
                 <li>
@@ -265,6 +273,18 @@ const ncWritings =
     font-family: var(--serif);
     font-size: 1.3125rem;
     line-height: 1.2;
+  }
+
+  a.contributors__name {
+    align-self: start;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.2em;
+  }
+
+  a.contributors__name:hover {
+    color: var(--brick);
+    text-decoration-color: currentColor;
   }
 
   .contributors__list ul {

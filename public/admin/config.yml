@@ -123,7 +123,7 @@ _page_fields: &page_fields
   - label: Text
     name: body
     widget: markdown
-    modes: [raw]
+    modes: [rich_text, raw]
     hint: >-
       Each sub-item of the page is a second-level heading (## Heading), spelt as in the site structure; the build checks
       them. Cite sources as [@record-file-name]. Mark missing material with a line beginning “> [!PENDING]”, and
@@ -202,6 +202,22 @@ collections:
             required: false
             hint: When off, every page asks search engines not to list it.
           - { label: Pre-publication note, name: prepublicationNote, widget: string, required: false, hint: Shown in the notice when the pre-publication edition is on. }
+          - label: Home page image (optional)
+            name: homeImage
+            widget: object
+            required: false
+            collapsed: true
+            hint: The large picture at the top of the home page. Leave empty to show the drawing. The picture is used only when its description and credit are filled in.
+            fields:
+              - { label: Image, name: src, widget: image, required: false, hint: 'JPG, PNG or WebP, landscape, at least 1800 pixels wide.' }
+              - { label: Describe the image (alt text), name: alt, widget: string, required: false }
+              - { label: Credit, name: credit, widget: string, required: false, hint: 'Photographer or rights holder.' }
+              - { label: Caption, name: caption, widget: string, required: false }
+          - label: Site icon (optional)
+            name: siteIcon
+            widget: image
+            required: false
+            hint: The small icon in browser tabs and next to the site in Google results. A square PNG, at least 192 × 192 pixels, works best. Leave empty for the default mark. Google takes days to weeks to show a new icon.
           - label: Contact email
             name: contactEmail
             widget: string
@@ -310,7 +326,7 @@ collections:
               - { label: Subtitle (a few words), name: role, widget: string }
               - { label: 'Short description (one or two lines, shown on the Governance page)', name: summary, widget: string, required: false }
               - { label: Page address (do not change), name: path, widget: string }
-              - { label: Full description (shown on the body’s own page), name: text, widget: text }
+              - { label: Full description (shown on the body’s own page), name: text, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [] }
 
       - name: profiles
         label: 'People (profiles)'
@@ -336,7 +352,7 @@ collections:
               - { label: Portrait photograph, name: photo, widget: image, required: false, hint: 'JPG, PNG or WebP, ideally upright (4:5). The photograph appears only when a credit is filled in below; until then initials are shown.' }
               - { label: Describe the photograph (alt text), name: photoAlt, widget: string, required: false }
               - { label: Photograph credit (required with a photograph), name: photoCredit, widget: string, required: false }
-              - { label: Biography, name: biography, widget: text, required: false, hint: Leave a blank line between paragraphs. }
+              - { label: Biography, name: biography, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false }
               - label: Relevant work
                 name: work
                 widget: list
@@ -380,7 +396,7 @@ collections:
                 display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false, hint: In this group. }
 
       - name: practice-policy-council
         label: Practice & Policy Council (members)
@@ -409,7 +425,7 @@ collections:
                 display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
+              - { label: Contribution to New Contextualism, name: contribution, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false, hint: In this group. }
 
       - name: student-nexus
         label: NC Student Nexus (directory)
@@ -459,8 +475,8 @@ collections:
                 display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
-              - { label: Role within the movement, name: role, widget: text, required: false }
+              - { label: Contribution to New Contextualism, name: contribution, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false, hint: In this group. }
+              - { label: Role within the movement, name: role, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false }
 
       - name: early-adopters
         label: Early Adopters (members)
@@ -489,8 +505,8 @@ collections:
                 display_fields: ['entries.*.name']
               - *status
               - *publish_at
-              - { label: Contribution to New Contextualism, name: contribution, widget: text, required: false, hint: In this group. }
-              - { label: Role within the movement, name: role, widget: text, required: false }
+              - { label: Contribution to New Contextualism, name: contribution, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false, hint: In this group. }
+              - { label: Role within the movement, name: role, widget: markdown, modes: [rich_text, raw], buttons: [bold, italic, link, bulleted-list, numbered-list], editor_components: [], required: false }
   - name: dimensions
     label: The ten layers
     label_singular: Layer

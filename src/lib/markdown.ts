@@ -46,7 +46,9 @@ marked.use({
 const ENTITIES: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
 const decodeEntities = (s: string) => s.replace(/&(?:amp|lt|gt|quot|#39);/g, (e) => ENTITIES[e]);
 
-const CITATION = /\[(@[\w.-]+(?:\s*;\s*@[\w.-]+)*)\]/g;
+// The rich-text editor saves a citation as \[@key] and may escape _ in a key; both forms are read.
+const CITATION = /\\?\[(@[\w.\\-]+(?:\s*;\s*@[\w.\\-]+)*)\\?\]/g;
+const cleanKey = (k: string) => k.trim().replace(/\\/g, '').replace(/^@/, '');
 
 export interface CiteContext {
   /** Returns the author–date label for a key; throws for unknown keys. */
@@ -57,7 +59,7 @@ export interface CiteContext {
 
 function citations(src: string, ctx: CiteContext): string {
   return src.replace(CITATION, (_match, group: string) => {
-    const keys = group.split(';').map((k) => k.trim().replace(/^@/, ''));
+    const keys = group.split(';').map(cleanKey);
     const links = keys.map((key) => {
       const label = ctx.label(key);
       ctx.onCite?.(key);
@@ -73,6 +75,12 @@ export function renderMarkdown(src: string | undefined, ctx: CiteContext): strin
   return marked.parse(citations(src, ctx), { async: false }) as string;
 }
 
+/** Markdown without citations, for profile and description texts written in the rich-text editor. */
+export function renderPlain(src: string | undefined): string {
+  if (!src?.trim()) return '';
+  return marked.parse(src, { async: false }) as string;
+}
+
 export function renderInline(src: string | undefined, ctx: CiteContext): string {
   if (!src?.trim()) return '';
   return marked.parseInline(citations(src, ctx), { async: false }) as string;
@@ -84,7 +92,7 @@ export function citedKeys(src: string | undefined): string[] {
   const out: string[] = [];
   for (const m of src.matchAll(CITATION)) {
     for (const k of m[1].split(';')) {
-      const key = k.trim().replace(/^@/, '');
+      const key = cleanKey(k);
       if (!out.includes(key)) out.push(key);
     }
   }

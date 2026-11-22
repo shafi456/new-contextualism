@@ -23,7 +23,7 @@ interface Entry {
 
 const clip = (s: string, n = 1200) => (s.length > n ? `${s.slice(0, n)}…` : s);
 // Module markers and callout markers are not part of the text.
-const text = (md: string | undefined) => stripMarkdown((md ?? '').replace(/<!--[\s\S]*?-->/g, ' ').replace(/\[!(PENDING|NOTE)\]/g, ' '));
+const text = (md: string | undefined) => stripMarkdown((md ?? '').replace(/<!--[\s\S]*?-->/g, ' ').replace(/\\?\[!(PENDING|NOTE)\\?\]/g, ' ').replace(/\\([[\]_*])/g, '$1'));
 
 export const GET: APIRoute = async () => {
   const reg = await registry();
