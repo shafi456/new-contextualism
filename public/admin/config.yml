@@ -123,12 +123,15 @@ _page_fields: &page_fields
   - label: Text
     name: body
     widget: markdown
-    modes: [rich_text, raw]
+    # Markdown only: the rich-text editor of Decap CMS can crash on long pages
+    # with links, notes and module markers ("Cannot find a descendant at path";
+    # decaporg/decap-cms#8056). Short profile texts keep rich text.
+    modes: [raw]
     hint: >-
-      Each sub-item of the page is a second-level heading (## Heading), spelt as in the site structure; the build checks
-      them. Cite sources as [@record-file-name]. Mark missing material with a line beginning “> [!PENDING]”, and
-      editorial notes with “> [!NOTE]”. Diagrams and lists are inserted with markers such as <!-- module: chronology -->;
-      see README.md for the list of modules.
+      Use the buttons above the text for bold, italic, links, headings and lists. Sub-headings are written as “## Heading”.
+      Cite sources as [@record-file-name]. Mark missing material with a line beginning “> [!PENDING]”, and editorial
+      notes with “> [!NOTE]”. Lines such as <!-- module: chronology --> insert diagrams and lists; please leave them in
+      place.
 
 _page_collection: &page_collection
   create: false
