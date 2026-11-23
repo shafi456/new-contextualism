@@ -16,6 +16,7 @@ Context therefore extends beyond physical surroundings. It encompasses the socia
 The objective is not to reproduce existing forms or preserve every existing condition unchanged. Rather, it is to interpret the underlying relationships, values, knowledge, and processes that give a place its identity, and use them to inform appropriate contemporary interventions. 
 
 ## Why New Contextualism?
+
 Architectural and urban development has frequently been influenced by universal design models that are transferred between places without sufficient consideration of their local conditions. Although these approaches have contributed to technological advancement and new architectural possibilities, their application can sometimes produce environments disconnected from local climate, culture, livelihoods, and community needs.
 
 Conventional contextual approaches have also tended to prioritise visible relationships such as scale, proportion, materials, and architectural character. While these considerations remain important, they do not necessarily address the deeper ecological, social, historical, and economic systems that shape a place.
@@ -33,5 +34,3 @@ Its scope is also temporal, connecting historical knowledge, contemporary condit
 The philosophy draws upon architecture, urbanism, environmental science, sociology, anthropology, history, economics, and related fields. It encourages the integration of diverse forms of knowledge into a coherent design process.
 
 Its intellectual contribution lies in establishing contextual understanding as a comprehensive foundation for architectural and urban decision-making, while placing particular emphasis on sustainability, equity, cultural identity, and long-term resilience.
-
-
